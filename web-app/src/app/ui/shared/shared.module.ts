@@ -4,13 +4,17 @@ import {AppIndexLayoutComponent} from './layouts/app-index-layout/app-index-layo
 import {AppAdminLayoutComponent} from './layouts/app-admin-layout/app-admin-layout.component';
 import {RouterModule} from '@angular/router';
 import { AppLoadingComponent } from './components/app-loading/app-loading.component';
+import { AppNavbarComponent } from './components/app-navbar/app-navbar.component';
+import { AppFooterComponent } from './components/app-footer/app-footer.component';
 
 
 @NgModule({
   declarations: [
     AppIndexLayoutComponent,
     AppAdminLayoutComponent,
-    AppLoadingComponent
+    AppLoadingComponent,
+    AppNavbarComponent,
+    AppFooterComponent
   ],
   imports: [
     CommonModule,
