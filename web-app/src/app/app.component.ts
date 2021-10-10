@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {environment} from '../environments/environment';
+import {PrimeNGConfig} from 'primeng/api';
 
 @Component({
   selector: 'app-root',
@@ -9,11 +10,14 @@ import {environment} from '../environments/environment';
 })
 export class AppComponent implements OnInit {
   constructor(
-    private readonly router: Router
+    private readonly router: Router,
+    private primengConfig: PrimeNGConfig
   ) {
   }
 
   ngOnInit(): void {
+    this.primengConfig.ripple = true;
+
     if (environment.production)
       AppComponent.disableBrowserDeveloperTools();
 
