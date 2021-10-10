@@ -6,6 +6,7 @@ import {Component, OnInit} from '@angular/core';
   styleUrls: ['./app-index-layout.component.scss']
 })
 export class AppIndexLayoutComponent implements OnInit {
+  isLoading = false;
 
   constructor() {
   }

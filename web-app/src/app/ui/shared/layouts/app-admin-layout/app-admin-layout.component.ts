@@ -6,6 +6,7 @@ import {Component, OnInit} from '@angular/core';
   styleUrls: ['./app-admin-layout.component.scss']
 })
 export class AppAdminLayoutComponent implements OnInit {
+  isLoading = false;
 
   constructor() {
   }
