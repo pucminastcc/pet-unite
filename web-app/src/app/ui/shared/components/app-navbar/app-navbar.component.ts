@@ -1,15 +1,20 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Location} from '@angular/common';
 
 @Component({
   selector: 'app-navbar',
   templateUrl: './app-navbar.component.html',
-  styleUrls: ['./app-navbar.component.scss']
+  styleUrls: ['./app-navbar.component.scss'],
+  providers: [Location]
 })
-export class AppNavbarComponent implements OnInit {
+export class AppNavbarComponent {
+  @Input() title: string = '';
+  @Output() onButtonToggleClick: EventEmitter<boolean> = new EventEmitter<boolean>();
+
   constructor() {
   }
 
-  ngOnInit(): void {
+  public toggle(): void {
+    this.onButtonToggleClick.emit(true);
   }
-
 }

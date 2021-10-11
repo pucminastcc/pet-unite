@@ -1,0 +1,32 @@
+<div class="sidebar" data-background-color="white" data-color="danger" data-image="./assets/img/sidebar-1.jpg">
+  <div class="logo">
+    <a class="simple-text" href="javascript:void(0)">
+      <div class="logo-normal">
+        <img alt="Logo" height="125" src="./assets/img/angular.png"/>
+      </div>
+    </a>
+  </div>
+  <div class="sidebar-wrapper">
+    <ul class="nav">
+      <li *ngFor="let menuItem of menuItems" class="nav-item" routerLinkActive="active">
+        <a (click)="clickMenuItem()" [routerLink]="menuItem.path" class="nav-link">
+          <i class="{{menuItem.icon}}" style="font-size: 1.25rem"></i>
+          <p>{{menuItem.title}}</p>
+        </a>
+      </li>
+    </ul>
+    <div *ngIf="isMobileMenu()">
+      <ul class="nav navbar-nav nav-mobile-menu">
+        <li class="nav-item">
+          <a class="nav-link" href="javascript:void(0)">
+            <i class="d-lg-none d-md-block pi pi-sign-out"></i>
+            <p>
+              <span class="d-lg-none d-md-block">Logout</span>
+            </p>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="sidebar-background" style="background-image: url('./assets/img/sidebar-4.jpg')"></div>
+</div>

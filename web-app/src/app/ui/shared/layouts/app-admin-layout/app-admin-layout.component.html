@@ -1,4 +1,12 @@
 <app-loading [isLoading]="isLoading">
-  <p>app-admin-layout works!</p>
-  <router-outlet></router-outlet>
+  <div class="wrapper">
+    <app-sidebar (onMenuItemClick)="onEventEmit($event)" [menuItems]="sidebarMenuItem"></app-sidebar>
+    <div class="main-panel">
+      <app-navbar (onButtonToggleClick)="onEventEmit($event)" [title]="getTitle()"></app-navbar>
+      <div class="content">
+        <router-outlet></router-outlet>
+        <app-footer></app-footer>
+      </div>
+    </div>
+  </div>
 </app-loading>

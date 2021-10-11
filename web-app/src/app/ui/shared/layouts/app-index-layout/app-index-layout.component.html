@@ -1,6 +1,10 @@
 <app-loading [isLoading]="isLoading">
-  <app-navbar></app-navbar>
-  <router-outlet></router-outlet>
+  <header>
+    <app-navbar></app-navbar>
+  </header>
+  <main>
+    <router-outlet></router-outlet>
+  </main>
   <app-footer></app-footer>
 </app-loading>
 
