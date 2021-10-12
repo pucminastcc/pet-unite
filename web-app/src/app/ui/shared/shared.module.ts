@@ -7,6 +7,8 @@ import {AppLoadingComponent} from './components/app-loading/app-loading.componen
 import {AppNavbarComponent} from './components/app-navbar/app-navbar.component';
 import {AppFooterComponent} from './components/app-footer/app-footer.component';
 import {AppSidebarComponent} from './components/app-sidebar/app-sidebar.component';
+import {ButtonModule} from 'primeng/button';
+import {MenuModule} from 'primeng/menu';
 
 
 @NgModule({
@@ -20,7 +22,9 @@ import {AppSidebarComponent} from './components/app-sidebar/app-sidebar.componen
   ],
   imports: [
     CommonModule,
-    RouterModule
+    RouterModule,
+    ButtonModule,
+    MenuModule
   ],
   exports: [
     AppIndexLayoutComponent,

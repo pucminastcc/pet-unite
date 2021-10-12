@@ -14,9 +14,9 @@ export class AppAdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy
   public sidebarMenuItem: SidebarMenuItemModel[] = [];
 
   private location: Location;
-  private toggleButton: any;
-  private layer: any;
-  private body: any;
+  private toggleButton: HTMLElement = document.createElement('div');
+  private layer: HTMLElement = document.createElement('div');
+  private body: HTMLElement = document.createElement('div');
   private sidebarVisible: boolean = false;
 
   constructor(
@@ -33,9 +33,9 @@ export class AppAdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy
 
   ngAfterViewInit(): void {
     const navbar: HTMLElement = this.element.nativeElement;
-    this.toggleButton = navbar.getElementsByClassName('navbar-toggler')[0];
-    this.body = document.getElementsByTagName('body')[0];
-    this.layer = document.getElementsByClassName('close-layer')[0];
+    this.toggleButton = navbar.getElementsByClassName('navbar-toggler')[0] as HTMLElement;
+    this.body = document.getElementsByTagName('body')[0] as HTMLElement;
+    this.layer = document.getElementsByClassName('close-layer')[0] as HTMLElement;
 
     this.sidebarClose();
     if (this.layer) {
@@ -58,7 +58,8 @@ export class AppAdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   public sidebarOpen(): void {
-    setTimeout(() => this.toggleButton.classList.add('toggled'), 500);
+    const toggleButton = this.toggleButton;
+    setTimeout(() => toggleButton.classList.add('toggled'), 500);
     this.body.classList.add('nav-open');
     this.sidebarVisible = true;
   }
@@ -105,6 +106,7 @@ export class AppAdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy
         setTimeout(() => {
           this.layer.remove();
           this.toggleButton.classList.remove('toggled');
+          this.sidebarVisible = false;
         }, 400);
       };
 
@@ -124,10 +126,5 @@ export class AppAdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy
       }
     }
     return 'Dashboard';
-  }
-
-  public onEventEmit(event: boolean): void {
-    if (event)
-      this.sidebarToggle();
   }
 }

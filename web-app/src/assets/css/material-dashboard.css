@@ -26,6 +26,7 @@
           box-sizing: border-box; }
 
 html {
+  scroll-behavior: smooth;
   font-family: sans-serif;
   line-height: 1.15;
   -webkit-text-size-adjust: 100%;
@@ -11185,7 +11186,7 @@ fieldset[disabled] .form-group .form-control {
   .navbar .navbar-brand {
     position: relative;
     color: inherit;
-    height: 50px;
+    height: auto;
     font-size: 1.125rem;
     line-height: 30px;
     padding: 0.625rem 0;

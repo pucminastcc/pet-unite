@@ -1,5 +1,8 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Location} from '@angular/common';
+import {Router} from '@angular/router';
+import {NavbarMenuItemModel} from '../../../../domain/shared/components/app-navbar/models/navbar-menu-item.model';
+import {MenuItem} from 'primeng/api';
 
 @Component({
   selector: 'app-navbar',
@@ -7,14 +10,41 @@ import {Location} from '@angular/common';
   styleUrls: ['./app-navbar.component.scss'],
   providers: [Location]
 })
-export class AppNavbarComponent {
+export class AppNavbarComponent implements OnInit {
+  items: MenuItem[] = [];
+  @Input() class: string = '';
   @Input() title: string = '';
-  @Output() onButtonToggleClick: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Input() containerFluid: boolean = true;
+  @Input() showLoginButton: boolean = false;
+  @Input() user: any = undefined;
+  @Input() menuItems: NavbarMenuItemModel[] = [];
+  @Output() onToggleButtonClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() onLoginButtonClick: EventEmitter<any> = new EventEmitter<any>();
 
-  constructor() {
+  constructor(
+    private readonly router: Router
+  ) {
+  }
+
+  ngOnInit(): void {
+    this.items = [
+      {label: 'New', icon: 'pi pi-fw pi-plus'},
+      {label: 'Download', icon: 'pi pi-fw pi-download'}
+    ];
+  }
+
+  public navigate(path: string): void {
+    this.toggle();
+    this.router.onSameUrlNavigation = 'reload';
+    this.router.navigate([path]).then(() => {
+    });
   }
 
   public toggle(): void {
-    this.onButtonToggleClick.emit(true);
+    this.onToggleButtonClick.emit();
+  }
+
+  public login(): void {
+    this.onLoginButtonClick.emit();
   }
 }

@@ -1,7 +1,14 @@
-<nav class="navbar navbar-expand-lg navbar-light navbar-absolute fixed-top">
-  <div class="container-fluid">
+<nav class="navbar navbar-expand-lg {{class}}">
+  <div class="{{containerFluid ? 'container-fluid' : 'container'}}">
     <div class="navbar-wrapper">
-      <a class="navbar-brand" href="javascript:void(0)">{{title}}</a>
+      <a class="navbar-brand {{title === '' ? 'p-0 m-0' : ''}}" href="{{title === '' ? '/' : 'javascript:void(0)'}}">
+        <span *ngIf="title === '';else titleBlock">
+          <img alt="Logo" height="50" src="https://angular.io/assets/images/logos/angular/shield-large.svg">NGULAR
+        </span>
+        <ng-template #titleBlock>
+          {{title}}
+        </ng-template>
+      </a>
     </div>
     <div (click)="toggle()" class="navbar-toggler p-2" type="button">
       <span class="sr-only">Toggle navigation</span>
@@ -9,5 +16,22 @@
       <span class="navbar-toggler-icon icon-bar"></span>
       <span class="navbar-toggler-icon icon-bar"></span>
     </div>
+    <ul class="navbar-nav rounded p-fluid p-2">
+      <li *ngFor="let menuItem of menuItems" class="nav-item">
+        <button (click)="navigate(menuItem.path)"
+                [class]="'p-button p-button-text p-button-rounded text-light' + menuItem.class" [icon]="menuItem.icon"
+                [label]="menuItem.title" iconPos="left" pButton>
+        </button>
+      </li>
+      <li *ngIf="!user;else userBlock;" class="nav-item">
+        <button *ngIf="showLoginButton" class="p-button p-button-rounded p-button-raised text-light mx-lg-2 my-1"
+                icon="fas fa-sign-in-alt" iconPos="left" label="Login" pButton>
+        </button>
+      </li>
+      <ng-template #userBlock>
+        <li class="nav-item">
+        </li>
+      </ng-template>
+    </ul>
   </div>
 </nav>

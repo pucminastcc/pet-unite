@@ -1,0 +1,22 @@
+.navbar-nav {
+  display: flex;
+  justify-content: space-between;
+}
+
+@media only screen and (max-width: 990px) {
+  .navbar-nav {
+    position: fixed;
+    right: -125%;
+    top: 3.5rem;
+    flex-direction: column;
+    background-color: #2e2e2e;
+    width: 100%;
+    text-align: center;
+    transition: 0.3s;
+    box-shadow: 0 10px 27px rgba(0, 0, 0, 0.5);
+  }
+
+  .navbar-nav.active {
+    right: 0;
+  }
+}

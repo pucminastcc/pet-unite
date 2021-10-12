@@ -1,8 +1,11 @@
 <app-loading [isLoading]="isLoading">
   <div class="wrapper">
-    <app-sidebar (onMenuItemClick)="onEventEmit($event)" [menuItems]="sidebarMenuItem"></app-sidebar>
+    <app-sidebar (onMenuItemClick)="sidebarToggle()" [menuItems]="sidebarMenuItem">
+    </app-sidebar>
     <div class="main-panel">
-      <app-navbar (onButtonToggleClick)="onEventEmit($event)" [title]="getTitle()"></app-navbar>
+      <app-navbar (onToggleButtonClick)="sidebarToggle()" [title]="getTitle()" [user]="undefined"
+                  class="navbar-light navbar-absolute">
+      </app-navbar>
       <div class="content">
         <router-outlet></router-outlet>
         <app-footer></app-footer>

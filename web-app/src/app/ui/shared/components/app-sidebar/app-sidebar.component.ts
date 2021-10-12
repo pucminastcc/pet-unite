@@ -8,7 +8,7 @@ import {SidebarMenuItemModel} from '../../../../domain/shared/components/app-sid
 })
 export class AppSidebarComponent implements OnInit {
   @Input() menuItems: SidebarMenuItemModel[] = [];
-  @Output() onMenuItemClick: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Output() onMenuItemClick: EventEmitter<any> = new EventEmitter<any>();
 
   constructor() {
   }
@@ -21,6 +21,6 @@ export class AppSidebarComponent implements OnInit {
   };
 
   public clickMenuItem(): void {
-    this.onMenuItemClick.emit(true);
+    this.onMenuItemClick.emit();
   }
 }
