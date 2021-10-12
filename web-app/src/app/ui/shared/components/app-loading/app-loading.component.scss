@@ -1,0 +1,78 @@
+.loading {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1040;
+  background: #2e2e2e;
+  place-items: center;
+  display: grid;
+}
+
+.loading__area {
+  perspective: 200px;
+  transform-style: preserve-3d;
+}
+
+.loading__box {
+  width: 20vmin;
+  height: 20vmin;
+  background-color: hsla(170, 50%, 50%, 0.5);
+  transform: rotateZ(30deg) skew(-35deg);
+  position: relative;
+  animation: animate 1000ms infinite ease-in-out both alternate;
+}
+
+.loading__box:nth-of-type(1) {
+  animation-delay: 0.1s;
+}
+
+.loading__box:nth-of-type(2) {
+  animation-delay: 0.2s;
+}
+
+.loading__box:nth-of-type(3) {
+  animation-delay: 0.3s;
+}
+
+.loading__box:nth-of-type(4) {
+  animation-delay: 0.4s;
+}
+
+.loading__box::after, .loading__box::before {
+  content: "";
+  width: inherit;
+  height: 5px;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  transform-origin: left bottom;
+}
+
+.loading__box::before {
+  background-color: hsla(170, 50%, 50%, 0.7);
+  transform-origin: left bottom;
+  transform: translateX(20vmin) rotateZ(180deg) skew(45deg);
+}
+
+.loading__box::after {
+  background-color: hsla(170, 50%, 50%, 0.5);
+  transform-origin: right bottom;
+  transform: translateX(0) rotateZ(90deg) skew(-45deg);
+}
+
+.loading__box + .loading__box {
+  top: 0;
+  position: absolute;
+  transform: translateX(0) rotateZ(30deg) skew(-35deg);
+}
+
+@keyframes animate {
+  from {
+    transform: translatey(0) rotateZ(30deg) skew(-35deg);
+  }
+  to {
+    transform: translateY(-20vmin) rotateZ(30deg) skew(-35deg);
+  }
+}

@@ -1,2 +1,15 @@
-<p>app-admin-layout works!</p>
-<router-outlet></router-outlet>
+<app-loading [isLoading]="isLoading">
+  <div class="wrapper">
+    <app-sidebar (onMenuItemClick)="sidebarToggle()" [menuItems]="sidebarMenuItem">
+    </app-sidebar>
+    <div class="main-panel">
+      <app-navbar (onToggleButtonClick)="sidebarToggle()" [title]="getTitle()" [user]="undefined"
+                  class="navbar-light navbar-absolute">
+      </app-navbar>
+      <div class="content">
+        <router-outlet></router-outlet>
+        <app-footer></app-footer>
+      </div>
+    </div>
+  </div>
+</app-loading>
