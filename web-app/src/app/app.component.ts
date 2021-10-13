@@ -19,13 +19,10 @@ export class AppComponent implements OnInit {
     this.primengConfig.ripple = true;
 
     if (environment.production)
-      AppComponent.disableBrowserDeveloperTools();
-
-    // this.router.navigate(['/']).then(() => {
-    // });
+      this.disableBrowserDeveloperTools();
   }
 
-  private static disableBrowserDeveloperTools(): void {
+  private disableBrowserDeveloperTools(): void {
     window.document.onkeydown = (e: KeyboardEvent) => !((e.keyCode === 123)
       || (e.ctrlKey && e.keyCode === 85)
       || (e.ctrlKey && e.shiftKey && e.keyCode === 74)

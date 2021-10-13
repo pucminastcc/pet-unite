@@ -24,8 +24,9 @@
         </button>
       </li>
       <li *ngIf="!user;else userBlock;" class="nav-item">
-        <button *ngIf="showLoginButton" class="p-button p-button-rounded p-button-raised text-light mx-lg-2 my-1"
-                icon="fas fa-sign-in-alt" iconPos="left" label="Login" pButton>
+        <button (click)="login()" *ngIf="showLoginButton"
+                class="p-button p-button-rounded p-button-raised text-light mx-lg-2 my-1" icon="fas fa-sign-in-alt"
+                iconPos="left" label="Login" pButton>
         </button>
       </li>
       <ng-template #userBlock>

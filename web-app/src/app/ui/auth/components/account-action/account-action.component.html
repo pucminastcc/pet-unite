@@ -1,0 +1,13 @@
+<ng-container [ngSwitch]="accountAction">
+  <app-login (onSelectAccountAction)="getAccountAction($event)"
+             *ngSwitchCase="accountActionEnum.Login">
+  </app-login>
+
+  <app-register (onSelectAccountAction)="getAccountAction($event)"
+                *ngSwitchCase="accountActionEnum.Register">
+  </app-register>
+
+  <app-password-recovery (onSelectAccountAction)="getAccountAction($event)"
+                         *ngSwitchCase="accountActionEnum.PasswordRecovery">
+  </app-password-recovery>
+</ng-container>

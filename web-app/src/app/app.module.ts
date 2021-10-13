@@ -3,12 +3,10 @@ import {BrowserModule} from '@angular/platform-browser';
 
 import {AppRoutes} from './app-routing.module';
 import {AppComponent} from './app.component';
-import {CoreModule} from './core/core.module';
-import {DataModule} from './data/data.module';
-import {DomainModule} from './domain/domain.module';
 import {SharedModule} from './ui/shared/shared.module';
 import {HashLocationStrategy, LocationStrategy} from '@angular/common';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {AuthModule} from './ui/auth/auth.module';
 
 @NgModule({
   declarations: [
@@ -18,13 +16,11 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
     BrowserModule,
     BrowserAnimationsModule,
     AppRoutes,
-    CoreModule,
-    DataModule,
-    DomainModule,
+    AuthModule,
     SharedModule
   ],
   providers: [
-    {provide: LocationStrategy, useClass: HashLocationStrategy}
+    {provide: LocationStrategy, useClass: HashLocationStrategy},
   ],
   bootstrap: [AppComponent]
 })
