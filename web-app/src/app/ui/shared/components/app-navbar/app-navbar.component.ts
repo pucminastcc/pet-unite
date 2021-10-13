@@ -2,7 +2,6 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Location} from '@angular/common';
 import {Router} from '@angular/router';
 import {NavbarMenuItemModel} from '../../../../domain/shared/components/app-navbar/models/navbar-menu-item.model';
-import {MenuItem} from 'primeng/api';
 
 @Component({
   selector: 'app-navbar',
@@ -11,7 +10,6 @@ import {MenuItem} from 'primeng/api';
   providers: [Location]
 })
 export class AppNavbarComponent implements OnInit {
-  items: MenuItem[] = [];
   @Input() class: string = '';
   @Input() title: string = '';
   @Input() containerFluid: boolean = true;
@@ -27,10 +25,6 @@ export class AppNavbarComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.items = [
-      {label: 'New', icon: 'pi pi-fw pi-plus'},
-      {label: 'Download', icon: 'pi pi-fw pi-download'}
-    ];
   }
 
   public navigate(path: string): void {

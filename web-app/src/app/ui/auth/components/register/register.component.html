@@ -1,0 +1,66 @@
+<div class="p-grid p-fluid">
+  <form (ngSubmit)="register()" [formGroup]="registerForm">
+    <div class="p-col-12 p-md-12 mt-2">
+      <span class="p-input-icon-left">
+        <i class="pi pi-envelope"></i>
+        <input #emailInput [formControl]="rf.email" [spellcheck]="false" class="p-inputtext p-inputtext-sm rounded"
+               pInputText
+               placeholder="Email" type="text">
+      </span>
+      <div *ngIf="!rf.email.valid && (rf.email.dirty || submitted)">
+        <p-message *ngIf="rf.email.errors.required" severity="error" text="Informe o email"></p-message>
+        <p-message *ngIf="rf.email.errors.email" severity="error" text="Informe um email válido"></p-message>
+      </div>
+    </div>
+    <div class="p-col-12 p-md-12 mt-3">
+      <span class="p-input-icon-left">
+        <i class="pi pi-user"></i>
+        <input #usernameInput [formControl]="rf.username" [spellcheck]="false"
+               class="p-inputtext p-inputtext-sm rounded" pInputText
+               placeholder="Usuário" type="text">
+      </span>
+      <div *ngIf="!rf.username.valid && (rf.username.dirty || submitted)">
+        <p-message *ngIf="rf.username.errors.required" severity="error" text="Informe o usuário"></p-message>
+      </div>
+    </div>
+    <div class="p-col-12 p-md-12 mt-3">
+      <span class="p-input-icon-left">
+        <i class="pi pi-lock"></i>
+        <input #passwordInput [formControl]="rf.password" type="password" class="p-inputtext p-inputtext-sm rounded"
+               pPassword
+               placeholder="Senha">
+      </span>
+      <div *ngIf="!rf.password.valid && (rf.password.dirty || submitted)">
+        <p-message *ngIf="rf.password.errors.required" severity="error" text="Informe a senha"></p-message>
+        <p-message *ngIf="rf.password.errors.minlength" severity="error" text="Mínimo de 8 caracteres"></p-message>
+        <p-message *ngIf="rf.password.errors.maxlength" severity="error" text="Máximo de 16 caracteres"></p-message>
+      </div>
+    </div>
+    <div class="p-col-12 p-md-12 mt-3">
+      <span class="p-input-icon-left">
+        <i class="pi pi-lock"></i>
+        <input #confirmPasswordInput [formControl]="rf.confirmPassword" type="password"
+               class="p-inputtext p-inputtext-sm rounded" pPassword placeholder="Confirmação Senha">
+      </span>
+      <div *ngIf="!rf.confirmPassword.valid && (rf.confirmPassword.dirty || submitted)">
+        <p-message *ngIf="rf.confirmPassword.errors.required" severity="error" text="Confirme a senha"></p-message>
+        <p-message *ngIf="rf.confirmPassword.errors.mustMatch" severity="error"
+                   text="Senhas não correspondem"></p-message>
+      </div>
+    </div>
+    <div class="p-col-12 p-md-12 d-flex mt-3">
+      <p-checkbox [formControl]="rf.terms" [binary]="true"></p-checkbox>
+      <div class="ml-1 font-weight-normal"><a href="#">Termos de uso e serviços</a></div>
+    </div>
+    <button [disabled]="isLoading" [loading]="isLoading"
+            class="p-button p-button-success p-button-raised p-button-rounded mt-4" icon="fas fa-user-plus"
+            iconPos="left" [label]="!isLoading ? 'Cadastrar' : 'Aguarde...'" pButton type="submit">
+    </button>
+  </form>
+</div>
+<hr>
+<button (click)="selectAccountAction(accountActionEnum.Login, 'Login')" [disabled]="isLoading"
+        class="p-button p-button-outlined p-button-secondary p-button-rounded p-button-sm mt-1"
+        icon="fas fa-angle-double-left" label="Login" pButton type="button">
+</button>
+

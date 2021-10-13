@@ -1,5 +1,6 @@
 import {Injectable} from '@angular/core';
 import {StorageService} from './storage.service';
+import jwtDecode from 'jwt-decode';
 
 @Injectable({
   providedIn: 'root'
@@ -23,5 +24,15 @@ export class LocalService {
     localStorage.clear();
     this.storageService.secureStorage.clear();
     return;
+  }
+
+  decodePayloadJwt(accessToken: string): any {
+    let result: any;
+    try {
+      result = jwtDecode(accessToken);
+    } catch (Error) {
+      return null;
+    }
+    return result;
   }
 }

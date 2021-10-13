@@ -1,0 +1,47 @@
+<div class="p-grid p-fluid">
+  <form (ngSubmit)="login()" [formGroup]="loginForm">
+    <div class="p-col-12 p-md-12 mt-4">
+      <span class="p-input-icon-left">
+        <i class="pi pi-envelope"></i>
+        <input #emailInput [formControl]="lf.email" [spellcheck]="false" class="p-inputtext p-inputtext-sm rounded"
+               pInputText placeholder="Email" type="text">
+      </span>
+      <div *ngIf="!lf.email.valid && (lf.email.dirty || submitted)">
+        <p-message *ngIf="lf.email.errors.required" severity="error" text="Informe o email"></p-message>
+        <p-message *ngIf="lf.email.errors.email" severity="error" text="Informe um email válido"></p-message>
+      </div>
+    </div>
+    <div class="p-col-12 p-md-12 mt-3">
+      <span class="p-input-icon-left">
+        <i class="pi pi-lock"></i>
+        <input #passwordInput [formControl]="lf.password" type="password" class="p-inputtext p-inputtext-sm rounded"
+               pPassword placeholder="Senha">
+      </span>
+      <div *ngIf="!lf.password.valid && (lf.password.dirty || submitted)">
+        <p-message *ngIf="lf.password.errors.required" severity="error" text="Informe a senha"></p-message>
+      </div>
+    </div>
+    <div class="p-col-12 p-md-12 mt-3">
+      <div class="float-left">
+        <button (click)="selectAccountAction(accountActionEnum.Register, 'Cadastro')" [disabled]="isLoading"
+                class="p-button p-button-success p-button-outlined p-button-rounded p-button-sm" label="Criar conta"
+                pButton type="button">
+        </button>
+      </div>
+      <div class="float-right">
+        <button (click)="selectAccountAction(accountActionEnum.PasswordRecovery, 'Recuperação de Senha')"
+                [disabled]="isLoading" class="p-button p-button-info p-button-outlined p-button-rounded p-button-sm"
+                label="Esqueceu sua senha?" pButton type="button">
+        </button>
+      </div>
+    </div>
+    <button [disabled]="isLoading" [loading]="isLoading" class="p-button p-button-raised p-button-rounded mt-4"
+            icon="fas fa-sign-in-alt" iconPos="left" [label]="!isLoading ? 'Entrar' : 'Aguarde...'" pButton type="submit">
+    </button>
+  </form>
+  <button (click)="facebookLogin()" [disabled]="isLoading"
+          [ngStyle]="{backgroundColor:'var(--indigo-500)', borderColor:'var(--indigo-500)'}"
+          class="p-button p-button-raised p-button-rounded" icon="pi pi-facebook" iconPos="left" label="Facebook"
+          pButton>
+  </button>
+</div>
