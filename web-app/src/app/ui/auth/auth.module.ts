@@ -5,7 +5,7 @@ import {AuthRoutingModule} from './auth-routing.module';
 import {AccountActionComponent} from './components/account-action/account-action.component';
 import {LoginComponent} from './components/login/login.component';
 import {RegisterComponent} from './components/register/register.component';
-import {PasswordRecoveryComponent} from './components/password-recovery/password-recovery.component';
+import {PasswordResetComponent} from './components/password-reset/password-reset.component';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {FormBuilderTypeSafe} from 'angular-typesafe-reactive-forms-helper';
 import {ButtonModule} from 'primeng/button';
@@ -21,7 +21,7 @@ import {CheckboxModule} from 'primeng/checkbox';
     AccountActionComponent,
     LoginComponent,
     RegisterComponent,
-    PasswordRecoveryComponent
+    PasswordResetComponent
   ],
   imports: [
     CommonModule,

@@ -1,16 +1,23 @@
-import {Module} from '@nestjs/common';
+import {Global, Module} from '@nestjs/common';
 import {AuthRepository} from './auth/repositories/auth.repository';
-import {PetRepository} from './pet/respositories/pet.repository';
+import {MongooseModule} from '@nestjs/mongoose';
+import {UserSchema} from 'libs/core/lib/database/schemas/user.schema';
+import {PasswordResetSchema} from 'libs/core/lib/database/schemas/password-reset.schema';
 
+@Global()
 @Module({
+    imports: [
+        MongooseModule.forFeature([
+            {name: 'User', schema: UserSchema},
+            {name: 'PasswordReset', schema: PasswordResetSchema},
+        ])
+    ],
     exports: [
-        AuthRepository,
-        PetRepository
+        AuthRepository
     ],
     providers: [
-        AuthRepository,
-        PetRepository
-    ],
+        AuthRepository
+    ]
 })
 export class InfraModule {
 }

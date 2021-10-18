@@ -9,8 +9,12 @@ import {map} from 'rxjs/operators';
 import {LocalService} from '../../../ui/shared/services/local.service';
 import {RegisterInput} from '../../../domain/auth/commands/inputs/register.input';
 import {RegisterResult} from '../../../domain/auth/models/results/register.result';
-import {SendPasswordRecoveryInput} from '../../../domain/auth/commands/inputs/send-password-recovery.input';
-import {SendPasswordRecoveryResult} from '../../../domain/auth/models/results/send-password-recovery.result';
+import {SendPasswordResetCodeInput} from '../../../domain/auth/commands/inputs/send-password-reset-code';
+import {SendPasswordResetCodeResult} from '../../../domain/auth/models/results/send-password-reset-code.result';
+import {ValidatePasswordResetCodeInput} from '../../../domain/auth/commands/inputs/validate-password-reset-code.input';
+import {ValidatePasswordResetCodeResult} from '../../../domain/auth/models/results/validate-password-reset-code.result';
+import {ChangePasswordInput} from '../../../domain/auth/commands/inputs/change-password.input';
+import {ChangePasswordResult} from '../../../domain/auth/models/results/change-password.result';
 
 @Injectable({
   providedIn: 'root'
@@ -27,8 +31,12 @@ export class AuthRepository extends IAuthRepository {
     return this.http.post<LoginResult>(`${environment.apiUrl}/auth/login`, input)
       .pipe(map((result: LoginResult) => {
         if (result.accessToken) {
+          const authValue = {
+            accessToken: result.accessToken,
+            user: result.user
+          };
           // this.localService.decodePayloadJwt(login.accessToken);
-          this.localService.setJsonValue('auth', JSON.stringify(result));
+          this.localService.setJsonValue('auth', JSON.stringify(authValue));
         }
         return result;
       }));
@@ -41,9 +49,23 @@ export class AuthRepository extends IAuthRepository {
       }));
   }
 
-  sendPasswordRecovery(input: SendPasswordRecoveryInput): Observable<SendPasswordRecoveryResult> {
-    return this.http.post<SendPasswordRecoveryResult>(`${environment.apiUrl}/auth/passwordRecovery`, input)
-      .pipe(map((result: SendPasswordRecoveryResult) => {
+  sendPasswordResetCode(input: SendPasswordResetCodeInput): Observable<SendPasswordResetCodeResult> {
+    return this.http.post<SendPasswordResetCodeResult>(`${environment.apiUrl}/auth/passwordResetCode`, input)
+      .pipe(map((result: SendPasswordResetCodeResult) => {
+        return result;
+      }));
+  }
+
+  validatePasswordResetCode(input: ValidatePasswordResetCodeInput): Observable<ValidatePasswordResetCodeResult> {
+    return this.http.post<ValidatePasswordResetCodeResult>(`${environment.apiUrl}/auth/passwordResetCodeValidation`, input)
+      .pipe(map((result: ValidatePasswordResetCodeResult) => {
+        return result;
+      }));
+  }
+
+  changePassword(input: ChangePasswordInput): Observable<ChangePasswordResult> {
+    return this.http.patch<ChangePasswordResult>(`${environment.apiUrl}/auth/passwordReset`, input)
+      .pipe(map((result: ChangePasswordResult) => {
         return result;
       }));
   }

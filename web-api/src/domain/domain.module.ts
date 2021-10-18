@@ -1,11 +1,6 @@
-import { Module } from '@nestjs/common';
-import {InfraModule} from '../infra/infra.module';
-import {LoginCommand} from './auth/commands/login.command';
+import {Global, Module} from '@nestjs/common';
 
-@Module({
-    imports: [InfraModule],
-    exports: [LoginCommand],
-    providers: [LoginCommand],
-})
+@Global()
+@Module({})
 export class DomainModule {
 }

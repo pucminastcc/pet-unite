@@ -97,10 +97,10 @@ export class LoginComponent implements OnInit, OnDestroy {
     }).subscribe((data: LoginResult) => {
       if (data) {
         if (data.accessToken && data.user) {
-          this.notify('success', 'Sucesso', 'Usuário autenticado, aguarde...');
+          this.notify('success', 'Sucesso', data.message);
           setTimeout(() => window.location.reload(), 3000);
         } else {
-          this.notify('error', 'Erro', 'Usuário não identificado');
+          this.notify('error', 'Erro', data.message);
           this.reset();
         }
       }
