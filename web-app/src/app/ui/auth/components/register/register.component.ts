@@ -73,7 +73,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if(this.registerSubscription)
+    if (this.registerSubscription)
       this.registerSubscription.unsubscribe();
   }
 
@@ -124,10 +124,17 @@ export class RegisterComponent implements OnInit, OnDestroy {
       if (data) {
         if (data.success) {
           this.notify('success', 'Sucesso', data.message, true);
+          this.selectAccountAction(AccountActionEnum.Login, 'Login');
         } else {
           this.notify('error', 'Erro', data.message);
+
+          if (data.message.toLowerCase().includes('email')) {
+            this.rf.email.setValue('');
+          } else if (data.message.toLowerCase().includes('usuário')) {
+            this.rf.username.setValue('');
+          }
         }
-        this.reset();
+        this.isLoading = false;
       }
     }, () => {
       this.notify('error', 'Erro', 'Ops, algo deu errado');
