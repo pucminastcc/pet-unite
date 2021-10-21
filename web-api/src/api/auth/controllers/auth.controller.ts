@@ -11,7 +11,6 @@ import {ValidatePasswordResetCodeResult} from '../../../domain/auth/models/resul
 import {ChangePasswordDto} from '../../../domain/auth/dtos/change-password.dto';
 import {ChangePasswordResult} from '../../../domain/auth/models/results/change-password.result';
 
-
 @Controller('auth')
 export class AuthController {
     constructor(

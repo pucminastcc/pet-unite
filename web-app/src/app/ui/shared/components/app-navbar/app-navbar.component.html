@@ -31,6 +31,10 @@
       </li>
       <ng-template #userBlock>
         <li class="nav-item">
+          <button (click)="logout()" *ngIf="showLoginButton"
+                  class="p-button p-button-rounded p-button-raised text-light mx-lg-2 my-1" icon="fas fa-user"
+                  iconPos="left" [label]="user.username" pButton>
+          </button>
         </li>
       </ng-template>
     </ul>

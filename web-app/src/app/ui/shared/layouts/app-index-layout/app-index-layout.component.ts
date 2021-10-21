@@ -1,9 +1,13 @@
 import {AfterViewInit, Component, HostListener, OnDestroy, OnInit} from '@angular/core';
 import {NavbarMenuItemModel} from '../../../../domain/shared/components/app-navbar/models/navbar-menu-item.model';
-import {UserModel} from '../../../../domain/auth/models/user.model';
 import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {MessageService} from 'primeng/api';
 import {AccountActionComponent} from '../../../auth/components/account-action/account-action.component';
+import {AuthenticatedUserResult} from '../../../../domain/auth/models/results/authenticated-user.result';
+import {AuthService} from '../../../auth/services/auth.service';
+import {Subscription} from 'rxjs';
+import {LogoutResult} from '../../../../domain/auth/models/results/logout.result';
+import {AuthenticatedUserModel} from '../../../../domain/auth/models/authenticated-user.model';
 
 @Component({
   selector: 'app-index-layout',
@@ -11,7 +15,10 @@ import {AccountActionComponent} from '../../../auth/components/account-action/ac
   styleUrls: ['./app-index-layout.component.scss']
 })
 export class AppIndexLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
-  public readonly user: UserModel | undefined;
+  private readonly getAuthenticatedUserSubscription: Subscription | undefined;
+  private logoutSubscription: Subscription | undefined;
+
+  public user: AuthenticatedUserModel | undefined;
   public isLoading = false;
   public menuItems: NavbarMenuItemModel[] = [];
   private toggleButton: HTMLElement = document.createElement('div');
@@ -20,12 +27,39 @@ export class AppIndexLayoutComponent implements OnInit, AfterViewInit, OnDestroy
 
   constructor(
     private readonly dialogService: DialogService,
-    private readonly messageService: MessageService
+    private readonly messageService: MessageService,
+    private readonly authService: AuthService
   ) {
+    this.getAuthenticatedUserSubscription = this.authService.getAuthenticatedUser()
+      .subscribe((data: AuthenticatedUserResult) => {
+        if (data) {
+          this.user = data;
+        }
+      });
   }
 
   ngOnInit(): void {
     this.menuItems = this.getMenuItems();
+  }
+
+  ngAfterViewInit(): void {
+    this.toggleButton = document.getElementsByClassName('navbar-toggler')[0] as HTMLElement;
+    this.navMenu = document.getElementsByClassName('navbar-nav')[0] as HTMLElement;
+  }
+
+  ngOnDestroy(): void {
+    if (this.ref)
+      this.ref.destroy();
+
+    this.unsubscribe();
+  }
+
+  private unsubscribe(): void {
+    if (this.getAuthenticatedUserSubscription)
+      this.getAuthenticatedUserSubscription.unsubscribe();
+
+    if (this.logoutSubscription)
+      this.logoutSubscription.unsubscribe();
   }
 
   private getMenuItems(): NavbarMenuItemModel[] {
@@ -54,18 +88,18 @@ export class AppIndexLayoutComponent implements OnInit, AfterViewInit, OnDestroy
     });
   }
 
-  ngAfterViewInit(): void {
-    this.toggleButton = document.getElementsByClassName('navbar-toggler')[0] as HTMLElement;
-    this.navMenu = document.getElementsByClassName('navbar-nav')[0] as HTMLElement;
+  public logout(): void {
+    this.logoutSubscription = this.authService.logout().subscribe((data: LogoutResult) => {
+      if (data) {
+        if (data.success) {
+          window.location.reload();
+        }
+      }
+    });
   }
 
   @HostListener('window:resize', ['$event'])
   public getScreenWidth(): number {
     return window.innerWidth;
-  }
-
-  ngOnDestroy(): void {
-    if(this.ref)
-      this.ref.destroy();
   }
 }

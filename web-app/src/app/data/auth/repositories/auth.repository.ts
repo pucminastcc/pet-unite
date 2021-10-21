@@ -1,6 +1,6 @@
 import {IAuthRepository} from '../../../domain/auth/repositories/iauth.repository';
 import {LoginInput} from '../../../domain/auth/commands/inputs/login.input';
-import {Observable} from 'rxjs';
+import {Observable, of as observableOf} from 'rxjs';
 import {LoginResult} from '../../../domain/auth/models/results/login.result';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
@@ -15,6 +15,10 @@ import {ValidatePasswordResetCodeInput} from '../../../domain/auth/commands/inpu
 import {ValidatePasswordResetCodeResult} from '../../../domain/auth/models/results/validate-password-reset-code.result';
 import {ChangePasswordInput} from '../../../domain/auth/commands/inputs/change-password.input';
 import {ChangePasswordResult} from '../../../domain/auth/models/results/change-password.result';
+import {LogoutInput} from '../../../domain/auth/commands/inputs/logout.input';
+import {LogoutResult} from '../../../domain/auth/models/results/logout.result';
+import {GetAuthenticatedUserInput} from 'src/app/domain/auth/commands/inputs/get-authenticated-user.input';
+import {AuthenticatedUserModel} from '../../../domain/auth/models/authenticated-user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -35,7 +39,7 @@ export class AuthRepository extends IAuthRepository {
             accessToken: result.accessToken,
             user: result.user
           };
-          // this.localService.decodePayloadJwt(login.accessToken);
+          // this.localService.decodePayloadJwt(result.accessToken);
           this.localService.setJsonValue('auth', JSON.stringify(authValue));
         }
         return result;
@@ -68,5 +72,19 @@ export class AuthRepository extends IAuthRepository {
       .pipe(map((result: ChangePasswordResult) => {
         return result;
       }));
+  }
+
+  logout(input?: LogoutInput): Observable<LogoutResult> {
+    this.localService.clearToken();
+    const result: LogoutResult = {
+      success: !this.localService.getJsonValue('auth')
+    };
+    return observableOf(result);
+  }
+
+  getAuthenticatedUser(input?: GetAuthenticatedUserInput): Observable<AuthenticatedUserModel> {
+    const auth = this.localService.getJsonValue('auth');
+    const result: AuthenticatedUserModel = auth?.user as AuthenticatedUserModel;
+    return observableOf(result);
   }
 }

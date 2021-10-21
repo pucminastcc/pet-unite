@@ -9,6 +9,10 @@ import {ValidatePasswordResetCodeInput} from '../commands/inputs/validate-passwo
 import {ValidatePasswordResetCodeResult} from '../models/results/validate-password-reset-code.result';
 import {ChangePasswordInput} from '../commands/inputs/change-password.input';
 import {ChangePasswordResult} from '../models/results/change-password.result';
+import {LogoutInput} from '../commands/inputs/logout.input';
+import {LogoutResult} from '../models/results/logout.result';
+import {GetAuthenticatedUserInput} from '../commands/inputs/get-authenticated-user.input';
+import {AuthenticatedUserModel} from '../models/authenticated-user.model';
 
 export abstract class IAuthRepository {
   abstract login(input: LoginInput): Observable<LoginResult>;
@@ -20,4 +24,8 @@ export abstract class IAuthRepository {
   abstract validatePasswordResetCode(input: ValidatePasswordResetCodeInput): Observable<ValidatePasswordResetCodeResult>;
 
   abstract changePassword(input: ChangePasswordInput): Observable<ChangePasswordResult>;
+
+  abstract logout(input?: LogoutInput): Observable<LogoutResult>;
+
+  abstract getAuthenticatedUser(input?: GetAuthenticatedUserInput): Observable<AuthenticatedUserModel>;
 }

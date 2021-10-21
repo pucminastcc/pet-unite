@@ -1,7 +1,7 @@
-import {UserModel} from '../user.model';
+import {AuthenticatedUserModel} from '../authenticated-user.model';
 
 export interface LoginResult {
   accessToken: string;
-  user: UserModel;
+  user: AuthenticatedUserModel;
   message: string;
 }
