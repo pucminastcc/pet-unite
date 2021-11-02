@@ -1,8 +1,9 @@
 <app-loading [isLoading]="isLoading">
   <p-toast [baseZIndex]="5000" [hideTransitionOptions]="'0ms'" position="top-right"></p-toast>
   <header>
-    <app-navbar (onLoginButtonClick)="openLoginModal()" (onToggleButtonClick)="toggle()" [containerFluid]="false"
-                [menuItems]="menuItems" [showLoginButton]="true" [user]="user" class="navbar-dark bg-dark fixed-top">
+    <app-navbar (onLogin)="openLoginModal()" (onLogout)="logout()" (onToggleButtonClick)="toggle()"
+                [containerFluid]="false" [menuItems]="menuItems" [showLoginButton]="true" [user]="user"
+                class="navbar-dark bg-dark fixed-top">
     </app-navbar>
   </header>
   <main>

@@ -14,6 +14,7 @@ import {IValidatePasswordResetCodeForm} from '../../../../domain/auth/models/for
 import {ValidatePasswordResetCodeResult} from '../../../../domain/auth/models/results/validate-password-reset-code.result';
 import {IChangePasswordForm} from '../../../../domain/auth/models/forms/ichange-password.form';
 import {ChangePasswordResult} from '../../../../domain/auth/models/results/change-password.result';
+import {PasswordResetCodeModel} from '../../../../domain/auth/models/password-reset-code.model';
 
 @Component({
   selector: 'app-password-reset',
@@ -42,6 +43,8 @@ export class PasswordResetComponent implements OnInit, OnDestroy {
   private sendPasswordResetCodeSubscription: Subscription | undefined;
   private validatePasswordResetCodeSubscription: Subscription | undefined;
   private changePasswordSubscription: Subscription | undefined;
+
+  private passwordResetCode: PasswordResetCodeModel | undefined;
 
   constructor(
     private ref: DynamicDialogRef,
@@ -189,6 +192,7 @@ export class PasswordResetComponent implements OnInit, OnDestroy {
           this.notify('success', 'Sucesso', data.message, true);
           this.passwordResetAction = PasswordResetActionEnum.ChangePassword;
           this.validatePasswordResetCodeForm.reset();
+          this.passwordResetCode = data.passwordResetCode;
         } else {
           this.notify('error', 'Erro', data.message);
           this.vprcf.code.setValue('');
@@ -213,23 +217,30 @@ export class PasswordResetComponent implements OnInit, OnDestroy {
 
     this.isLoading = true;
     this.config.closable = false;
-    const {password} = this.changePasswordForm.value;
-    this.changePasswordSubscription = this.authService.changePassword({
-      password
-    }).subscribe((data: ChangePasswordResult) => {
-      if (data) {
-        if (data.success) {
-          this.notify('success', 'Sucesso', data.message, true);
-          this.changePasswordForm.reset();
-          this.selectAccountAction(AccountActionEnum.Login, 'Login');
-        } else {
-          this.notify('error', 'Erro', data.message);
+
+    if (this.passwordResetCode) {
+      const {email, code} = this.passwordResetCode;
+      const {password} = this.changePasswordForm.value;
+
+      this.changePasswordSubscription = this.authService.changePassword({
+        email,
+        code,
+        password
+      }).subscribe((data: ChangePasswordResult) => {
+        if (data) {
+          if (data.success) {
+            this.notify('success', 'Sucesso', data.message, true);
+            this.changePasswordForm.reset();
+            this.selectAccountAction(AccountActionEnum.Login, 'Login');
+          } else {
+            this.notify('error', 'Erro', data.message);
+          }
+          this.reset();
         }
-        this.reset();
-      }
-    }, () => {
-      this.notify('error', 'Erro', 'Ops, algo deu errado');
-      this.isLoading = false;
-    });
+      }, () => {
+        this.notify('error', 'Erro', 'Ops, algo deu errado');
+        this.isLoading = false;
+      });
+    }
   }
 }

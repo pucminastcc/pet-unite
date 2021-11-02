@@ -70,7 +70,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   private reset(): void {
     this.submitted = false;
     this.isLoading = false;
-    this.loginForm.reset();
+    this.lf.password.reset();
     this.config.closable = true;
   }
 

@@ -16,6 +16,15 @@ import {SendPasswordResetCodeCommand} from '../../../domain/auth/commands/send-p
 import {ChangePasswordInput} from '../../../domain/auth/commands/inputs/change-password.input';
 import {ChangePasswordResult} from '../../../domain/auth/models/results/change-password.result';
 import {ChangePasswordCommand} from '../../../domain/auth/commands/change-password.command';
+import {LogoutCommand} from '../../../domain/auth/commands/logout.command';
+import {LogoutInput} from '../../../domain/auth/commands/inputs/logout.input';
+import {LogoutResult} from '../../../domain/auth/models/results/logout.result';
+import {GetAuthenticatedUserInput} from 'src/app/domain/auth/commands/inputs/get-authenticated-user.input';
+import {GetAuthenticatedUserCommand} from '../../../domain/auth/commands/get-authenticated-user.command';
+import {AuthenticatedUserModel} from '../../../domain/auth/models/authenticated-user.model';
+import {ConfirmEmailCommand} from '../../../domain/auth/commands/confirm-email.command';
+import {ConfirmEmailInput} from '../../../domain/auth/commands/inputs/confirm-email.input';
+import {ConfirmEmailResult} from '../../../domain/auth/models/results/confirm-email.result';
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +36,10 @@ export class AuthService implements IAuthRepository {
     private readonly registerCommand: RegisterCommand,
     private readonly sendPasswordResetCommand: SendPasswordResetCodeCommand,
     private readonly validatePasswordRecoveryCommand: ValidatePasswordResetCodeCommand,
-    private readonly changePasswordCommand: ChangePasswordCommand
+    private readonly changePasswordCommand: ChangePasswordCommand,
+    private readonly logoutCommand: LogoutCommand,
+    private readonly getAuthenticatedUserCommand: GetAuthenticatedUserCommand,
+    private readonly confirmEmailCommand: ConfirmEmailCommand,
   ) {
   }
 
@@ -49,5 +61,17 @@ export class AuthService implements IAuthRepository {
 
   changePassword(input: ChangePasswordInput): Observable<ChangePasswordResult> {
     return this.changePasswordCommand.execute(input);
+  }
+
+  logout(input?: LogoutInput): Observable<LogoutResult> {
+    return this.logoutCommand.execute(input);
+  }
+
+  getAuthenticatedUser(input?: GetAuthenticatedUserInput): Observable<AuthenticatedUserModel> {
+    return this.getAuthenticatedUserCommand.execute(input);
+  }
+
+  confirmEmail(input: ConfirmEmailInput): Observable<ConfirmEmailResult> {
+    return this.confirmEmailCommand.execute(input);
   }
 }

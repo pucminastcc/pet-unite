@@ -8,6 +8,8 @@ import {ValidatePasswordResetCodeDto} from '../dtos/validate-password-reset-code
 import {ValidatePasswordResetCodeResult} from '../models/results/validate-password-reset-code.result';
 import {ChangePasswordDto} from '../dtos/change-password.dto';
 import {ChangePasswordResult} from '../models/results/change-password.result';
+import {EmailConfirmationDto} from '../dtos/email-confirmation.dto';
+import {EmailConfirmationResult} from '../models/results/email-confirmation.result';
 
 export abstract class IAuthRepository {
     abstract login(input: LoginDto): Promise<LoginResult>;
@@ -19,4 +21,6 @@ export abstract class IAuthRepository {
     abstract validatePasswordResetCode(input: ValidatePasswordResetCodeDto): Promise<ValidatePasswordResetCodeResult>;
 
     abstract changePassword(input: ChangePasswordDto): Promise<ChangePasswordResult>;
+
+    abstract confirmEmail(input: EmailConfirmationDto): Promise<EmailConfirmationResult>;
 }

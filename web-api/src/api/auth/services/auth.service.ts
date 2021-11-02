@@ -11,6 +11,8 @@ import {ValidatePasswordResetCodeDto} from '../../../domain/auth/dtos/validate-p
 import {ValidatePasswordResetCodeResult} from '../../../domain/auth/models/results/validate-password-reset-code.result';
 import {ChangePasswordDto} from '../../../domain/auth/dtos/change-password.dto';
 import {ChangePasswordResult} from '../../../domain/auth/models/results/change-password.result';
+import { EmailConfirmationDto } from 'src/domain/auth/dtos/email-confirmation.dto';
+import { EmailConfirmationResult } from 'src/domain/auth/models/results/email-confirmation.result';
 
 @Injectable()
 export class AuthService implements IAuthRepository {
@@ -37,5 +39,9 @@ export class AuthService implements IAuthRepository {
 
     async changePassword(input: ChangePasswordDto): Promise<ChangePasswordResult> {
         return await this.repository.changePassword(input);
+    }
+
+    async confirmEmail(input: EmailConfirmationDto): Promise<EmailConfirmationResult> {
+        return await this.repository.confirmEmail(input);
     }
 }

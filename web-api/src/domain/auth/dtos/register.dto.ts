@@ -4,4 +4,5 @@ export interface RegisterDto {
     password: string;
     terms: boolean;
     activated: boolean;
+    provider: string;
 }
