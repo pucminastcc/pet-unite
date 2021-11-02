@@ -2,6 +2,7 @@ import {Module} from '@nestjs/common';
 import {MongooseModule} from '@nestjs/mongoose';
 import {UserSchema} from './schemas/user.schema';
 import {PasswordResetCodeSchema} from './schemas/password-reset-code.schema';
+import {AccountSchema} from './schemas/account.schema';
 
 @Module({
     imports: [
@@ -12,6 +13,7 @@ import {PasswordResetCodeSchema} from './schemas/password-reset-code.schema';
         MongooseModule.forFeature([
             {name: 'User', schema: UserSchema},
             {name: 'PasswordResetCode', schema: PasswordResetCodeSchema},
+            {name: 'Account', schema: AccountSchema},
         ]),
     ],
     exports: [MongooseModule]

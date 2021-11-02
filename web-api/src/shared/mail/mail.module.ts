@@ -1,6 +1,8 @@
 import {Module} from '@nestjs/common';
 import {MailService} from './services/mail.service';
 import {MailerModule} from '@nestjs-modules/mailer';
+import {HandlebarsAdapter} from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import {join} from 'path';
 
 @Module({
     imports: [
@@ -20,13 +22,13 @@ import {MailerModule} from '@nestjs-modules/mailer';
             defaults: {
                 from: `"Não Responda" <${process.env.SMTP_USER}>`,
             },
-            // template: {
-            //     dir: join(__dirname, 'templates'),
-            //     adapter: new HandlebarsAdapter(),
-            //     options: {
-            //         strict: true,
-            //     },
-            // },
+            template: {
+                dir: join(__dirname, 'shared/mail/templates'),
+                adapter: new HandlebarsAdapter(),
+                options: {
+                    strict: true,
+                },
+            },
         }),
     ],
     providers: [MailService],

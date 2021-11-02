@@ -13,6 +13,8 @@ import {LogoutInput} from '../commands/inputs/logout.input';
 import {LogoutResult} from '../models/results/logout.result';
 import {GetAuthenticatedUserInput} from '../commands/inputs/get-authenticated-user.input';
 import {AuthenticatedUserModel} from '../models/authenticated-user.model';
+import {ConfirmEmailInput} from '../commands/inputs/confirm-email.input';
+import {ConfirmEmailResult} from '../models/results/confirm-email.result';
 
 export abstract class IAuthRepository {
   abstract login(input: LoginInput): Observable<LoginResult>;
@@ -28,4 +30,6 @@ export abstract class IAuthRepository {
   abstract logout(input?: LogoutInput): Observable<LogoutResult>;
 
   abstract getAuthenticatedUser(input?: GetAuthenticatedUserInput): Observable<AuthenticatedUserModel>;
+
+  abstract confirmEmail(input: ConfirmEmailInput): Observable<ConfirmEmailResult>;
 }

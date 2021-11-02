@@ -22,6 +22,9 @@ import {LogoutResult} from '../../../domain/auth/models/results/logout.result';
 import {GetAuthenticatedUserInput} from 'src/app/domain/auth/commands/inputs/get-authenticated-user.input';
 import {GetAuthenticatedUserCommand} from '../../../domain/auth/commands/get-authenticated-user.command';
 import {AuthenticatedUserModel} from '../../../domain/auth/models/authenticated-user.model';
+import {ConfirmEmailCommand} from '../../../domain/auth/commands/confirm-email.command';
+import {ConfirmEmailInput} from '../../../domain/auth/commands/inputs/confirm-email.input';
+import {ConfirmEmailResult} from '../../../domain/auth/models/results/confirm-email.result';
 
 @Injectable({
   providedIn: 'root'
@@ -35,7 +38,8 @@ export class AuthService implements IAuthRepository {
     private readonly validatePasswordRecoveryCommand: ValidatePasswordResetCodeCommand,
     private readonly changePasswordCommand: ChangePasswordCommand,
     private readonly logoutCommand: LogoutCommand,
-    private readonly getAuthenticatedUserCommand: GetAuthenticatedUserCommand
+    private readonly getAuthenticatedUserCommand: GetAuthenticatedUserCommand,
+    private readonly confirmEmailCommand: ConfirmEmailCommand,
   ) {
   }
 
@@ -65,5 +69,9 @@ export class AuthService implements IAuthRepository {
 
   getAuthenticatedUser(input?: GetAuthenticatedUserInput): Observable<AuthenticatedUserModel> {
     return this.getAuthenticatedUserCommand.execute(input);
+  }
+
+  confirmEmail(input: ConfirmEmailInput): Observable<ConfirmEmailResult> {
+    return this.confirmEmailCommand.execute(input);
   }
 }

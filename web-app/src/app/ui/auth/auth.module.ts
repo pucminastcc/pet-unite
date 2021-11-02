@@ -14,6 +14,7 @@ import {MessageModule} from 'primeng/message';
 import {MessagesModule} from 'primeng/messages';
 import {HttpClient, HttpClientModule} from '@angular/common/http';
 import {CheckboxModule} from 'primeng/checkbox';
+import { EmailConfirmationComponent } from './components/email-confirmation/email-confirmation.component';
 
 
 @NgModule({
@@ -21,7 +22,8 @@ import {CheckboxModule} from 'primeng/checkbox';
     AccountActionComponent,
     LoginComponent,
     RegisterComponent,
-    PasswordResetComponent
+    PasswordResetComponent,
+    EmailConfirmationComponent
   ],
   imports: [
     CommonModule,

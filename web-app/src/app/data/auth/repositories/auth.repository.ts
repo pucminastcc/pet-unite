@@ -19,6 +19,8 @@ import {LogoutInput} from '../../../domain/auth/commands/inputs/logout.input';
 import {LogoutResult} from '../../../domain/auth/models/results/logout.result';
 import {GetAuthenticatedUserInput} from 'src/app/domain/auth/commands/inputs/get-authenticated-user.input';
 import {AuthenticatedUserModel} from '../../../domain/auth/models/authenticated-user.model';
+import {ConfirmEmailInput} from '../../../domain/auth/commands/inputs/confirm-email.input';
+import {ConfirmEmailResult} from '../../../domain/auth/models/results/confirm-email.result';
 
 @Injectable({
   providedIn: 'root'
@@ -86,5 +88,12 @@ export class AuthRepository extends IAuthRepository {
     const auth = this.localService.getJsonValue('auth');
     const result: AuthenticatedUserModel = auth?.user as AuthenticatedUserModel;
     return observableOf(result);
+  }
+
+  confirmEmail(input: ConfirmEmailInput): Observable<ConfirmEmailResult> {
+    return this.http.patch<ConfirmEmailResult>(`${environment.apiUrl}/auth/confirm`, input)
+      .pipe(map((result: ConfirmEmailResult) => {
+        return result;
+      }));
   }
 }

@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import {User} from '../../../domain/auth/models/interfaces/user.interface';
 import {PasswordResetCode} from '../../../domain/auth/models/interfaces/password-reset.interface';
+import {Account} from '../../../domain/auth/models/interfaces/account.interface';
 import {LoginDto} from '../../../domain/auth/dtos/login.dto';
 import {LoginResult} from '../../../domain/auth/models/results/login.result';
 import {LoginMessage} from '../../../domain/auth/enums/login-message.enum';
@@ -21,7 +22,11 @@ import {ValidatePasswordResetCodeMessage} from '../../../domain/auth/enums/valid
 import {ChangePasswordDto} from 'src/domain/auth/dtos/change-password.dto';
 import {ChangePasswordResult} from 'src/domain/auth/models/results/change-password.result';
 import {ChangePasswordMessage} from '../../../domain/auth/enums/change-password-message.enum';
+import {EmailConfirmationDto} from '../../../domain/auth/dtos/email-confirmation.dto';
+import {EmailConfirmationResult} from '../../../domain/auth/models/results/email-confirmation.result';
 import {MailService} from '../../../shared/mail/services/mail.service';
+import {UtilService} from '../../../shared/util/services/util.service';
+import {ConfirmEmailMessage} from '../../../domain/auth/enums/confirm-email.message';
 
 
 @Injectable()
@@ -29,7 +34,9 @@ export class AuthRepository extends IAuthRepository {
     constructor(
         @InjectModel('User') private readonly userModel: Model<User>,
         @InjectModel('PasswordResetCode') private readonly passwordResetCodeModel: Model<PasswordResetCode>,
-        private readonly mailService: MailService
+        @InjectModel('Account') private readonly accountModel: Model<Account>,
+        private readonly mailService: MailService,
+        private readonly utilService: UtilService
     ) {
         super();
     }
@@ -45,6 +52,14 @@ export class AuthRepository extends IAuthRepository {
 
             if (isMatch) {
                 if (!doc.activated) {
+                    const enc = await this.utilService.encrypt(doc.id);
+                    const token = enc.content + enc.iv;
+
+                    await this.accountModel.deleteMany({userId: doc.id});
+                    await this.accountModel.insertMany({token, userId: doc.id});
+
+                    this.mailService.sendUserConfirmation(doc, token);
+
                     result = {...result, message: LoginMessage.YourAccountHasNotBeenActivated}
                     return result;
                 }
@@ -74,9 +89,17 @@ export class AuthRepository extends IAuthRepository {
 
             const exec = await this.userModel.insertMany(doc);
 
-            await this.mailService.sendUserConfirmation(doc.email, doc.username, '');
+            if (exec) {
+                const user = exec[0];
+                const enc = await this.utilService.encrypt(user.id);
+                const token = enc.content + enc.iv;
 
-            result = {success: true, message: RegisterMessage.SuccessfulRegistration};
+                await this.accountModel.insertMany({token, userId: user.id});
+
+                this.mailService.sendUserConfirmation(user, token);
+
+                result = {success: true, message: RegisterMessage.SuccessfulRegistration};
+            }
             return result;
         } else {
             if (docExistingEmail)
@@ -162,6 +185,26 @@ export class AuthRepository extends IAuthRepository {
 
             if (doc)
                 result = {success: true, message: ChangePasswordMessage.Success};
+        }
+        return result;
+    }
+
+    async confirmEmail(input: EmailConfirmationDto): Promise<EmailConfirmationResult> {
+        let result: EmailConfirmationResult = {success: false, message: ConfirmEmailMessage.InvalidOrExpired};
+
+        const {token} = input;
+        const account = await this.accountModel.findOne({token}).exec();
+
+        if (account) {
+            const user = await this.userModel.findOne({id: account.userId});
+            if (!user.activated) {
+                const id = user.id;
+                await this.userModel.findOneAndUpdate({id}, {activated: true});
+
+                result = {success: true, message: ConfirmEmailMessage.Success}
+            } else {
+                result = {success: false, message: ConfirmEmailMessage.YourAccountAlreadyActivated}
+            }
         }
         return result;
     }
