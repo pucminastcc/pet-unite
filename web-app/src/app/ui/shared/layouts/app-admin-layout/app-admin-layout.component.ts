@@ -9,7 +9,7 @@ import {Router} from '@angular/router';
   styleUrls: ['./app-admin-layout.component.scss']
 })
 export class AppAdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
-  public isLoading = false;
+  public isLoading: boolean = true;
   public mobileMenuVisible: number = 0;
   public sidebarMenuItem: SidebarMenuItemModel[] = [];
 
@@ -38,13 +38,17 @@ export class AppAdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy
     this.layer = document.getElementsByClassName('close-layer')[0] as HTMLElement;
 
     this.sidebarClose();
+
     if (this.layer) {
       this.layer.remove();
       this.mobileMenuVisible = 0;
     }
+
+    setTimeout(() => this.isLoading = false, 3000);
   }
 
   ngOnDestroy(): void {
+    this.body.classList.remove('nav-open');
   }
 
   private getSidebarMenuItems(): SidebarMenuItemModel[] {

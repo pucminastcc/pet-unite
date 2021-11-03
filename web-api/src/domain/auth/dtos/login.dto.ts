@@ -1,4 +1,6 @@
+import {UserModel} from '../models/user.model';
+
 export interface LoginDto {
-    email: string;
-    password: string;
+    payload: UserModel;
+    message: string;
 }

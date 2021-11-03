@@ -24,7 +24,7 @@
     <div *ngIf="isMobileMenu()" class="mt-2">
       <ul class="nav navbar-nav nav-mobile-menu">
         <li class="nav-item">
-          <a class="nav-link" href="javascript:void(0)">
+          <a (click)="logout()" class="nav-link">
             <i class="d-lg-none d-md-block pi pi-sign-out"></i>
             <p class="d-lg-none d-md-block">Logout</p>
           </a>

@@ -8,6 +8,7 @@ import {AuthService} from '../../../auth/services/auth.service';
 import {Subscription} from 'rxjs';
 import {LogoutResult} from '../../../../domain/auth/models/results/logout.result';
 import {AuthenticatedUserModel} from '../../../../domain/auth/models/authenticated-user.model';
+import {NavigationStart, Router} from '@angular/router';
 
 @Component({
   selector: 'app-index-layout',
@@ -28,8 +29,16 @@ export class AppIndexLayoutComponent implements OnInit, AfterViewInit, OnDestroy
   constructor(
     private readonly dialogService: DialogService,
     private readonly messageService: MessageService,
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+    private readonly router: Router
   ) {
+    // @ts-ignore
+    this.router.events.subscribe((event: NavigationStart) => {
+      if (event.navigationTrigger === 'popstate') {
+        window.location.reload();
+      }
+    });
+
     this.getAuthenticatedUserSubscription = this.authService.getAuthenticatedUser()
       .subscribe((data: AuthenticatedUserResult) => {
         if (data) {
@@ -40,6 +49,7 @@ export class AppIndexLayoutComponent implements OnInit, AfterViewInit, OnDestroy
 
   ngOnInit(): void {
     this.menuItems = this.getMenuItems();
+    // setTimeout(() => this.isLoading = false, 3000);
   }
 
   ngAfterViewInit(): void {

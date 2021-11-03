@@ -1,15 +1,14 @@
-<app-loading [isLoading]="isLoading">
-  <div class="wrapper">
-    <app-sidebar (onMenuItemClick)="sidebarToggle()" [menuItems]="sidebarMenuItem">
-    </app-sidebar>
-    <div class="main-panel">
-      <app-navbar (onToggleButtonClick)="sidebarToggle()" [title]="getTitle()" [user]="undefined"
-                  class="navbar-light navbar-absolute">
-      </app-navbar>
-      <div class="content">
-        <router-outlet></router-outlet>
-        <app-footer></app-footer>
-      </div>
+<app-loading [isLoading]="isLoading"></app-loading>
+<div class="wrapper">
+  <app-sidebar (onMenuItemClick)="sidebarToggle()" [menuItems]="sidebarMenuItem">
+  </app-sidebar>
+  <div class="main-panel">
+    <app-navbar (onToggleButtonClick)="sidebarToggle()" [title]="getTitle()" [user]="undefined"
+                class="navbar-light navbar-absolute">
+    </app-navbar>
+    <div class="content">
+      <router-outlet></router-outlet>
+      <app-footer></app-footer>
     </div>
   </div>
-</app-loading>
+</div>

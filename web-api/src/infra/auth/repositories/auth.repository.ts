@@ -7,6 +7,8 @@ import * as crypto from 'crypto';
 import {User} from '../../../domain/auth/models/interfaces/user.interface';
 import {PasswordResetCode} from '../../../domain/auth/models/interfaces/password-reset.interface';
 import {Account} from '../../../domain/auth/models/interfaces/account.interface';
+import {ValidateUserDto} from '../../../domain/auth/dtos/validate-user.dto';
+import {ValidateUserResult} from '../../../domain/auth/models/results/validate-user.result';
 import {LoginDto} from '../../../domain/auth/dtos/login.dto';
 import {LoginResult} from '../../../domain/auth/models/results/login.result';
 import {LoginMessage} from '../../../domain/auth/enums/login-message.enum';
@@ -24,51 +26,73 @@ import {ChangePasswordResult} from 'src/domain/auth/models/results/change-passwo
 import {ChangePasswordMessage} from '../../../domain/auth/enums/change-password-message.enum';
 import {EmailConfirmationDto} from '../../../domain/auth/dtos/email-confirmation.dto';
 import {EmailConfirmationResult} from '../../../domain/auth/models/results/email-confirmation.result';
+import {EmailConfirmationMessage} from '../../../domain/auth/enums/confirm-email.message';
 import {MailService} from '../../../shared/mail/services/mail.service';
 import {UtilService} from '../../../shared/util/services/util.service';
-import {ConfirmEmailMessage} from '../../../domain/auth/enums/confirm-email.message';
+import {JwtService} from '@nestjs/jwt';
+import {UpdateUserDto} from '../../../domain/auth/dtos/update-user.dto';
+import {UpdateUserResult} from '../../../domain/auth/models/results/update-user.result';
 
 
 @Injectable()
 export class AuthRepository extends IAuthRepository {
+
     constructor(
         @InjectModel('User') private readonly userModel: Model<User>,
         @InjectModel('PasswordResetCode') private readonly passwordResetCodeModel: Model<PasswordResetCode>,
         @InjectModel('Account') private readonly accountModel: Model<Account>,
         private readonly mailService: MailService,
-        private readonly utilService: UtilService
+        private readonly utilService: UtilService,
+        private readonly jwtService: JwtService
     ) {
         super();
     }
 
-    async login(input: LoginDto): Promise<LoginResult> {
-        let result: LoginResult = {accessToken: undefined, user: undefined, message: LoginMessage.UserNotFound};
+    async validateUser(input: ValidateUserDto): Promise<ValidateUserResult> {
+        let result: ValidateUserResult = {payload: undefined, message: LoginMessage.UserNotFound};
 
         const {email, password} = input;
         const doc = await this.userModel.findOne({email, provider: 'application'}).exec();
 
         if (doc) {
             const isMatch = await bcrypt.compare(password, doc.password);
-
             if (isMatch) {
                 if (!doc.activated) {
-                    const enc = await this.utilService.encrypt(doc.id);
+                    const userId = doc.id;
+                    const enc = await this.utilService.encrypt(userId);
                     const token = enc.content + enc.iv;
 
-                    await this.accountModel.deleteMany({userId: doc.id});
-                    await this.accountModel.insertMany({token, userId: doc.id});
+                    await this.accountModel.deleteMany({userId});
+                    await this.accountModel.insertMany({token, userId});
 
                     this.mailService.sendUserConfirmation(doc, token);
 
-                    result = {...result, message: LoginMessage.YourAccountHasNotBeenActivated}
-                    return result;
+                    result = {
+                        ...result,
+                        message: LoginMessage.YourAccountHasNotBeenActivated
+                    }
+                } else {
+                    result = {
+                        payload: {
+                            email: doc.email,
+                            username: doc.username
+                        },
+                        message: LoginMessage.UserIsAuthenticated
+                    }
                 }
+            }
+        }
+        return result;
+    }
 
-                result = {
-                    accessToken: 'myBearerToken',
-                    user: {email: doc.email, username: doc.username},
-                    message: LoginMessage.UserIsAuthenticated
-                }
+    async login(input: LoginDto): Promise<LoginResult> {
+        const {payload, message} = input;
+        let result = {accessToken: undefined, user: payload, message};
+
+        if (payload) {
+            result = {
+                ...result,
+                accessToken: this.jwtService.sign(payload)
             }
         }
         return result;
@@ -190,7 +214,7 @@ export class AuthRepository extends IAuthRepository {
     }
 
     async confirmEmail(input: EmailConfirmationDto): Promise<EmailConfirmationResult> {
-        let result: EmailConfirmationResult = {success: false, message: ConfirmEmailMessage.InvalidOrExpired};
+        let result: EmailConfirmationResult = {success: false, message: EmailConfirmationMessage.InvalidOrExpired};
 
         const {token} = input;
         const account = await this.accountModel.findOne({token}).exec();
@@ -201,11 +225,15 @@ export class AuthRepository extends IAuthRepository {
                 const id = user.id;
                 await this.userModel.findOneAndUpdate({id}, {activated: true});
 
-                result = {success: true, message: ConfirmEmailMessage.Success}
+                result = {success: true, message: EmailConfirmationMessage.Success}
             } else {
-                result = {success: false, message: ConfirmEmailMessage.YourAccountAlreadyActivated}
+                result = {success: false, message: EmailConfirmationMessage.YourAccountAlreadyActivated}
             }
         }
         return result;
+    }
+
+    async updateUser(input: UpdateUserDto): Promise<UpdateUserResult> {
+        return Promise.resolve(undefined);
     }
 }

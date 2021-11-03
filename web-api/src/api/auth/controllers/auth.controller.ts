@@ -1,6 +1,5 @@
-import {Body, Controller, Get, Patch, Post, Query, Res} from '@nestjs/common';
+import {Body, Controller, Get, Patch, Post, Put, Query, Request, Res, UseGuards} from '@nestjs/common';
 import {AuthService} from '../services/auth.service';
-import {LoginDto} from '../../../domain/auth/dtos/login.dto';
 import {LoginResult} from '../../../domain/auth/models/results/login.result';
 import {RegisterDto} from '../../../domain/auth/dtos/register.dto';
 import {RegisterResult} from '../../../domain/auth/models/results/register.result';
@@ -12,6 +11,10 @@ import {ChangePasswordDto} from '../../../domain/auth/dtos/change-password.dto';
 import {ChangePasswordResult} from '../../../domain/auth/models/results/change-password.result';
 import {EmailConfirmationDto} from '../../../domain/auth/dtos/email-confirmation.dto';
 import {EmailConfirmationResult} from '../../../domain/auth/models/results/email-confirmation.result';
+import {LocalAuthGuard} from '../shared/guards/local-auth.guard';
+import {JwtAuthGuard} from '../shared/guards/jwt-auth.guard';
+import {UpdateUserDto} from '../../../domain/auth/dtos/update-user.dto';
+import {UpdateUserResult} from '../../../domain/auth/models/results/update-user.result';
 
 @Controller('auth')
 export class AuthController {
@@ -20,9 +23,10 @@ export class AuthController {
     ) {
     }
 
+    @UseGuards(LocalAuthGuard)
     @Post('login')
-    async login(@Body() req: LoginDto): Promise<LoginResult> {
-        return await this.authService.login(req);
+    async login(@Request() req): Promise<LoginResult> {
+        return await this.authService.login(req.user);
     }
 
     @Post('registration')
@@ -53,5 +57,11 @@ export class AuthController {
     @Patch('confirm')
     async confirmEmail(@Body() req: EmailConfirmationDto): Promise<EmailConfirmationResult> {
         return await this.authService.confirmEmail(req);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Put('user')
+    async updateUser(@Body() req: UpdateUserDto): Promise<UpdateUserResult> {
+        return await this.authService.updateUser(req);
     }
 }
