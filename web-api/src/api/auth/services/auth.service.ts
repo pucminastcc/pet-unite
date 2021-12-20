@@ -11,13 +11,13 @@ import {ValidatePasswordResetCodeDto} from '../../../domain/auth/dtos/validate-p
 import {ValidatePasswordResetCodeResult} from '../../../domain/auth/models/results/validate-password-reset-code.result';
 import {ChangePasswordDto} from '../../../domain/auth/dtos/change-password.dto';
 import {ChangePasswordResult} from '../../../domain/auth/models/results/change-password.result';
-import { EmailConfirmationDto } from 'src/domain/auth/dtos/email-confirmation.dto';
-import { EmailConfirmationResult } from 'src/domain/auth/models/results/email-confirmation.result';
+import {EmailConfirmationResult} from 'src/domain/auth/models/results/email-confirmation.result';
 import {ValidateUserResult} from '../../../domain/auth/models/results/validate-user.result';
 import {UpdateUserDto} from '../../../domain/auth/dtos/update-user.dto';
 import {UpdateUserResult} from '../../../domain/auth/models/results/update-user.result';
 import {ValidateLocalUserDto} from '../../../domain/auth/dtos/validate-local-user.dto';
 import {ValidateFacebookUserDto} from '../../../domain/auth/dtos/validate-facebook-user.dto';
+import {ConfirmEmailDto} from '../../../domain/auth/dtos/confirm-email.dto';
 
 @Injectable()
 export class AuthService implements IAuthRepository {
@@ -54,7 +54,7 @@ export class AuthService implements IAuthRepository {
         return await this.repository.changePassword(input);
     }
 
-    async confirmEmail(input: EmailConfirmationDto): Promise<EmailConfirmationResult> {
+    async confirmEmail(input: ConfirmEmailDto): Promise<EmailConfirmationResult> {
         return await this.repository.confirmEmail(input);
     }
 
