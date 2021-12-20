@@ -1,8 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Params} from '@angular/router';
-import {EmailConfirmationModel} from '../../../../domain/auth/models/email-confirmation.model';
 import {AuthService} from '../../services/auth.service';
 import {ConfirmEmailResult} from '../../../../domain/auth/models/results/confirm-email.result';
+import {EmailConfirmationModel} from '../../../../domain/auth/models/email-confirmation.model';
 
 @Component({
   selector: 'app-email-confirmation',
@@ -10,7 +10,8 @@ import {ConfirmEmailResult} from '../../../../domain/auth/models/results/confirm
   styleUrls: ['./email-confirmation.component.scss']
 })
 export class EmailConfirmationComponent implements OnInit {
-  private emailConfirmation: EmailConfirmationModel | undefined;
+  private params: EmailConfirmationModel | undefined;
+  private result: ConfirmEmailResult | undefined;
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -18,7 +19,7 @@ export class EmailConfirmationComponent implements OnInit {
   ) {
     this.route.params.subscribe((data: Params) => {
       if (data) {
-        this.emailConfirmation = {
+        this.params = {
           token: data.token,
           key: data.key
         };
@@ -27,13 +28,14 @@ export class EmailConfirmationComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if(this.emailConfirmation) {
-      const {token, key} = this.emailConfirmation;
+    if (this.params) {
+      const {token, key} = this.params;
       this.authService.confirmEmail({
         token,
         key
       }).subscribe((data: ConfirmEmailResult) => {
         if (data) {
+          this.result = data;
         }
       });
     }

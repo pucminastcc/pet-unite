@@ -6,4 +6,5 @@ export interface User extends Document {
     password: string;
     terms: boolean;
     activated: boolean;
+    img: string;
 }

@@ -13,12 +13,25 @@ import {ChangePasswordDto} from '../../../domain/auth/dtos/change-password.dto';
 import {ChangePasswordResult} from '../../../domain/auth/models/results/change-password.result';
 import { EmailConfirmationDto } from 'src/domain/auth/dtos/email-confirmation.dto';
 import { EmailConfirmationResult } from 'src/domain/auth/models/results/email-confirmation.result';
+import {ValidateUserResult} from '../../../domain/auth/models/results/validate-user.result';
+import {UpdateUserDto} from '../../../domain/auth/dtos/update-user.dto';
+import {UpdateUserResult} from '../../../domain/auth/models/results/update-user.result';
+import {ValidateLocalUserDto} from '../../../domain/auth/dtos/validate-local-user.dto';
+import {ValidateFacebookUserDto} from '../../../domain/auth/dtos/validate-facebook-user.dto';
 
 @Injectable()
 export class AuthService implements IAuthRepository {
     constructor(
         private readonly repository: AuthRepository
     ) {
+    }
+
+    async validateLocalUser(input: ValidateLocalUserDto): Promise<ValidateUserResult> {
+        return await this.repository.validateLocalUser(input);
+    }
+
+    async validateFacebookUser(input: ValidateFacebookUserDto): Promise<ValidateUserResult> {
+        return await this.repository.validateFacebookUser(input);
     }
 
     async login(input: LoginDto): Promise<LoginResult> {
@@ -43,5 +56,9 @@ export class AuthService implements IAuthRepository {
 
     async confirmEmail(input: EmailConfirmationDto): Promise<EmailConfirmationResult> {
         return await this.repository.confirmEmail(input);
+    }
+
+    async updateUser(input: UpdateUserDto): Promise<UpdateUserResult> {
+        return await this.repository.updateUser(input);
     }
 }

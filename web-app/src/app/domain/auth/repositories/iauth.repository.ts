@@ -15,9 +15,12 @@ import {GetAuthenticatedUserInput} from '../commands/inputs/get-authenticated-us
 import {AuthenticatedUserModel} from '../models/authenticated-user.model';
 import {ConfirmEmailInput} from '../commands/inputs/confirm-email.input';
 import {ConfirmEmailResult} from '../models/results/confirm-email.result';
+import {FacebookLoginInput} from '../commands/inputs/facebook-login.input';
 
 export abstract class IAuthRepository {
   abstract login(input: LoginInput): Observable<LoginResult>;
+
+  abstract facebookLogin(input?: FacebookLoginInput): void;
 
   abstract register(input: RegisterInput): Observable<RegisterResult>;
 
@@ -29,7 +32,7 @@ export abstract class IAuthRepository {
 
   abstract logout(input?: LogoutInput): Observable<LogoutResult>;
 
-  abstract getAuthenticatedUser(input?: GetAuthenticatedUserInput): Observable<AuthenticatedUserModel>;
+  abstract getAuthenticatedUser(input: GetAuthenticatedUserInput): Observable<AuthenticatedUserModel>;
 
   abstract confirmEmail(input: ConfirmEmailInput): Observable<ConfirmEmailResult>;
 }

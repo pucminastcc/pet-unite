@@ -111,5 +111,6 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   public facebookLogin(): void {
+    this.authenticationService.facebookLogin();
   }
 }

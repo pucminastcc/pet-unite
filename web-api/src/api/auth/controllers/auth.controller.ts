@@ -1,6 +1,5 @@
-import {Body, Controller, Get, Patch, Post, Query, Res} from '@nestjs/common';
+import {Body, Controller, Get, HttpStatus, Patch, Post, Put, Query, Req, Request, Res, UseGuards} from '@nestjs/common';
 import {AuthService} from '../services/auth.service';
-import {LoginDto} from '../../../domain/auth/dtos/login.dto';
 import {LoginResult} from '../../../domain/auth/models/results/login.result';
 import {RegisterDto} from '../../../domain/auth/dtos/register.dto';
 import {RegisterResult} from '../../../domain/auth/models/results/register.result';
@@ -12,6 +11,13 @@ import {ChangePasswordDto} from '../../../domain/auth/dtos/change-password.dto';
 import {ChangePasswordResult} from '../../../domain/auth/models/results/change-password.result';
 import {EmailConfirmationDto} from '../../../domain/auth/dtos/email-confirmation.dto';
 import {EmailConfirmationResult} from '../../../domain/auth/models/results/email-confirmation.result';
+import {UpdateUserDto} from '../../../domain/auth/dtos/update-user.dto';
+import {UpdateUserResult} from '../../../domain/auth/models/results/update-user.result';
+import {LocalAuthGuard} from '../shared/guards/local-auth.guard';
+import {JwtAuthGuard} from '../shared/guards/jwt-auth.guard';
+import {FacebookAuthGuard} from '../shared/guards/facebook-auth.guard';
+import passport from 'passport';
+
 
 @Controller('auth')
 export class AuthController {
@@ -20,9 +26,25 @@ export class AuthController {
     ) {
     }
 
+    @UseGuards(LocalAuthGuard)
     @Post('login')
-    async login(@Body() req: LoginDto): Promise<LoginResult> {
-        return await this.authService.login(req);
+    async login(@Request() req): Promise<LoginResult> {
+        return await this.authService.login(req.user);
+    }
+
+    @UseGuards(FacebookAuthGuard)
+    @Get('facebook')
+    async facebook(): Promise<any> {
+        return HttpStatus.OK;
+    }
+
+    @UseGuards(FacebookAuthGuard)
+    @Get('facebook/redirect')
+    async facebookLoginRedirect(@Req() req, @Res() res): Promise<any> {
+        const result = await this.authService.login(req.user);
+        res.cookie('facebook', result);
+
+        return res.redirect(`${process.env.APP_URL}`);
     }
 
     @Post('registration')
@@ -53,5 +75,11 @@ export class AuthController {
     @Patch('confirm')
     async confirmEmail(@Body() req: EmailConfirmationDto): Promise<EmailConfirmationResult> {
         return await this.authService.confirmEmail(req);
+    }
+
+    @Put('user')
+    @UseGuards(JwtAuthGuard)
+    async updateUser(@Body() req: UpdateUserDto): Promise<UpdateUserResult> {
+        return await this.authService.updateUser(req);
     }
 }

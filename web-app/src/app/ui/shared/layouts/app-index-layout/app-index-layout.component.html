@@ -1,4 +1,5 @@
-<app-loading [isLoading]="isLoading">
+<app-loading [isLoading]="isLoading"></app-loading>
+<ng-container *ngIf="!isLoading">
   <p-toast [baseZIndex]="5000" [hideTransitionOptions]="'0ms'" position="top-right"></p-toast>
   <header>
     <app-navbar (onLogin)="openLoginModal()" (onLogout)="logout()" (onToggleButtonClick)="toggle()"
@@ -10,5 +11,6 @@
     <router-outlet></router-outlet>
   </main>
   <app-footer></app-footer>
-</app-loading>
+</ng-container>
+
 

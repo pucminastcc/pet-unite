@@ -1,15 +1,15 @@
 <nav class="navbar navbar-expand-lg {{class}}">
   <div class="{{containerFluid ? 'container-fluid' : 'container'}}">
     <div class="navbar-wrapper">
-      <a class="navbar-brand {{title === '' ? 'p-0 m-0' : ''}}" href="{{title === '' ? '/' : 'javascript:void(0)'}}">
-        <span *ngIf="title === '';else titleBlock">
+      <a class="navbar-brand {{!title ? 'p-0 m-0' : ''}}" href="{{!title ? '/' : 'javascript:void(0)'}}">
+        <span *ngIf="!title;else titleBlock">
           <img alt="Logo" height="50" src="https://angular.io/assets/images/logos/angular/shield-large.svg">NGULAR
         </span>
-        <ng-template #titleBlock>
-          {{title}}
-        </ng-template>
       </a>
     </div>
+    <ng-template #titleBlock>
+      {{title}}
+    </ng-template>
     <div (click)="toggle()" class="navbar-toggler p-2" type="button">
       <span class="sr-only">Toggle navigation</span>
       <span class="navbar-toggler-icon icon-bar"></span>
@@ -31,12 +31,17 @@
       </li>
       <ng-template #userBlock>
         <li class="nav-item">
-          <button (click)="logout()" *ngIf="showLoginButton"
+          <button (click)="navigate('/admin/dashboard')" *ngIf="showLoginButton"
                   class="p-button p-button-rounded p-button-raised text-light mx-lg-2 my-1" icon="fas fa-user"
                   iconPos="left" [label]="user.username" pButton>
           </button>
         </li>
       </ng-template>
     </ul>
+    <button (click)="logout()" *ngIf="!isMobile && title"
+            [ngStyle]="{backgroundColor:'var(--bluegray-200)', borderColor:'var(--bluegray-200)'}"
+            class="p-button p-button-rounded p-button-raised" icon="pi pi-power-off" pButton pTooltip="Sair"
+            tooltipPosition="bottom">
+    </button>
   </div>
 </nav>

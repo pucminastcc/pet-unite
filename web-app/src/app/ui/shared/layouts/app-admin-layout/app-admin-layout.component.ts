@@ -1,7 +1,10 @@
-import {AfterViewInit, Component, ElementRef, OnDestroy, OnInit} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit} from '@angular/core';
 import {Location} from '@angular/common';
 import {SidebarMenuItemModel} from '../../../../domain/shared/components/app-sidebar/models/sidebar-menu-item.model';
 import {Router} from '@angular/router';
+import {AuthenticatedUserModel} from '../../../../domain/auth/models/authenticated-user.model';
+import {AuthService} from '../../../auth/services/auth.service';
+import {LogoutResult} from '../../../../domain/auth/models/results/logout.result';
 
 @Component({
   selector: 'app-admin-layout',
@@ -9,7 +12,9 @@ import {Router} from '@angular/router';
   styleUrls: ['./app-admin-layout.component.scss']
 })
 export class AppAdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
-  public isLoading = false;
+  public user: AuthenticatedUserModel | undefined;
+
+  public isLoading: boolean = false;
   public mobileMenuVisible: number = 0;
   public sidebarMenuItem: SidebarMenuItemModel[] = [];
 
@@ -22,9 +27,16 @@ export class AppAdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy
   constructor(
     private readonly element: ElementRef,
     private readonly router: Router,
+    private readonly authService: AuthService,
     location: Location,
   ) {
     this.location = location;
+
+    this.authService.getAuthenticatedUser().subscribe((data: AuthenticatedUserModel) => {
+      if (data) {
+        this.user = data;
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -38,13 +50,17 @@ export class AppAdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy
     this.layer = document.getElementsByClassName('close-layer')[0] as HTMLElement;
 
     this.sidebarClose();
+
     if (this.layer) {
       this.layer.remove();
       this.mobileMenuVisible = 0;
     }
+
+    setTimeout(() => this.isLoading = false, 3000);
   }
 
   ngOnDestroy(): void {
+    this.body.classList.remove('nav-open');
   }
 
   private getSidebarMenuItems(): SidebarMenuItemModel[] {
@@ -126,5 +142,24 @@ export class AppAdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy
       }
     }
     return 'Dashboard';
+  }
+
+  public logout(): void {
+    this.authService.logout().subscribe((data: LogoutResult) => {
+      if (data) {
+        if (data.success) {
+          window.location.href = '/';
+        }
+      }
+    });
+  }
+
+  public isMobileMenu(): boolean {
+    return window.innerWidth <= 991;
+  };
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: Event) {
+    this.isMobileMenu();
   }
 }

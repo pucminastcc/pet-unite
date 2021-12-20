@@ -9,5 +9,8 @@ export const configuration = () => {
         smtpPort: process.env.SMTP_PORT,
         smtpUser: process.env.SMTP_USER,
         smtpPass: process.env.SMTP_PASS,
+        jwtSecret: process.env.JWT_SECRET,
+        facebookAppId: process.env.FACEBOOK_APP_ID,
+        facebookAppSecret: process.env.FACEBOOK_APP_SECRET,
     };
 }

@@ -7,6 +7,8 @@ import * as crypto from 'crypto';
 import {User} from '../../../domain/auth/models/interfaces/user.interface';
 import {PasswordResetCode} from '../../../domain/auth/models/interfaces/password-reset.interface';
 import {Account} from '../../../domain/auth/models/interfaces/account.interface';
+import {ValidateLocalUserDto} from '../../../domain/auth/dtos/validate-local-user.dto';
+import {ValidateUserResult} from '../../../domain/auth/models/results/validate-user.result';
 import {LoginDto} from '../../../domain/auth/dtos/login.dto';
 import {LoginResult} from '../../../domain/auth/models/results/login.result';
 import {LoginMessage} from '../../../domain/auth/enums/login-message.enum';
@@ -24,51 +26,96 @@ import {ChangePasswordResult} from 'src/domain/auth/models/results/change-passwo
 import {ChangePasswordMessage} from '../../../domain/auth/enums/change-password-message.enum';
 import {EmailConfirmationDto} from '../../../domain/auth/dtos/email-confirmation.dto';
 import {EmailConfirmationResult} from '../../../domain/auth/models/results/email-confirmation.result';
+import {EmailConfirmationMessage} from '../../../domain/auth/enums/confirm-email.message';
 import {MailService} from '../../../shared/mail/services/mail.service';
 import {UtilService} from '../../../shared/util/services/util.service';
-import {ConfirmEmailMessage} from '../../../domain/auth/enums/confirm-email.message';
+import {JwtService} from '@nestjs/jwt';
+import {UpdateUserDto} from '../../../domain/auth/dtos/update-user.dto';
+import {UpdateUserResult} from '../../../domain/auth/models/results/update-user.result';
+import {ValidateFacebookUserDto} from '../../../domain/auth/dtos/validate-facebook-user.dto';
+import {UserModel} from '../../../domain/auth/models/user.model';
 
 
 @Injectable()
 export class AuthRepository extends IAuthRepository {
+
     constructor(
         @InjectModel('User') private readonly userModel: Model<User>,
         @InjectModel('PasswordResetCode') private readonly passwordResetCodeModel: Model<PasswordResetCode>,
         @InjectModel('Account') private readonly accountModel: Model<Account>,
         private readonly mailService: MailService,
-        private readonly utilService: UtilService
+        private readonly utilService: UtilService,
+        private readonly jwtService: JwtService
     ) {
         super();
     }
 
-    async login(input: LoginDto): Promise<LoginResult> {
-        let result: LoginResult = {accessToken: undefined, user: undefined, message: LoginMessage.UserNotFound};
+    private getPayload(doc): UserModel {
+        return {
+            email: doc.email,
+            username: doc.username,
+            img: doc.img
+        };
+    }
+
+    async validateLocalUser(input: ValidateLocalUserDto): Promise<ValidateUserResult> {
+        let result: ValidateUserResult = {payload: undefined, message: LoginMessage.UserNotFound};
 
         const {email, password} = input;
         const doc = await this.userModel.findOne({email, provider: 'application'}).exec();
 
         if (doc) {
             const isMatch = await bcrypt.compare(password, doc.password);
-
             if (isMatch) {
                 if (!doc.activated) {
-                    const enc = await this.utilService.encrypt(doc.id);
-                    const token = enc.content + enc.iv;
+                    const userId = doc.id;
+                    const enc = await this.utilService.encrypt(userId);
+                    const token = `${enc.content}${enc.iv}`;
 
-                    await this.accountModel.deleteMany({userId: doc.id});
-                    await this.accountModel.insertMany({token, userId: doc.id});
+                    await this.accountModel.deleteMany({userId});
+                    await this.accountModel.insertMany({token, userId});
 
                     this.mailService.sendUserConfirmation(doc, token);
 
-                    result = {...result, message: LoginMessage.YourAccountHasNotBeenActivated}
-                    return result;
+                    result = {
+                        ...result,
+                        message: LoginMessage.YourAccountHasNotBeenActivated
+                    }
+                } else {
+                    result = {
+                        payload: this.getPayload(doc),
+                        message: LoginMessage.UserIsAuthenticated
+                    }
                 }
+            }
+        }
+        return result;
+    }
 
-                result = {
-                    accessToken: 'myBearerToken',
-                    user: {email: doc.email, username: doc.username},
-                    message: LoginMessage.UserIsAuthenticated
-                }
+    async validateFacebookUser(input: ValidateFacebookUserDto): Promise<ValidateUserResult> {
+        let result: ValidateUserResult = {payload: undefined, message: LoginMessage.UserNotFound};
+
+        const {email, img} = input;
+        let doc = await this.userModel.findOne({email, provider: 'facebook'}).exec();
+        doc.img = img;
+
+        if (doc) {
+            result = {
+                payload: this.getPayload(doc),
+                message: LoginMessage.UserIsAuthenticated
+            }
+        }
+        return result;
+    }
+
+    async login(input: LoginDto): Promise<LoginResult> {
+        const {payload, message} = input;
+        let result = {accessToken: undefined, user: payload, message};
+
+        if (payload) {
+            result = {
+                ...result,
+                accessToken: this.jwtService.sign(payload)
             }
         }
         return result;
@@ -76,38 +123,29 @@ export class AuthRepository extends IAuthRepository {
 
     async register(input: RegisterDto): Promise<RegisterResult> {
         let result: RegisterResult = {success: false, message: RegisterMessage.EmailAddressAlreadyExists};
+        const {email, provider, password, activated} = input;
 
-        const {email, username} = input;
-        const docExistingEmail = await this.userModel.findOne({email, provider: 'application'}).exec();
-        const docExistingUsername = await this.userModel.findOne({username, provider: 'application'}).exec();
+        const docExstingEmail = await this.userModel.findOne({
+            email, provider
+        }).exec();
 
-        if (!docExistingEmail && !docExistingUsername) {
-            const doc: RegisterDto = {...input, terms: true, activated: false, provider: 'application'};
-
+        if (!docExstingEmail) {
+            let doc: RegisterDto = input;
             const salt = await bcrypt.genSalt();
-            doc.password = await bcrypt.hashSync(doc.password, salt);
+            doc.password = await bcrypt.hashSync(password, salt);
 
-            const exec = await this.userModel.insertMany(doc);
+            const insert = await this.userModel.insertMany(doc);
 
-            if (exec) {
-                const user = exec[0];
+            if (insert) {
+                const user = insert[0];
                 const enc = await this.utilService.encrypt(user.id);
-                const token = enc.content + enc.iv;
+                const token = `${enc.content}${enc.iv}`
 
-                await this.accountModel.insertMany({token, userId: user.id});
-
-                this.mailService.sendUserConfirmation(user, token);
-
+                if(!activated) {
+                    await this.accountModel.insertMany({token, userId: user.id});
+                    this.mailService.sendUserConfirmation(user, token);
+                }
                 result = {success: true, message: RegisterMessage.SuccessfulRegistration};
-            }
-            return result;
-        } else {
-            if (docExistingEmail)
-                return result;
-
-            if (docExistingUsername) {
-                result = {...result, message: RegisterMessage.UsernameAlreadyExists};
-                return result;
             }
         }
         return result;
@@ -190,22 +228,29 @@ export class AuthRepository extends IAuthRepository {
     }
 
     async confirmEmail(input: EmailConfirmationDto): Promise<EmailConfirmationResult> {
-        let result: EmailConfirmationResult = {success: false, message: ConfirmEmailMessage.InvalidOrExpired};
+        let result: EmailConfirmationResult = {success: false, message: EmailConfirmationMessage.InvalidOrExpired};
 
         const {token} = input;
         const account = await this.accountModel.findOne({token}).exec();
 
         if (account) {
-            const user = await this.userModel.findOne({id: account.userId});
-            if (!user.activated) {
-                const id = user.id;
-                await this.userModel.findOneAndUpdate({id}, {activated: true});
+            const user = await this.userModel.findOne({_id: account.userId});
+            if (user) {
+                if (!user.activated) {
+                    const id = user.id;
+                    await this.userModel.findOneAndUpdate({_id: id}, {activated: true});
+                    await this.accountModel.deleteOne({_id: account.id});
 
-                result = {success: true, message: ConfirmEmailMessage.Success}
-            } else {
-                result = {success: false, message: ConfirmEmailMessage.YourAccountAlreadyActivated}
+                    result = {success: true, message: EmailConfirmationMessage.Success}
+                } else {
+                    result = {success: false, message: EmailConfirmationMessage.YourAccountAlreadyActivated}
+                }
             }
         }
         return result;
+    }
+
+    async updateUser(input: UpdateUserDto): Promise<UpdateUserResult> {
+        return Promise.resolve(undefined);
     }
 }

@@ -11,6 +11,7 @@ import {MessageService} from 'primeng/api';
 import {ToastModule} from 'primeng/toast';
 import {AppIndexLayoutComponent} from './layouts/app-index-layout/app-index-layout.component';
 import {AppAdminLayoutComponent} from './layouts/app-admin-layout/app-admin-layout.component';
+import {TooltipModule} from 'primeng/tooltip';
 
 
 @NgModule({
@@ -27,7 +28,8 @@ import {AppAdminLayoutComponent} from './layouts/app-admin-layout/app-admin-layo
     RouterModule,
     ButtonModule,
     DynamicDialogModule,
-    ToastModule
+    ToastModule,
+    TooltipModule
   ],
   exports: [
     AppLoadingComponent,
