@@ -1,6 +1,6 @@
 import {ApiProperty} from '@nestjs/swagger';
 
-export class UpdateUserDto {
+export class ConfirmEmailDto {
     @ApiProperty()
-    username: string;
+    token: string;
 }

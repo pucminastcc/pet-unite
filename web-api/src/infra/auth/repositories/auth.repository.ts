@@ -24,7 +24,6 @@ import {ValidatePasswordResetCodeMessage} from '../../../domain/auth/enums/valid
 import {ChangePasswordDto} from 'src/domain/auth/dtos/change-password.dto';
 import {ChangePasswordResult} from 'src/domain/auth/models/results/change-password.result';
 import {ChangePasswordMessage} from '../../../domain/auth/enums/change-password-message.enum';
-import {EmailConfirmationDto} from '../../../domain/auth/dtos/email-confirmation.dto';
 import {EmailConfirmationResult} from '../../../domain/auth/models/results/email-confirmation.result';
 import {EmailConfirmationMessage} from '../../../domain/auth/enums/confirm-email.message';
 import {MailService} from '../../../shared/mail/services/mail.service';
@@ -34,6 +33,7 @@ import {UpdateUserDto} from '../../../domain/auth/dtos/update-user.dto';
 import {UpdateUserResult} from '../../../domain/auth/models/results/update-user.result';
 import {ValidateFacebookUserDto} from '../../../domain/auth/dtos/validate-facebook-user.dto';
 import {UserModel} from '../../../domain/auth/models/user.model';
+import {ConfirmEmailDto} from '../../../domain/auth/dtos/confirm-email.dto';
 
 
 @Injectable()
@@ -123,7 +123,8 @@ export class AuthRepository extends IAuthRepository {
 
     async register(input: RegisterDto): Promise<RegisterResult> {
         let result: RegisterResult = {success: false, message: RegisterMessage.EmailAddressAlreadyExists};
-        const {email, provider, password, activated} = input;
+        let {email, provider, password, activated} = input;
+        provider = !provider ? 'application' : provider;
 
         const docExstingEmail = await this.userModel.findOne({
             email, provider
@@ -141,9 +142,15 @@ export class AuthRepository extends IAuthRepository {
                 const enc = await this.utilService.encrypt(user.id);
                 const token = `${enc.content}${enc.iv}`
 
-                if(!activated) {
+                if (!activated) {
                     await this.accountModel.insertMany({token, userId: user.id});
-                    this.mailService.sendUserConfirmation(user, token);
+                    try {
+                        await this.mailService.sendUserConfirmation(user, token);
+                    } catch (error) {
+                        await this.userModel.deleteOne({email: user.email});
+                        error.statusCode = 400;
+                        throw error;
+                    }
                 }
                 result = {success: true, message: RegisterMessage.SuccessfulRegistration};
             }
@@ -227,7 +234,7 @@ export class AuthRepository extends IAuthRepository {
         return result;
     }
 
-    async confirmEmail(input: EmailConfirmationDto): Promise<EmailConfirmationResult> {
+    async confirmEmail(input: ConfirmEmailDto): Promise<EmailConfirmationResult> {
         let result: EmailConfirmationResult = {success: false, message: EmailConfirmationMessage.InvalidOrExpired};
 
         const {token} = input;
