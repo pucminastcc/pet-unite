@@ -15,6 +15,7 @@ import {MessagesModule} from 'primeng/messages';
 import {HttpClient, HttpClientModule} from '@angular/common/http';
 import {CheckboxModule} from 'primeng/checkbox';
 import { EmailConfirmationComponent } from './components/email-confirmation/email-confirmation.component';
+import {SharedModule} from '../shared/shared.module';
 
 
 @NgModule({
@@ -25,17 +26,18 @@ import { EmailConfirmationComponent } from './components/email-confirmation/emai
     PasswordResetComponent,
     EmailConfirmationComponent
   ],
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    FormsModule,
-    ButtonModule,
-    MessageModule,
-    MessagesModule,
-    HttpClientModule,
-    CheckboxModule,
-    AuthRoutingModule
-  ],
+    imports: [
+        CommonModule,
+        ReactiveFormsModule,
+        FormsModule,
+        ButtonModule,
+        MessageModule,
+        MessagesModule,
+        HttpClientModule,
+        CheckboxModule,
+        AuthRoutingModule,
+        SharedModule
+    ],
   providers: [
     FormBuilderTypeSafe,
     MessageService

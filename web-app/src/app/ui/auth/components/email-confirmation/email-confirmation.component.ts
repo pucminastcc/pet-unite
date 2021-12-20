@@ -11,7 +11,8 @@ import {EmailConfirmationModel} from '../../../../domain/auth/models/email-confi
 })
 export class EmailConfirmationComponent implements OnInit {
   private params: EmailConfirmationModel | undefined;
-  private result: ConfirmEmailResult | undefined;
+  public result: ConfirmEmailResult | undefined;
+  public isLoading: boolean = true;
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -35,7 +36,12 @@ export class EmailConfirmationComponent implements OnInit {
         key
       }).subscribe((data: ConfirmEmailResult) => {
         if (data) {
-          this.result = data;
+          if(data.success) {
+            this.result = data;
+            this.isLoading = false;
+          } else {
+            window.location.href = '/';
+          }
         }
       });
     }
