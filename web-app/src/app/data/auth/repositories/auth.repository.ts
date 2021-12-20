@@ -21,6 +21,7 @@ import {GetAuthenticatedUserInput} from 'src/app/domain/auth/commands/inputs/get
 import {AuthenticatedUserModel} from '../../../domain/auth/models/authenticated-user.model';
 import {ConfirmEmailInput} from '../../../domain/auth/commands/inputs/confirm-email.input';
 import {ConfirmEmailResult} from '../../../domain/auth/models/results/confirm-email.result';
+import {FacebookLoginInput} from '../../../domain/auth/commands/inputs/facebook-login.input';
 
 @Injectable({
   providedIn: 'root'
@@ -33,19 +34,25 @@ export class AuthRepository extends IAuthRepository {
     super();
   }
 
+  private setAuthValue(accessToken: string, user: AuthenticatedUserModel): void {
+    const authValue = {accessToken, user};
+    this.localService.setJsonValue('auth', JSON.stringify(authValue));
+  }
+
   login(input: LoginInput): Observable<LoginResult> {
     return this.http.post<LoginResult>(`${environment.apiUrl}/auth/login`, input)
       .pipe(map((result: LoginResult) => {
         if (result.accessToken) {
-          const authValue = {
-            accessToken: result.accessToken,
-            user: result.user
-          };
+          const {accessToken, user} = result;
+          this.setAuthValue(accessToken, user);
           // this.localService.decodePayloadJwt(result.accessToken);
-          this.localService.setJsonValue('auth', JSON.stringify(authValue));
         }
         return result;
       }));
+  }
+
+  facebookLogin(input?: FacebookLoginInput): void {
+    window.location.href = `${environment.apiUrl}/auth/facebook`;
   }
 
   register(input: RegisterInput): Observable<RegisterResult> {
@@ -85,8 +92,14 @@ export class AuthRepository extends IAuthRepository {
   }
 
   getAuthenticatedUser(input?: GetAuthenticatedUserInput): Observable<AuthenticatedUserModel> {
+    if (input?.accessToken) {
+      const {accessToken, user} = input;
+      this.setAuthValue(accessToken, user);
+    }
+
     const auth = this.localService.getJsonValue('auth');
     const result: AuthenticatedUserModel = auth?.user as AuthenticatedUserModel;
+
     return observableOf(result);
   }
 

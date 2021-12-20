@@ -11,4 +11,6 @@ export const validationSchema = Joi.object({
     SMTP_USER: Joi.string().required(),
     SMTP_PASS: Joi.string().required(),
     JWT_SECRET: Joi.string().required(),
+    FACEBOOK_APP_ID: Joi.string().required(),
+    FACEBOOK_APP_SECRET: Joi.string().required(),
 });

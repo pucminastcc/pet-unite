@@ -1,4 +1,4 @@
-export interface ValidateUserDto {
+export interface ValidateLocalUserDto {
     email: string;
     password: string;
 }

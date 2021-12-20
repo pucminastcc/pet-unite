@@ -42,6 +42,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
       username: new FormControl('', [Validators.required, Validators.maxLength(25)]),
       password: new FormControl('', [Validators.required, Validators.minLength(8), Validators.maxLength(16)]),
       confirmPassword: new FormControl('', [Validators.required]),
+      provider: new FormControl('application', [Validators.required]),
       terms: new FormControl(false, [Validators.requiredTrue])
     }, {
       validator: this.mustMatch('password', 'confirmPassword')
@@ -115,11 +116,12 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
     this.isLoading = true;
     this.config.closable = false;
-    const {email, username, password} = this.registerForm.value;
+    const {email, username, password, provider} = this.registerForm.value;
     this.registerSubscription = this.authService.register({
       email,
       username,
-      password
+      password,
+      provider
     }).subscribe((data: RegisterResult) => {
       if (data) {
         if (data.success) {
@@ -135,10 +137,12 @@ export class RegisterComponent implements OnInit, OnDestroy {
           }
         }
         this.isLoading = false;
+        this.config.closable = true;
       }
     }, () => {
       this.notify('error', 'Erro', 'Ops, algo deu errado');
       this.isLoading = false;
+      this.config.closable = true;
     });
   }
 }

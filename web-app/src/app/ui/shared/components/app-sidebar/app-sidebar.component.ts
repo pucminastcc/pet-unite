@@ -1,8 +1,9 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output} from '@angular/core';
 import {SidebarMenuItemModel} from '../../../../domain/shared/components/app-sidebar/models/sidebar-menu-item.model';
 import {AuthService} from '../../../auth/services/auth.service';
 import {Subscription} from 'rxjs';
 import {LogoutResult} from '../../../../domain/auth/models/results/logout.result';
+import {AuthenticatedUserModel} from '../../../../domain/auth/models/authenticated-user.model';
 
 @Component({
   selector: 'app-sidebar',
@@ -10,10 +11,11 @@ import {LogoutResult} from '../../../../domain/auth/models/results/logout.result
   styleUrls: ['./app-sidebar.component.scss']
 })
 export class AppSidebarComponent implements OnInit, OnDestroy {
-  private logoutSubscription: Subscription | undefined;
-
+  @Input() isMobile: boolean = false;
+  @Input() user: AuthenticatedUserModel | undefined;
   @Input() menuItems: SidebarMenuItemModel[] = [];
   @Output() onMenuItemClick: EventEmitter<any> = new EventEmitter<any>();
+  @Output() onLogout: EventEmitter<any> = new EventEmitter<any>();
 
   constructor(
     private readonly authService: AuthService
@@ -24,25 +26,13 @@ export class AppSidebarComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.logoutSubscription)
-      this.logoutSubscription.unsubscribe();
   }
-
-  public isMobileMenu(): boolean {
-    return window.innerWidth <= 991;
-  };
 
   public clickMenuItem(): void {
     this.onMenuItemClick.emit();
   }
 
   public logout(): void {
-    this.authService.logout().subscribe((data: LogoutResult) => {
-      if (data) {
-        if (data.success) {
-          window.location.href = '/';
-        }
-      }
-    });
+    this.onLogout.emit();
   }
 }

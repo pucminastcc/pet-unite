@@ -97,7 +97,6 @@ export class LoginComponent implements OnInit, OnDestroy {
     }).subscribe((data: LoginResult) => {
       if (data) {
         if (data.accessToken && data.user) {
-          console.log(data.accessToken);
           this.notify('success', 'Sucesso', data.message);
           setTimeout(() => window.location.reload(), 3000);
         } else {
@@ -112,5 +111,6 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   public facebookLogin(): void {
+    this.authenticationService.facebookLogin();
   }
 }

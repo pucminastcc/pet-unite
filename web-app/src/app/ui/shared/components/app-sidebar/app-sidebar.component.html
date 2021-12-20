@@ -2,9 +2,13 @@
   <div class="logo">
     <a class="simple-text" href="javascript:void(0)">
       <div class="logo-normal">
-        <img alt="Logo" height="125" src="./assets/img/angular.png"/>
+        <img #avatar (error)="avatar.src = './assets/img/avatar.png'" alt="Logo" class="rounded-circle" height="125"
+             src="{{user?.img}}"/>
       </div>
     </a>
+    <div class="text-center text-gray">
+      {{user?.username}}
+    </div>
   </div>
   <div class="sidebar-wrapper">
     <ul class="nav">
@@ -21,7 +25,7 @@
         </a>
       </li>
     </ul>
-    <div *ngIf="isMobileMenu()" class="mt-2">
+    <div *ngIf="isMobile" class="mt-2">
       <ul class="nav navbar-nav nav-mobile-menu">
         <li class="nav-item">
           <a (click)="logout()" class="nav-link">

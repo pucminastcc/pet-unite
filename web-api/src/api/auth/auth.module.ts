@@ -4,6 +4,7 @@ import {AuthService} from './services/auth.service';
 import {LocalStrategy} from './shared/guards/local.strategy';
 import {JwtStrategy} from './shared/guards/jwt.strategy';
 import {PassportModule} from '@nestjs/passport';
+import {FacebookStrategy} from './shared/guards/facebook.strategy';
 
 @Module({
     imports: [PassportModule],
@@ -11,7 +12,8 @@ import {PassportModule} from '@nestjs/passport';
     providers: [
         AuthService,
         LocalStrategy,
-        JwtStrategy
+        JwtStrategy,
+        FacebookStrategy,
     ],
 })
 export class AuthModule {

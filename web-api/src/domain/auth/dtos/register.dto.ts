@@ -5,4 +5,5 @@ export interface RegisterDto {
     terms: boolean;
     activated: boolean;
     provider: string;
+    img: string;
 }

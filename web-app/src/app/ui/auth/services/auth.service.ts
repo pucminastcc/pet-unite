@@ -25,6 +25,8 @@ import {AuthenticatedUserModel} from '../../../domain/auth/models/authenticated-
 import {ConfirmEmailCommand} from '../../../domain/auth/commands/confirm-email.command';
 import {ConfirmEmailInput} from '../../../domain/auth/commands/inputs/confirm-email.input';
 import {ConfirmEmailResult} from '../../../domain/auth/models/results/confirm-email.result';
+import {FacebookLoginInput} from '../../../domain/auth/commands/inputs/facebook-login.input';
+import {FacebookLoginCommand} from '../../../domain/auth/commands/facebook-login.command';
 
 @Injectable({
   providedIn: 'root'
@@ -33,6 +35,7 @@ export class AuthService implements IAuthRepository {
 
   constructor(
     private readonly loginCommand: LoginCommand,
+    private readonly facebookLoginCommand: FacebookLoginCommand,
     private readonly registerCommand: RegisterCommand,
     private readonly sendPasswordResetCommand: SendPasswordResetCodeCommand,
     private readonly validatePasswordRecoveryCommand: ValidatePasswordResetCodeCommand,
@@ -45,6 +48,10 @@ export class AuthService implements IAuthRepository {
 
   login(input: LoginInput): Observable<LoginResult> {
     return this.loginCommand.execute(input);
+  }
+
+  facebookLogin(input?: FacebookLoginInput): void {
+    this.facebookLoginCommand.execute(input);
   }
 
   register(input: RegisterInput): Observable<RegisterResult> {

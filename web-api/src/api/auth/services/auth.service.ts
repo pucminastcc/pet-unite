@@ -13,10 +13,11 @@ import {ChangePasswordDto} from '../../../domain/auth/dtos/change-password.dto';
 import {ChangePasswordResult} from '../../../domain/auth/models/results/change-password.result';
 import { EmailConfirmationDto } from 'src/domain/auth/dtos/email-confirmation.dto';
 import { EmailConfirmationResult } from 'src/domain/auth/models/results/email-confirmation.result';
-import {ValidateUserDto} from '../../../domain/auth/dtos/validate-user.dto';
 import {ValidateUserResult} from '../../../domain/auth/models/results/validate-user.result';
 import {UpdateUserDto} from '../../../domain/auth/dtos/update-user.dto';
 import {UpdateUserResult} from '../../../domain/auth/models/results/update-user.result';
+import {ValidateLocalUserDto} from '../../../domain/auth/dtos/validate-local-user.dto';
+import {ValidateFacebookUserDto} from '../../../domain/auth/dtos/validate-facebook-user.dto';
 
 @Injectable()
 export class AuthService implements IAuthRepository {
@@ -25,8 +26,12 @@ export class AuthService implements IAuthRepository {
     ) {
     }
 
-    async validateUser(input: ValidateUserDto): Promise<ValidateUserResult> {
-        return await this.repository.validateUser(input);
+    async validateLocalUser(input: ValidateLocalUserDto): Promise<ValidateUserResult> {
+        return await this.repository.validateLocalUser(input);
+    }
+
+    async validateFacebookUser(input: ValidateFacebookUserDto): Promise<ValidateUserResult> {
+        return await this.repository.validateFacebookUser(input);
     }
 
     async login(input: LoginDto): Promise<LoginResult> {

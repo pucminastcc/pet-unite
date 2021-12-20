@@ -9,6 +9,8 @@ import {Subscription} from 'rxjs';
 import {LogoutResult} from '../../../../domain/auth/models/results/logout.result';
 import {AuthenticatedUserModel} from '../../../../domain/auth/models/authenticated-user.model';
 import {NavigationStart, Router} from '@angular/router';
+import {CookieService} from 'ngx-cookie-service';
+import {LoginResult} from '../../../../domain/auth/models/results/login.result';
 
 @Component({
   selector: 'app-index-layout',
@@ -30,7 +32,8 @@ export class AppIndexLayoutComponent implements OnInit, AfterViewInit, OnDestroy
     private readonly dialogService: DialogService,
     private readonly messageService: MessageService,
     private readonly authService: AuthService,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly cookieService: CookieService
   ) {
     // @ts-ignore
     this.router.events.subscribe((event: NavigationStart) => {
@@ -39,12 +42,16 @@ export class AppIndexLayoutComponent implements OnInit, AfterViewInit, OnDestroy
       }
     });
 
-    this.getAuthenticatedUserSubscription = this.authService.getAuthenticatedUser()
-      .subscribe((data: AuthenticatedUserResult) => {
-        if (data) {
-          this.user = data;
-        }
-      });
+    const data = this.getFacebookData();
+
+    this.getAuthenticatedUserSubscription = this.authService.getAuthenticatedUser({
+      accessToken: data?.accessToken,
+      user: data?.user
+    }).subscribe((data: AuthenticatedUserResult) => {
+      if (data) {
+        this.user = data;
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -61,15 +68,26 @@ export class AppIndexLayoutComponent implements OnInit, AfterViewInit, OnDestroy
     if (this.ref)
       this.ref.destroy();
 
-    this.unsubscribe();
-  }
-
-  private unsubscribe(): void {
     if (this.getAuthenticatedUserSubscription)
       this.getAuthenticatedUserSubscription.unsubscribe();
 
     if (this.logoutSubscription)
       this.logoutSubscription.unsubscribe();
+  }
+
+  private getFacebookData(): LoginResult {
+    let result;
+    const facebook = this.cookieService.get('facebook');
+
+    if (facebook) {
+      this.cookieService.delete('facebook');
+      result = JSON.parse(facebook.substring(2, facebook.length));
+    }
+
+    return {
+      accessToken: result?.accessToken,
+      user: result?.user
+    }
   }
 
   private getMenuItems(): NavbarMenuItemModel[] {
