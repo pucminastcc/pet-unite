@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree} from '@angular/router';
 import {AuthService} from '../../auth/services/auth.service';
+import {AuthenticatedUserModel} from '../../../domain/auth/models/authenticated-user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +21,7 @@ export class AuthGuard implements CanActivate {
 
     await this.authService.getAuthenticatedUser()
       .toPromise()
-      .then((data) => {
+      .then((data: AuthenticatedUserModel) => {
         isAuthenticated = !!data;
       });
 

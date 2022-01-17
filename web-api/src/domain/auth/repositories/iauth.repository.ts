@@ -11,10 +11,12 @@ import {ValidatePasswordResetCodeDto} from '../dtos/validate-password-reset-code
 import {ValidatePasswordResetCodeResult} from '../models/results/validate-password-reset-code.result';
 import {ChangePasswordDto} from '../dtos/change-password.dto';
 import {ChangePasswordResult} from '../models/results/change-password.result';
-import {EmailConfirmationResult} from '../models/results/email-confirmation.result';
+import {ConfirmEmailDto} from '../dtos/confirm-email.dto';
+import {ConfirmEmailResult} from '../models/results/email-confirmation.result';
+import {GetUserDto} from '../dtos/get-user.dto';
+import {GetUserResult} from '../models/results/get-user.result';
 import {UpdateUserDto} from '../dtos/update-user.dto';
 import {UpdateUserResult} from '../models/results/update-user.result';
-import {ConfirmEmailDto} from '../dtos/confirm-email.dto';
 
 
 export abstract class IAuthRepository {
@@ -32,7 +34,9 @@ export abstract class IAuthRepository {
 
     abstract changePassword(input: ChangePasswordDto): Promise<ChangePasswordResult>;
 
-    abstract confirmEmail(input: ConfirmEmailDto): Promise<EmailConfirmationResult>;
+    abstract confirmEmail(input: ConfirmEmailDto): Promise<ConfirmEmailResult>;
+
+    abstract getUser(input: GetUserDto): Promise<GetUserResult>;
 
     abstract updateUser(input: UpdateUserDto): Promise<UpdateUserResult>;
 }

@@ -5,9 +5,11 @@ import {Model} from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import {User} from '../../../domain/auth/models/interfaces/user.interface';
+import {UserModel} from '../../../domain/auth/models/user.model';
 import {PasswordResetCode} from '../../../domain/auth/models/interfaces/password-reset.interface';
 import {Account} from '../../../domain/auth/models/interfaces/account.interface';
 import {ValidateLocalUserDto} from '../../../domain/auth/dtos/validate-local-user.dto';
+import {ValidateFacebookUserDto} from '../../../domain/auth/dtos/validate-facebook-user.dto';
 import {ValidateUserResult} from '../../../domain/auth/models/results/validate-user.result';
 import {LoginDto} from '../../../domain/auth/dtos/login.dto';
 import {LoginResult} from '../../../domain/auth/models/results/login.result';
@@ -24,16 +26,16 @@ import {ValidatePasswordResetCodeMessage} from '../../../domain/auth/enums/valid
 import {ChangePasswordDto} from 'src/domain/auth/dtos/change-password.dto';
 import {ChangePasswordResult} from 'src/domain/auth/models/results/change-password.result';
 import {ChangePasswordMessage} from '../../../domain/auth/enums/change-password-message.enum';
-import {EmailConfirmationResult} from '../../../domain/auth/models/results/email-confirmation.result';
 import {EmailConfirmationMessage} from '../../../domain/auth/enums/confirm-email.message';
 import {MailService} from '../../../shared/mail/services/mail.service';
 import {UtilService} from '../../../shared/util/services/util.service';
 import {JwtService} from '@nestjs/jwt';
+import {ConfirmEmailDto} from '../../../domain/auth/dtos/confirm-email.dto';
+import {ConfirmEmailResult} from '../../../domain/auth/models/results/email-confirmation.result';
 import {UpdateUserDto} from '../../../domain/auth/dtos/update-user.dto';
 import {UpdateUserResult} from '../../../domain/auth/models/results/update-user.result';
-import {ValidateFacebookUserDto} from '../../../domain/auth/dtos/validate-facebook-user.dto';
-import {UserModel} from '../../../domain/auth/models/user.model';
-import {ConfirmEmailDto} from '../../../domain/auth/dtos/confirm-email.dto';
+import {GetUserDto} from '../../../domain/auth/dtos/get-user.dto';
+import {GetUserResult} from '../../../domain/auth/models/results/get-user.result';
 
 
 @Injectable()
@@ -52,9 +54,14 @@ export class AuthRepository extends IAuthRepository {
 
     private getPayload(doc): UserModel {
         return {
+            id: doc.id,
             email: doc.email,
             username: doc.username,
-            img: doc.img
+            img: doc.img,
+            personTypeId: doc.personTypeId,
+            document: doc.document,
+            zipCode: doc.zipCode,
+            address: doc.address
         };
     }
 
@@ -114,8 +121,13 @@ export class AuthRepository extends IAuthRepository {
 
         if (payload) {
             result = {
-                ...result,
-                accessToken: this.jwtService.sign(payload)
+                accessToken: this.jwtService.sign(payload),
+                user: {
+                    email: payload.email,
+                    username: payload.username,
+                    img: payload.img
+                },
+                message
             }
         }
         return result;
@@ -234,8 +246,8 @@ export class AuthRepository extends IAuthRepository {
         return result;
     }
 
-    async confirmEmail(input: ConfirmEmailDto): Promise<EmailConfirmationResult> {
-        let result: EmailConfirmationResult = {success: false, message: EmailConfirmationMessage.InvalidOrExpired};
+    async confirmEmail(input: ConfirmEmailDto): Promise<ConfirmEmailResult> {
+        let result: ConfirmEmailResult = {success: false, message: EmailConfirmationMessage.InvalidOrExpired};
 
         const {token} = input;
         const account = await this.accountModel.findOne({token}).exec();
@@ -257,7 +269,51 @@ export class AuthRepository extends IAuthRepository {
         return result;
     }
 
+    async getUser(input: GetUserDto): Promise<GetUserResult> {
+        let result: GetUserResult = {success: false, data: undefined};
+        const {id} = input;
+
+        const user = await this.userModel.findById(id).exec();
+
+        if (user) {
+            result = {
+                success: true,
+                data: {
+                    id: user.id,
+                    email: user.email,
+                    username: user.username,
+                    img: user.img,
+                    personTypeId: user.personTypeId,
+                    document: user.document,
+                    zipCode: user.zipCode,
+                    address: user.address,
+                    district: user.district,
+                    city: user.city,
+                    state: user.state,
+                    complement: user.complement
+                }
+            }
+        }
+        return result;
+    }
+
     async updateUser(input: UpdateUserDto): Promise<UpdateUserResult> {
-        return Promise.resolve(undefined);
+        let result: UpdateUserResult = {success: false, message: ''};
+        const {id, username, personTypeId, document, zipCode, address, district, city, state, complement} = input;
+
+        const update = await this.userModel.findOneAndUpdate({
+            _id: id
+        }, {
+            username, personTypeId, document, zipCode, address, district, city, state, complement
+        });
+
+        if (update) {
+            result = {
+                success: true,
+                message: ''
+            }
+        }
+
+        return result;
     }
 }
