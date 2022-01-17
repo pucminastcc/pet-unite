@@ -16,6 +16,11 @@ import {AuthenticatedUserModel} from '../models/authenticated-user.model';
 import {ConfirmEmailInput} from '../commands/inputs/confirm-email.input';
 import {ConfirmEmailResult} from '../models/results/confirm-email.result';
 import {FacebookLoginInput} from '../commands/inputs/facebook-login.input';
+import {GetTokenInput} from '../commands/inputs/get-token.input';
+import {UpdateUserInput} from '../commands/inputs/update-user.input';
+import {UpdateUserResult} from '../models/results/update-user.result';
+import {GetUserInput} from '../commands/inputs/get-user.input';
+import {GetUserResult} from '../models/results/get-user.result';
 
 export abstract class IAuthRepository {
   abstract login(input: LoginInput): Observable<LoginResult>;
@@ -35,4 +40,10 @@ export abstract class IAuthRepository {
   abstract getAuthenticatedUser(input: GetAuthenticatedUserInput): Observable<AuthenticatedUserModel>;
 
   abstract confirmEmail(input: ConfirmEmailInput): Observable<ConfirmEmailResult>;
+
+  abstract getToken(input?: GetTokenInput): string;
+
+  abstract getUser(input: GetUserInput): Observable<GetUserResult>;
+
+  abstract updateUser(input: UpdateUserInput): Observable<UpdateUserResult>;
 }

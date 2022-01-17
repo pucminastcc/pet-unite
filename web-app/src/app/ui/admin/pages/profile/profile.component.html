@@ -1,1 +1,157 @@
-<p>profile works!</p>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12">
+      <p-toast baseZIndex="9999"></p-toast>
+      <div class="card">
+        <div class="card-header card-header-danger">
+          <h4 class="card-title">Editando...</h4>
+          <!--      <p class="card-category">Complete seu perfil</p>-->
+        </div>
+        <div class="card-body p-fluid">
+          <form [formGroup]="profileForm">
+            <div class="row">
+              <div class="col-12 col-md-12 text-center py-5">
+                <img #avatar
+                     (error)="avatar.src = './assets/img/avatar.png'"
+                     [src]="img"
+                     alt="Logo"
+                     class="rounded-circle"
+                     height="125"/>
+              </div>
+            </div>
+            <p-tabView>
+              <p-tabPanel header="Dados Principais">
+                <div class="row">
+                  <div class="col-12 col-md-6">
+                    <label for="email-input">Email</label>
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-envelope"></i>
+                        <input #emailInput
+                               [formControl]="pf.email"
+                               [readOnly]="true"
+                               [spellcheck]="false"
+                               class="p-inputtext p-inputtext-sm"
+                               id="email-input"
+                               pInputText
+                               placeholder="Email"
+                               type="email">
+                    </span>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label for="username-input">Usuário</label>
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-user"></i>
+                        <input #usernameInput
+                               [formControl]="pf.username"
+                               [readOnly]="true"
+                               [spellcheck]="false"
+                               class="p-inputtext p-inputtext-sm"
+                               id="username-input"
+                               pInputText
+                               placeholder="Usuário"
+                               type="text">
+                    </span>
+                  </div>
+                </div>
+                <div class="row mt-2">
+                  <div class="col-12 col-md-6">
+                    <label for="username-input">Tipo de Pessoa</label>
+                    <p-dropdown #personTypeInput
+                                (onChange)="changePersonType($event.value)"
+                                [formControl]="pf.personTypeId"
+                                [options]="optPersonTypes"
+                                emptyMessage="Nenhum registro foi encontrado."
+                                optionValue="value.id"
+                                placeholder="Selecione o tipo de pessoa">
+                    </p-dropdown>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label for="username-input">{{document}}</label>
+                    <p-inputMask #documentInput
+                                 *ngIf="documentMask"
+                                 [formControl]="pf.document"
+                                 [mask]="documentMask">
+                    </p-inputMask>
+                  </div>
+                </div>
+                <div class="row mt-2">
+                  <div class="col-12 col-md-6">
+                    <label>CEP</label>
+                    <p-inputMask #zipCodeInput
+                                 (focusout)="getAddress(pf.zipCode.value)"
+                                 [formControl]="pf.zipCode"
+                                 mask="99.999-999">
+                    </p-inputMask>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label>Logradouro</label>
+                    <input #addressInput
+                           [formControl]="pf.address"
+                           [spellcheck]="false"
+                           class="p-inputtext p-inputtext-sm"
+                           pInputText
+                           type="text">
+                  </div>
+                </div>
+                <div class="row mt-2">
+                  <div class="col-12 col-md-4">
+                    <label>Cidade</label>
+                    <input #cityInput
+                           [formControl]="pf.city"
+                           [spellcheck]="false"
+                           class="p-inputtext p-inputtext-sm"
+                           pInputText
+                           type="text">
+                  </div>
+                  <div class="col-12 col-md-2">
+                    <label>UF</label>
+                    <input #stateInput
+                           [formControl]="pf.state"
+                           [spellcheck]="false"
+                           class="p-inputtext p-inputtext-sm"
+                           pInputText
+                           type="text">
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label>Bairro</label>
+                    <input #districtInput
+                           [formControl]="pf.district"
+                           [spellcheck]="false"
+                           class="p-inputtext p-inputtext-sm"
+                           pInputText
+                           type="text">
+                  </div>
+                </div>
+                <div class="row mt-2">
+                  <div class="col-12 col-md-6">
+                    <label>Complemento</label>
+                    <input #complementInput
+                           [formControl]="pf.complement"
+                           [spellcheck]="false"
+                           class="p-inputtext p-inputtext-sm"
+                           pInputText
+                           type="text">
+                  </div>
+                </div>
+              </p-tabPanel>
+            </p-tabView>
+            <div class="col-12 col-md-2 float-left py-3">
+              <button (click)="tryUpdate()"
+                      [loading]="isLoading"
+                      [ngStyle]="{backgroundColor:'var(--green-500)', borderColor:'var(--green-500)'}"
+                      class="p-button p-button-sm p-button-raised p-button-rounded"
+                      icon="pi pi-check-circle"
+                      iconPos="left"
+                      label="Atualizar"
+                      pButton
+                      type="button">
+              </button>
+            </div>
+            <div class="clearfix"></div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -11,13 +11,15 @@ import {ValidatePasswordResetCodeDto} from '../../../domain/auth/dtos/validate-p
 import {ValidatePasswordResetCodeResult} from '../../../domain/auth/models/results/validate-password-reset-code.result';
 import {ChangePasswordDto} from '../../../domain/auth/dtos/change-password.dto';
 import {ChangePasswordResult} from '../../../domain/auth/models/results/change-password.result';
-import {EmailConfirmationResult} from 'src/domain/auth/models/results/email-confirmation.result';
 import {ValidateUserResult} from '../../../domain/auth/models/results/validate-user.result';
-import {UpdateUserDto} from '../../../domain/auth/dtos/update-user.dto';
-import {UpdateUserResult} from '../../../domain/auth/models/results/update-user.result';
 import {ValidateLocalUserDto} from '../../../domain/auth/dtos/validate-local-user.dto';
 import {ValidateFacebookUserDto} from '../../../domain/auth/dtos/validate-facebook-user.dto';
 import {ConfirmEmailDto} from '../../../domain/auth/dtos/confirm-email.dto';
+import {ConfirmEmailResult} from '../../../domain/auth/models/results/email-confirmation.result';
+import {GetUserDto} from 'src/domain/auth/dtos/get-user.dto';
+import {GetUserResult} from 'src/domain/auth/models/results/get-user.result';
+import {UpdateUserDto} from '../../../domain/auth/dtos/update-user.dto';
+import {UpdateUserResult} from '../../../domain/auth/models/results/update-user.result';
 
 @Injectable()
 export class AuthService implements IAuthRepository {
@@ -54,8 +56,12 @@ export class AuthService implements IAuthRepository {
         return await this.repository.changePassword(input);
     }
 
-    async confirmEmail(input: ConfirmEmailDto): Promise<EmailConfirmationResult> {
+    async confirmEmail(input: ConfirmEmailDto): Promise<ConfirmEmailResult> {
         return await this.repository.confirmEmail(input);
+    }
+
+    async getUser(input: GetUserDto): Promise<GetUserResult> {
+        return await this.repository.getUser(input);
     }
 
     async updateUser(input: UpdateUserDto): Promise<UpdateUserResult> {

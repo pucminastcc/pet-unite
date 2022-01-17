@@ -22,13 +22,21 @@ import {AuthenticatedUserModel} from '../../../domain/auth/models/authenticated-
 import {ConfirmEmailInput} from '../../../domain/auth/commands/inputs/confirm-email.input';
 import {ConfirmEmailResult} from '../../../domain/auth/models/results/confirm-email.result';
 import {FacebookLoginInput} from '../../../domain/auth/commands/inputs/facebook-login.input';
+import {GetTokenInput} from '../../../domain/auth/commands/inputs/get-token.input';
+import {ApiDatasource} from '../../datasources/api.datasource';
+import {UpdateUserInput} from '../../../domain/auth/commands/inputs/update-user.input';
+import {UpdateUserResult} from '../../../domain/auth/models/results/update-user.result';
+import {GetUserInput} from '../../../domain/auth/commands/inputs/get-user.input';
+import {GetUserResult} from '../../../domain/auth/models/results/get-user.result';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthRepository extends IAuthRepository {
+
   constructor(
     private readonly http: HttpClient,
+    private readonly api: ApiDatasource,
     private readonly localService: LocalService
   ) {
     super();
@@ -106,6 +114,27 @@ export class AuthRepository extends IAuthRepository {
   confirmEmail(input: ConfirmEmailInput): Observable<ConfirmEmailResult> {
     return this.http.patch<ConfirmEmailResult>(`${environment.apiUrl}/auth/confirm`, input)
       .pipe(map((result: ConfirmEmailResult) => {
+        return result;
+      }));
+  }
+
+  getToken(input?: GetTokenInput): string {
+    const auth = this.localService.getJsonValue('auth');
+    return auth?.accessToken as string;
+  }
+
+  getUser(input: GetUserInput): Observable<GetUserResult> {
+    const {accessToken} = input;
+    return this.api.get<GetUserResult>(`${environment.apiUrl}/auth/user`, accessToken)
+      .pipe(map((result: GetUserResult) => {
+        return result;
+      }));
+  }
+
+  updateUser(input: UpdateUserInput): Observable<UpdateUserResult> {
+    const {accessToken} = input;
+    return this.api.put<UpdateUserResult>(`${environment.apiUrl}/auth/user`, input, accessToken)
+      .pipe(map((result: UpdateUserResult) => {
         return result;
       }));
   }

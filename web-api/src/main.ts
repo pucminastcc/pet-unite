@@ -1,6 +1,6 @@
 import {NestFactory} from '@nestjs/core';
 import {AppModule} from './app.module';
-import {SwaggerModule, DocumentBuilder, SwaggerDocumentOptions} from '@nestjs/swagger';
+import {DocumentBuilder, SwaggerModule} from '@nestjs/swagger';
 import {ConfigService} from '@nestjs/config';
 
 async function bootstrap() {
@@ -11,9 +11,10 @@ async function bootstrap() {
     app.enableCors();
 
     const options = new DocumentBuilder()
-        .setTitle('Documentação')
+        .setTitle('Pet Unite')
         .setDescription('descrição da API do projeto')
         .setVersion('1.0')
+        .addBearerAuth()
         .build();
     const document = SwaggerModule.createDocument(app, options);
     SwaggerModule.setup('swagger', app, document);

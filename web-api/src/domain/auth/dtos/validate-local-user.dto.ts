@@ -1,8 +1,8 @@
 import {ApiProperty} from '@nestjs/swagger';
 
 export class ValidateLocalUserDto {
-    @ApiProperty()
+    @ApiProperty({default: 'sistema@exemplo.com', required: true})
     email: string;
-    @ApiProperty()
+    @ApiProperty({default: '#@Senha!123', required: true})
     password: string;
 }

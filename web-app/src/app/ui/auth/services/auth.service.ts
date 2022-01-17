@@ -27,11 +27,21 @@ import {ConfirmEmailInput} from '../../../domain/auth/commands/inputs/confirm-em
 import {ConfirmEmailResult} from '../../../domain/auth/models/results/confirm-email.result';
 import {FacebookLoginInput} from '../../../domain/auth/commands/inputs/facebook-login.input';
 import {FacebookLoginCommand} from '../../../domain/auth/commands/facebook-login.command';
+import { GetTokenInput } from 'src/app/domain/auth/commands/inputs/get-token.input';
+import {GetTokenCommand} from '../../../domain/auth/commands/get-token.command';
+import {UpdateUserResult} from '../../../domain/auth/models/results/update-user.result';
+import {UpdateUserInput} from '../../../domain/auth/commands/inputs/update-user.input';
+import {UpdateUserCommand} from '../../../domain/auth/commands/update-user.command';
+import {GetUserCommand} from '../../../domain/auth/commands/get-user.command';
+import { GetUserInput } from 'src/app/domain/auth/commands/inputs/get-user.input';
+import { GetUserResult } from 'src/app/domain/auth/models/results/get-user.result';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService implements IAuthRepository {
+
+  private readonly accessToken: string;
 
   constructor(
     private readonly loginCommand: LoginCommand,
@@ -43,7 +53,11 @@ export class AuthService implements IAuthRepository {
     private readonly logoutCommand: LogoutCommand,
     private readonly getAuthenticatedUserCommand: GetAuthenticatedUserCommand,
     private readonly confirmEmailCommand: ConfirmEmailCommand,
+    private readonly getTokenCommand: GetTokenCommand,
+    private readonly getUserCommand: GetUserCommand,
+    private readonly updateUserCommand: UpdateUserCommand
   ) {
+    this.accessToken = this.getToken();
   }
 
   login(input: LoginInput): Observable<LoginResult> {
@@ -80,5 +94,23 @@ export class AuthService implements IAuthRepository {
 
   confirmEmail(input: ConfirmEmailInput): Observable<ConfirmEmailResult> {
     return this.confirmEmailCommand.execute(input);
+  }
+
+  getToken(input?: GetTokenInput): string {
+    return this.getTokenCommand.execute(input);
+  }
+
+  getUser(input?: GetUserInput): Observable<GetUserResult> {
+    return this.getUserCommand.execute({
+      ...input,
+      accessToken: this.accessToken
+    });
+  }
+
+  updateUser(input: UpdateUserInput): Observable<UpdateUserResult> {
+    return this.updateUserCommand.execute({
+      ...input,
+      accessToken: this.accessToken
+    });
   }
 }

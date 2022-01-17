@@ -3,6 +3,7 @@ import {MongooseModule} from '@nestjs/mongoose';
 import {UserSchema} from './schemas/user.schema';
 import {PasswordResetCodeSchema} from './schemas/password-reset-code.schema';
 import {AccountSchema} from './schemas/account.schema';
+import {PersonTypeSchema} from './schemas/person-type.schema';
 
 @Module({
     imports: [
@@ -14,6 +15,7 @@ import {AccountSchema} from './schemas/account.schema';
             {name: 'User', schema: UserSchema},
             {name: 'PasswordResetCode', schema: PasswordResetCodeSchema},
             {name: 'Account', schema: AccountSchema},
+            {name: 'PersonType', schema: PersonTypeSchema},
         ]),
     ],
     exports: [MongooseModule]
