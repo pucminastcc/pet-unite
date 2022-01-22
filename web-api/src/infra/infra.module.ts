@@ -3,6 +3,7 @@ import {AuthRepository} from './auth/repositories/auth.repository';
 import {DatabaseModule} from './database/database.module';
 import {JwtModule} from '@nestjs/jwt';
 import {ConfigRepository} from './config/repositories/config.repository';
+import {PetRepository} from './pet/repositories/pet.repository';
 
 @Global()
 @Module({
@@ -15,11 +16,13 @@ import {ConfigRepository} from './config/repositories/config.repository';
     ],
     exports: [
         AuthRepository,
-        ConfigRepository
+        ConfigRepository,
+        PetRepository
     ],
     providers: [
         AuthRepository,
-        ConfigRepository
+        ConfigRepository,
+        PetRepository
     ]
 })
 export class InfraModule {

@@ -4,6 +4,7 @@ import {UserSchema} from './schemas/user.schema';
 import {PasswordResetCodeSchema} from './schemas/password-reset-code.schema';
 import {AccountSchema} from './schemas/account.schema';
 import {PersonTypeSchema} from './schemas/person-type.schema';
+import {PetSchema} from './schemas/pet.schema';
 
 @Module({
     imports: [
@@ -16,6 +17,7 @@ import {PersonTypeSchema} from './schemas/person-type.schema';
             {name: 'PasswordResetCode', schema: PasswordResetCodeSchema},
             {name: 'Account', schema: AccountSchema},
             {name: 'PersonType', schema: PersonTypeSchema},
+            {name: 'Pet', schema: PetSchema},
         ]),
     ],
     exports: [MongooseModule]
