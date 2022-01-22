@@ -50,21 +50,21 @@ export class AuthController {
     @ApiResponse({status: 200, description: 'Resposta padrão para solicitação HTTP bem-sucedida.'})
     @ApiResponse({status: 400, description: 'A solicitação não pode ser atendida devido a sintaxe incorreta.'})
     @ApiResponse({status: 500, description: 'Erro do Servidor Interno.'})
-    async registration(@Body() req: RegisterDto, @Res() res): Promise<RegisterResult> {
-        const result = await this.authService.register(req);
+    async registration(@Body() body: RegisterDto, @Res() res): Promise<RegisterResult> {
+        const result = await this.authService.register(body);
         return res.status(HttpStatus.OK).json(result);
     }
 
     @Get('confirm')
     @ApiExcludeEndpoint()
-    async confirm(@Query() req: ConfirmEmailDto, @Res() res): Promise<ConfirmEmailResult> {
-        return res.redirect(`${process.env.APP_URL}/#/confirm/${req.token}/token`);
+    async confirm(@Query() query: ConfirmEmailDto, @Res() res): Promise<ConfirmEmailResult> {
+        return res.redirect(`${process.env.APP_URL}/#/confirm/${query.token}/token`);
     }
 
     @Patch('confirm')
     @ApiExcludeEndpoint()
-    async confirmEmail(@Body() req: ConfirmEmailDto): Promise<ConfirmEmailResult> {
-        return await this.authService.confirmEmail(req);
+    async confirmEmail(@Body() body: ConfirmEmailDto): Promise<ConfirmEmailResult> {
+        return await this.authService.confirmEmail(body);
     }
 
     @Post('login')
@@ -81,20 +81,20 @@ export class AuthController {
 
     @Post('passwordResetCode')
     @ApiExcludeEndpoint()
-    async passwordResetCode(@Body() req: SendPasswordResetCodeDto): Promise<SendPasswordResetCodeResult> {
-        return await this.authService.sendPasswordResetCode(req);
+    async passwordResetCode(@Body() body: SendPasswordResetCodeDto): Promise<SendPasswordResetCodeResult> {
+        return await this.authService.sendPasswordResetCode(body);
     }
 
     @Post('passwordResetCodeValidation')
     @ApiExcludeEndpoint()
-    async passwordResetCodeValidation(@Body() req: ValidatePasswordResetCodeDto): Promise<ValidatePasswordResetCodeResult> {
-        return await this.authService.validatePasswordResetCode(req);
+    async passwordResetCodeValidation(@Body() body: ValidatePasswordResetCodeDto): Promise<ValidatePasswordResetCodeResult> {
+        return await this.authService.validatePasswordResetCode(body);
     }
 
     @Patch('passwordReset')
     @ApiExcludeEndpoint()
-    async passwordReset(@Body() req: ChangePasswordDto): Promise<ChangePasswordResult> {
-        return await this.authService.changePassword(req);
+    async passwordReset(@Body() body: ChangePasswordDto): Promise<ChangePasswordResult> {
+        return await this.authService.changePassword(body);
     }
 
     @UseGuards(JwtAuthGuard)

@@ -4,10 +4,7 @@ import {InjectModel} from '@nestjs/mongoose';
 import {Model} from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
-import {User} from '../../../domain/auth/models/interfaces/user.interface';
-import {UserModel} from '../../../domain/auth/models/user.model';
-import {PasswordResetCode} from '../../../domain/auth/models/interfaces/password-reset.interface';
-import {Account} from '../../../domain/auth/models/interfaces/account.interface';
+import {User, UserModel} from '../../../domain/auth/models/user.model';
 import {ValidateLocalUserDto} from '../../../domain/auth/dtos/validate-local-user.dto';
 import {ValidateFacebookUserDto} from '../../../domain/auth/dtos/validate-facebook-user.dto';
 import {ValidateUserResult} from '../../../domain/auth/models/results/validate-user.result';
@@ -26,16 +23,18 @@ import {ValidatePasswordResetCodeMessage} from '../../../domain/auth/enums/valid
 import {ChangePasswordDto} from 'src/domain/auth/dtos/change-password.dto';
 import {ChangePasswordResult} from 'src/domain/auth/models/results/change-password.result';
 import {ChangePasswordMessage} from '../../../domain/auth/enums/change-password-message.enum';
-import {EmailConfirmationMessage} from '../../../domain/auth/enums/confirm-email.message';
 import {MailService} from '../../../shared/mail/services/mail.service';
 import {UtilService} from '../../../shared/util/services/util.service';
 import {JwtService} from '@nestjs/jwt';
 import {ConfirmEmailDto} from '../../../domain/auth/dtos/confirm-email.dto';
 import {ConfirmEmailResult} from '../../../domain/auth/models/results/email-confirmation.result';
+import {ConfirmEmailMessage} from '../../../domain/auth/enums/confirm-email-message.enum';
 import {UpdateUserDto} from '../../../domain/auth/dtos/update-user.dto';
 import {UpdateUserResult} from '../../../domain/auth/models/results/update-user.result';
 import {GetUserDto} from '../../../domain/auth/dtos/get-user.dto';
 import {GetUserResult} from '../../../domain/auth/models/results/get-user.result';
+import {PasswordResetCode} from '../../../domain/auth/models/password-reset-code.model';
+import {Account} from '../../../domain/auth/models/account.model';
 
 
 @Injectable()
@@ -247,7 +246,7 @@ export class AuthRepository extends IAuthRepository {
     }
 
     async confirmEmail(input: ConfirmEmailDto): Promise<ConfirmEmailResult> {
-        let result: ConfirmEmailResult = {success: false, message: EmailConfirmationMessage.InvalidOrExpired};
+        let result: ConfirmEmailResult = {success: false, message: ConfirmEmailMessage.InvalidOrExpired};
 
         const {token} = input;
         const account = await this.accountModel.findOne({token}).exec();
@@ -260,9 +259,9 @@ export class AuthRepository extends IAuthRepository {
                     await this.userModel.findOneAndUpdate({_id: id}, {activated: true});
                     await this.accountModel.deleteOne({_id: account.id});
 
-                    result = {success: true, message: EmailConfirmationMessage.Success}
+                    result = {success: true, message: ConfirmEmailMessage.Success}
                 } else {
-                    result = {success: false, message: EmailConfirmationMessage.YourAccountAlreadyActivated}
+                    result = {success: false, message: ConfirmEmailMessage.YourAccountAlreadyActivated}
                 }
             }
         }

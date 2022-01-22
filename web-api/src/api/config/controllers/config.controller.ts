@@ -19,7 +19,7 @@ export class ConfigController {
     @ApiOperation({summary: 'Obter tipos de pessoas'})
     @ApiResponse({status: 200, description: 'Resposta padrão para solicitação HTTP bem-sucedida.'})
     @ApiResponse({status: 400, description: 'A solicitação não pode ser atendida devido a sintaxe incorreta.'})
-    async getPersonTypes(@Body() req: GetPersonTypesDto): Promise<PersonTypeResult[]> {
-        return await this.configService.getPersonTypes(req);
+    async getPersonTypes(@Body() body: GetPersonTypesDto): Promise<PersonTypeResult[]> {
+        return await this.configService.getPersonTypes(body);
     }
 }

@@ -20,7 +20,7 @@ import {join} from 'path';
                 }
             },
             defaults: {
-                from: `"Não Responda" <${process.env.SMTP_USER}>`,
+                from: `"Pet Unite" <${process.env.SMTP_USER}>`,
             },
             template: {
                 dir: join(__dirname, 'shared/mail/templates'),
