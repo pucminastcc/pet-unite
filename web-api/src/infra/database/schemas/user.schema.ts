@@ -9,7 +9,7 @@ export const UserSchema = new mongoose.Schema({
     activated: {type: Boolean, default: false},
     provider: {type: String, default: 'application'},
     img: {type: String, default: ''},
-    personTypeId: {type: Types.ObjectId, default: new Types.ObjectId('61de4656ba146329a791e7a1')},
+    personTypeId: {type: Types.ObjectId, default: new Types.ObjectId('61edc763ba146329a791e7a3')},
     document: {type: String, default: ''},
     zipCode: {type: String, default: ''},
     address: {type: String, default: ''},

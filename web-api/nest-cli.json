@@ -13,7 +13,5 @@
     }
   },
   "compilerOptions": {
-    "assets": ["shared/mail/templates/**/*"],
-    "webpack": true
   }
 }

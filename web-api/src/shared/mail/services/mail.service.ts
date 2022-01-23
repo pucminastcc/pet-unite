@@ -12,22 +12,29 @@ export class MailService {
     async sendUserConfirmation(user: User, token: string): Promise<void> {
         const url = `${process.env.API_URL}/auth/confirm?token=${token}`;
 
-        await this.mailerService.sendMail({
-            to: user.email,
-            subject: 'Bem-vindo ao Aplicativo! Confirme seu email',
-            template: './confirmation',
-            context: {
-                name: user.username,
-                url,
-            },
-        });
+        try {
+            await this.mailerService.sendMail({
+                to: user.email,
+                subject: 'Bem-vindo ao Aplicativo! Confirme seu email',
+                html: `<p>Olá ${user.username},</p>
+                   <p>Clique abaixo para confirmar seu e-mail</p>
+                   <p><a href="${url}">Confirmar</a></p>
+                   <p>Se você não solicitou este e-mail, pode ignorá-lo com segurança.</p>`
+            });
+        } catch (err) {
+            throw err;
+        }
     }
 
     async sendPasswordResetCode(email: string, code: string): Promise<void> {
-        await this.mailerService.sendMail({
-            to: email,
-            subject: 'Solicitação de alteração de senha! Expira em 15 minutos',
-            html: `Seu código de verificação é <b>${code}</b>`,
-        });
+        try {
+            await this.mailerService.sendMail({
+                to: email,
+                subject: 'Solicitação de alteração de senha! Expira em 15 minutos',
+                html: `Seu código de verificação é <b>${code}</b>`,
+            });
+        } catch (err) {
+            throw err;
+        }
     }
 }
