@@ -22,23 +22,84 @@ export class PetRepository extends IPetRepository {
         super();
     }
 
-    getPets(dto: GetPetsDto): Promise<GetPetsResult> {
-        return Promise.resolve(undefined);
+    async getPets(dto: GetPetsDto): Promise<GetPetsResult[]> {
+        let result: GetPetsResult[] = [];
+        const {userId} = dto;
+        const pets = await this.petModel.find({userId}).exec();
+
+        if (pets) {
+            for (const pet of pets) {
+                result.push({
+                    id: pet.id,
+                    name: pet.name,
+                    img: pet.img,
+                    inDonation: pet.inDonation
+                });
+            }
+        }
+        return result;
     }
 
-    getPet(dto: GetPetDto): Promise<GetPetResult> {
-        return Promise.resolve(undefined);
+    async getPet(dto: GetPetDto): Promise<GetPetResult> {
+        let result: GetPetResult;
+        const {userId, id} = dto;
+
+        const pet = await this.petModel.findById(id).exec();
+
+        if (pet) {
+            result = {
+                id: pet.id,
+                img: pet.img,
+                name: pet.name,
+                petGenderId: pet.petGenderId,
+                breed: pet.breed,
+                description: pet.description
+            }
+        }
+        return result;
     }
 
-    createPet(dto: CreatePetDto): Promise<CreatePetResult> {
-        return Promise.resolve(undefined);
+    async createPet(dto: CreatePetDto): Promise<CreatePetResult> {
+        let result: CreatePetResult = {success: false, id: ''};
+        const {userId, img, name, petGenderId, breed, description} = dto;
+
+        const inserted = await this.petModel.insertMany({
+            img, name, petGenderId, breed, description, userId
+        });
+
+        if (inserted) {
+            const pet = inserted.find(e => true);
+            result = {success: true, id: pet.id};
+        }
+        return result;
     }
 
-    updatePet(dto: UpdatePetDto): Promise<UpdatePetResult> {
-        return Promise.resolve(undefined);
+    async updatePet(dto: UpdatePetDto): Promise<UpdatePetResult> {
+        let result: UpdatePetResult = {success: false};
+        const {userId, id, img, name, petGenderId, breed, description} = dto;
+
+        const updated = await this.petModel.findByIdAndUpdate(id, {
+            img, name, petGenderId, breed, description, userId
+        }).exec();
+
+        if(updated) {
+            result = {success: true};
+        }
+        return result;
     }
 
-    deletePet(dto: DeletePetDto): Promise<DeletePetResult> {
-        return Promise.resolve(undefined);
+    async deletePet(dto: DeletePetDto): Promise<DeletePetResult> {
+        let result: DeletePetResult = {success: false};
+        const {id, userId} = dto;
+
+        const deleted = await this.petModel.deleteOne({
+            _id: id,
+            userId
+        }).exec();
+
+        if(deleted) {
+            result = {success: true};
+        }
+        return result;
     }
 }

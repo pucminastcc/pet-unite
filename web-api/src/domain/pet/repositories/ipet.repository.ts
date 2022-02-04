@@ -12,7 +12,7 @@ import {GetPetsResult} from '../models/results/get-pets.result';
 export abstract class IPetRepository {
     abstract getPet(dto: GetPetDto): Promise<GetPetResult>;
 
-    abstract getPets(dto: GetPetsDto): Promise<GetPetsResult>;
+    abstract getPets(dto: GetPetsDto): Promise<GetPetsResult[]>;
 
     abstract createPet(dto: CreatePetDto): Promise<CreatePetResult>;
 

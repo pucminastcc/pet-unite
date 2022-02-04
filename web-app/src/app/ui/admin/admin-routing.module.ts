@@ -5,8 +5,10 @@ import {ProfileComponent} from './pages/profile/profile.component';
 import {PetComponent} from './pages/pet/pet.component';
 import {DonationComponent} from './pages/donation/donation.component';
 import {AuthGuard} from '../shared/guards/auth.guard';
+import {ManagerComponent} from './pages/manager/manager.component';
 
 const routes: Routes = [
+  {path: 'manager', canActivate: [AuthGuard], component: ManagerComponent},
   {path: 'dashboard', canActivate: [AuthGuard], component: DashboardComponent},
   {path: 'profile', canActivate: [AuthGuard], component: ProfileComponent},
   {path: 'pet', canActivate: [AuthGuard], component: PetComponent},

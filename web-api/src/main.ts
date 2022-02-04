@@ -2,6 +2,7 @@ import {NestFactory} from '@nestjs/core';
 import {AppModule} from './app.module';
 import {DocumentBuilder, SwaggerModule} from '@nestjs/swagger';
 import {ConfigService} from '@nestjs/config';
+import {json} from 'express';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -9,6 +10,7 @@ async function bootstrap() {
 
     app.setGlobalPrefix('api');
     app.enableCors();
+    app.use(json({limit: '3mb'}));
 
     const options = new DocumentBuilder()
         .setTitle('Pet Unite')

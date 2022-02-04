@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Post, Put, Query, UseGuards} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Post, Put, Query, Request, UseGuards} from '@nestjs/common';
 import {PetService} from '../services/pet.service';
 import {JwtAuthGuard} from '../../auth/shared/guards/jwt-auth.guard';
 import {ApiBearerAuth, ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
@@ -12,7 +12,6 @@ import {GetPetDto} from '../../../domain/pet/dtos/get-pet.dto';
 import {GetPetResult} from '../../../domain/pet/models/results/get-pet.result';
 import {GetPetsDto} from '../../../domain/pet/dtos/get-pets.dto';
 import {GetPetsResult} from '../../../domain/pet/models/results/get-pets.result';
-import {query} from 'express';
 
 @Controller('pet')
 export class PetController {
@@ -32,8 +31,10 @@ export class PetController {
         status: 401,
         description: 'A solicitação não foi aplicada porque não possui credenciais de autenticação válidas para o recurso de destino'
     })
-    async getPets(@Query() query: GetPetsDto): Promise<GetPetsResult> {
-        return await this.petService.getPets(query);
+    async getPets(@Query() query: GetPetsDto, @Request() req): Promise<GetPetsResult[]> {
+        return await this.petService.getPets({
+            userId: req.user.id
+        });
     }
 
     @UseGuards(JwtAuthGuard)
@@ -47,8 +48,11 @@ export class PetController {
         status: 401,
         description: 'A solicitação não foi aplicada porque não possui credenciais de autenticação válidas para o recurso de destino'
     })
-    async getPet(@Query() query: GetPetDto): Promise<GetPetResult> {
-        return await this.petService.getPet(query);
+    async getPet(@Query() query: GetPetDto, @Request() req): Promise<GetPetResult> {
+        return await this.petService.getPet({
+            userId: req.user.id,
+            id: query.id
+        });
     }
 
     @UseGuards(JwtAuthGuard)
@@ -62,8 +66,11 @@ export class PetController {
         status: 401,
         description: 'A solicitação não foi aplicada porque não possui credenciais de autenticação válidas para o recurso de destino'
     })
-    async createPet(@Body() body: CreatePetDto): Promise<CreatePetResult> {
-        return await this.petService.createPet(body);
+    async createPet(@Body() body: CreatePetDto, @Request() req): Promise<CreatePetResult> {
+        return await this.petService.createPet({
+            userId: req.user.id,
+            ...body
+        });
     }
 
     @UseGuards(JwtAuthGuard)
@@ -77,8 +84,11 @@ export class PetController {
         status: 401,
         description: 'A solicitação não foi aplicada porque não possui credenciais de autenticação válidas para o recurso de destino'
     })
-    async updatePet(@Body() body: UpdatePetDto): Promise<UpdatePetResult> {
-        return await this.petService.updatePet(body);
+    async updatePet(@Body() body: UpdatePetDto, @Request() req): Promise<UpdatePetResult> {
+        return await this.petService.updatePet({
+            userId: req.user.id,
+            ...body
+        });
     }
 
     @UseGuards(JwtAuthGuard)
@@ -92,7 +102,10 @@ export class PetController {
         status: 401,
         description: 'A solicitação não foi aplicada porque não possui credenciais de autenticação válidas para o recurso de destino'
     })
-    async deletePet(@Body() body: DeletePetDto): Promise<DeletePetResult> {
-        return await this.petService.deletePet(body);
+    async deletePet(@Query() query: DeletePetDto, @Request() req): Promise<DeletePetResult> {
+        return await this.petService.deletePet({
+            userId: req.user.id,
+            ...query
+        });
     }
 }

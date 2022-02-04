@@ -3,6 +3,7 @@ export interface AuthenticatedUserModel {
   email: string;
   username: string;
   img: string;
+  isSuperUser: boolean;
   personTypeId?: string;
   document?: string;
   zipCode?: string;
@@ -11,4 +12,7 @@ export interface AuthenticatedUserModel {
   city?: string;
   state?: string;
   complement?: string;
+  phone?: string;
+  cell?: string;
+  whatsapp?: string;
 }

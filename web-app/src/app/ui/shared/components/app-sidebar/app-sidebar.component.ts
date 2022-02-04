@@ -1,8 +1,6 @@
-import {Component, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
 import {SidebarMenuItemModel} from '../../../../domain/shared/components/app-sidebar/models/sidebar-menu-item.model';
 import {AuthService} from '../../../auth/services/auth.service';
-import {Subscription} from 'rxjs';
-import {LogoutResult} from '../../../../domain/auth/models/results/logout.result';
 import {AuthenticatedUserModel} from '../../../../domain/auth/models/authenticated-user.model';
 
 @Component({

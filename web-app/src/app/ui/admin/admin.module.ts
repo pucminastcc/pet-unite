@@ -13,13 +13,32 @@ import {InputMaskModule} from 'primeng/inputmask';
 import {ToastModule} from 'primeng/toast';
 import {TabViewModule} from 'primeng/tabview';
 import {AuthService} from '../auth/services/auth.service';
+import {DataViewModule} from 'primeng/dataview';
+import {ManagerComponent} from './pages/manager/manager.component';
+import {DialogModule} from 'primeng/dialog';
+import {EditorModule} from 'primeng/editor';
+import {ToolbarModule} from 'primeng/toolbar';
+import {FileUploadModule} from 'primeng/fileupload';
+import {ConfirmDialogModule} from 'primeng/confirmdialog';
+import {ConfirmationService} from 'primeng/api';
+import { PetRegistrationComponent } from './pages/pet/components/pet-registration/pet-registration.component';
+import {DynamicDialogModule} from 'primeng/dynamicdialog';
+import {MessageModule} from 'primeng/message';
+import {MessagesModule} from 'primeng/messages';
+import {ImageModule} from 'primeng/image';
+import {CardModule} from 'primeng/card';
+import {ScrollPanelModule} from 'primeng/scrollpanel';
+import {ChipModule} from 'primeng/chip';
+
 
 @NgModule({
   declarations: [
     DashboardComponent,
     ProfileComponent,
     PetComponent,
-    DonationComponent
+    DonationComponent,
+    ManagerComponent,
+    PetRegistrationComponent
   ],
   imports: [
     CommonModule,
@@ -31,10 +50,24 @@ import {AuthService} from '../auth/services/auth.service';
     DropdownModule,
     InputMaskModule,
     ToastModule,
-    TabViewModule
+    TabViewModule,
+    DataViewModule,
+    DialogModule,
+    EditorModule,
+    ToolbarModule,
+    FileUploadModule,
+    ConfirmDialogModule,
+    DynamicDialogModule,
+    MessageModule,
+    MessagesModule,
+    ImageModule,
+    CardModule,
+    ScrollPanelModule,
+    ChipModule
   ],
   providers: [
-    AuthService
+    AuthService,
+    ConfirmationService
   ]
 })
 export class AdminModule {

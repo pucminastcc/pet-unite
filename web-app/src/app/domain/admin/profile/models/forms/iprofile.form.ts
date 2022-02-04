@@ -1,4 +1,5 @@
 export interface IProfileForm {
+  img: string;
   email: string;
   username: string;
   personTypeId: string;
@@ -9,4 +10,7 @@ export interface IProfileForm {
   city: string;
   state: string;
   complement: string;
+  phone: string;
+  cell: string;
+  whatsapp: string;
 }
