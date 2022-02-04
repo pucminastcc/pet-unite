@@ -31,16 +31,15 @@ export class AppAdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy
     location: Location,
   ) {
     this.location = location;
-
-    this.authService.getAuthenticatedUser().subscribe((data: AuthenticatedUserModel) => {
-      if (data) {
-        this.user = data;
-      }
-    });
   }
 
   ngOnInit(): void {
-    this.sidebarMenuItem = this.getSidebarMenuItems();
+    this.authService.getAuthenticatedUser().subscribe((data: AuthenticatedUserModel) => {
+      if (data) {
+        this.user = data;
+        this.sidebarMenuItem = this.getSidebarMenuItems();
+      }
+    });
   }
 
   ngAfterViewInit(): void {
@@ -65,12 +64,16 @@ export class AppAdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy
 
   private getSidebarMenuItems(): SidebarMenuItemModel[] {
     const routePrefix = '/admin';
-    return [
-      {path: `${routePrefix}/dashboard`, title: 'Dashboard', icon: 'fas fa-chart-line', class: ''},
-      {path: `${routePrefix}/profile`, title: 'Perfil', icon: 'fas fa-user', class: ''},
-      {path: `${routePrefix}/pet`, title: 'Pets', icon: 'fas fa-paw', class: ''},
-      {path: `${routePrefix}/donation`, title: 'Doações', icon: 'fas fa-dog', class: ''},
-    ];
+    const routes = [];
+    if (this.user?.isSuperUser) {
+      routes.push({path: `${routePrefix}/manager`, title: 'Admin', icon: 'fas fa-lock', class: ''});
+    }
+    routes.push({path: `${routePrefix}/dashboard`, title: 'Dashboard', icon: 'fas fa-chart-line', class: ''});
+    routes.push({path: `${routePrefix}/profile`, title: 'Perfil', icon: 'fas fa-user', class: ''});
+    routes.push({path: `${routePrefix}/pet`, title: 'Pets', icon: 'fas fa-dog', class: ''});
+    routes.push({path: `${routePrefix}/donation`, title: 'Doações', icon: 'fas fa-paw', class: ''});
+
+    return routes;
   }
 
   public sidebarOpen(): void {

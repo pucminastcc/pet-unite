@@ -15,6 +15,10 @@ export interface User extends Document {
     city: string;
     state: string;
     complement: string;
+    phone: string;
+    cell: string;
+    whatsapp: string;
+    isSuperUser: boolean;
 }
 
 export interface UserModel {
@@ -30,4 +34,8 @@ export interface UserModel {
     city?: string;
     state?: string;
     complement?: string;
+    phone?: string;
+    cell?: string;
+    whatsapp?: string;
+    isSuperUser?: boolean;
 }

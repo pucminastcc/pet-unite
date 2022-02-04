@@ -60,7 +60,8 @@ export class AuthRepository extends IAuthRepository {
             personTypeId: doc.personTypeId,
             document: doc.document,
             zipCode: doc.zipCode,
-            address: doc.address
+            address: doc.address,
+            isSuperUser: doc.isSuperUser
         };
     }
 
@@ -120,11 +121,12 @@ export class AuthRepository extends IAuthRepository {
 
         if (payload) {
             result = {
-                accessToken: this.jwtService.sign(payload),
+                accessToken: this.jwtService.sign({...payload, img: ''}),
                 user: {
                     email: payload.email,
                     username: payload.username,
-                    img: payload.img
+                    img: payload.img,
+                    isSuperUser: payload.isSuperUser
                 },
                 message
             }
@@ -289,7 +291,10 @@ export class AuthRepository extends IAuthRepository {
                     district: user.district,
                     city: user.city,
                     state: user.state,
-                    complement: user.complement
+                    complement: user.complement,
+                    phone: user.phone,
+                    cell: user.cell,
+                    whatsapp: user.whatsapp,
                 }
             }
         }
@@ -298,12 +303,16 @@ export class AuthRepository extends IAuthRepository {
 
     async updateUser(input: UpdateUserDto): Promise<UpdateUserResult> {
         let result: UpdateUserResult = {success: false, message: ''};
-        const {id, username, personTypeId, document, zipCode, address, district, city, state, complement} = input;
+        const {
+            id, username, personTypeId, document, zipCode, address, district, city, state, complement, cell,
+            phone, whatsapp, img
+        } = input;
 
         const update = await this.userModel.findOneAndUpdate({
             _id: id
         }, {
-            username, personTypeId, document, zipCode, address, district, city, state, complement
+            username, personTypeId, document, zipCode, address, district, city, state, complement, phone, cell,
+            whatsapp, img
         });
 
         if (update) {

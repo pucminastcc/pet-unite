@@ -17,4 +17,8 @@ export const UserSchema = new mongoose.Schema({
     city: {type: String, default: ''},
     state: {type: String, default: ''},
     complement: {type: String, default: ''},
+    phone: {type: String, default: ''},
+    cell: {type: String, default: ''},
+    whatsapp: {type: String, default: ''},
+    isSuperUser: {type: Boolean, default: false},
 }, {timestamps: true, collection: 'users'});

@@ -11,7 +11,7 @@ import {PetRepository} from './pet/repositories/pet.repository';
         DatabaseModule,
         JwtModule.register({
             secret: process.env.JWT_SECRET,
-            signOptions: {expiresIn: '3600s'}
+            signOptions: {expiresIn: '7200s'}
         })
     ],
     exports: [

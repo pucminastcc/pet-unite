@@ -8,5 +8,9 @@ export interface UpdateUserInput {
   city: string;
   state: string;
   complement: string;
+  phone: string;
+  cell: string;
+  whatsapp: string;
+  img: string;
   accessToken?: string;
 }

@@ -5,6 +5,8 @@ import {PasswordResetCodeSchema} from './schemas/password-reset-code.schema';
 import {AccountSchema} from './schemas/account.schema';
 import {PersonTypeSchema} from './schemas/person-type.schema';
 import {PetSchema} from './schemas/pet.schema';
+import {PetGendersSchema} from './schemas/pet-gender.schema';
+import {BrazilStateSchema} from './schemas/state.schema';
 
 @Module({
     imports: [
@@ -18,6 +20,8 @@ import {PetSchema} from './schemas/pet.schema';
             {name: 'Account', schema: AccountSchema},
             {name: 'PersonType', schema: PersonTypeSchema},
             {name: 'Pet', schema: PetSchema},
+            {name: 'PetGender', schema: PetGendersSchema},
+            {name: 'BrazilState', schema: BrazilStateSchema},
         ]),
     ],
     exports: [MongooseModule]

@@ -20,7 +20,7 @@ export class PetService implements IPetRepository{
     ) {
     }
 
-    async getPets(dto: GetPetsDto): Promise<GetPetsResult> {
+    async getPets(dto: GetPetsDto): Promise<GetPetsResult[]> {
         return await this.petRepository.getPets(dto);
     }
 
