@@ -8,5 +8,6 @@ export const PetSchema = new mongoose.Schema({
     breed: {type: String},
     description: {type: String},
     userId: {type: Types.ObjectId, required: true},
-    inDonation: {type: Boolean, default: false}
+    inDonation: {type: Boolean, default: false},
+    donationId: {type: Types.ObjectId}
 }, {timestamps: true, collection: 'pets'});

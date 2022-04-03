@@ -29,6 +29,15 @@ import {ImageModule} from 'primeng/image';
 import {CardModule} from 'primeng/card';
 import {ScrollPanelModule} from 'primeng/scrollpanel';
 import {ChipModule} from 'primeng/chip';
+import {TableModule} from 'primeng/table';
+import {ProgressSpinnerModule} from 'primeng/progressspinner';
+import {TooltipModule} from 'primeng/tooltip';
+import { UserAccountComponent } from './pages/manager/components/user-account/user-account.component';
+import { SupportComponent } from './pages/support/support.component';
+import {ChartModule} from 'primeng/chart';
+import { ReportComponent } from './pages/manager/components/report/report.component';
+import {InputTextareaModule} from 'primeng/inputtextarea';
+import {BadgeModule} from 'primeng/badge';
 
 
 @NgModule({
@@ -38,7 +47,10 @@ import {ChipModule} from 'primeng/chip';
     PetComponent,
     DonationComponent,
     ManagerComponent,
-    PetRegistrationComponent
+    PetRegistrationComponent,
+    UserAccountComponent,
+    SupportComponent,
+    ReportComponent
   ],
   imports: [
     CommonModule,
@@ -63,7 +75,13 @@ import {ChipModule} from 'primeng/chip';
     ImageModule,
     CardModule,
     ScrollPanelModule,
-    ChipModule
+    ChipModule,
+    TableModule,
+    ProgressSpinnerModule,
+    TooltipModule,
+    ChartModule,
+    InputTextareaModule,
+    BadgeModule
   ],
   providers: [
     AuthService,

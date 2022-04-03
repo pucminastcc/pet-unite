@@ -13,11 +13,13 @@ import {GetPetDto} from '../../../domain/pet/dtos/get-pet.dto';
 import {GetPetResult} from '../../../domain/pet/models/results/get-pet.result';
 import {GetPetsDto} from '../../../domain/pet/dtos/get-pets.dto';
 import {GetPetsResult} from '../../../domain/pet/models/results/get-pets.result';
+import {Donation} from '../../../domain/donation/models/donation.model';
 
 @Injectable()
 export class PetRepository extends IPetRepository {
     constructor(
-        @InjectModel('Pet') private readonly petModel: Model<Pet>
+        @InjectModel('Pet') private readonly petModel: Model<Pet>,
+        @InjectModel('Donation') private readonly donationModel: Model<Donation>
     ) {
         super();
     }
@@ -33,7 +35,8 @@ export class PetRepository extends IPetRepository {
                     id: pet.id,
                     name: pet.name,
                     img: pet.img,
-                    inDonation: pet.inDonation
+                    inDonation: pet.inDonation,
+                    donationId: pet.donationId
                 });
             }
         }
@@ -98,6 +101,11 @@ export class PetRepository extends IPetRepository {
         }).exec();
 
         if(deleted) {
+            await this.donationModel.deleteOne({
+                petId: id,
+                userId
+            }).exec();
+
             result = {success: true};
         }
         return result;

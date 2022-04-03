@@ -25,16 +25,18 @@ import {AuthenticatedUserModel} from '../../../domain/auth/models/authenticated-
 import {ConfirmEmailCommand} from '../../../domain/auth/commands/confirm-email.command';
 import {ConfirmEmailInput} from '../../../domain/auth/commands/inputs/confirm-email.input';
 import {ConfirmEmailResult} from '../../../domain/auth/models/results/confirm-email.result';
-import {FacebookLoginInput} from '../../../domain/auth/commands/inputs/facebook-login.input';
-import {FacebookLoginCommand} from '../../../domain/auth/commands/facebook-login.command';
-import { GetTokenInput } from 'src/app/domain/auth/commands/inputs/get-token.input';
+import {GetTokenInput} from 'src/app/domain/auth/commands/inputs/get-token.input';
 import {GetTokenCommand} from '../../../domain/auth/commands/get-token.command';
 import {UpdateUserResult} from '../../../domain/auth/models/results/update-user.result';
 import {UpdateUserInput} from '../../../domain/auth/commands/inputs/update-user.input';
 import {UpdateUserCommand} from '../../../domain/auth/commands/update-user.command';
 import {GetUserCommand} from '../../../domain/auth/commands/get-user.command';
-import { GetUserInput } from 'src/app/domain/auth/commands/inputs/get-user.input';
-import { GetUserResult } from 'src/app/domain/auth/models/results/get-user.result';
+import {GetUserInput} from 'src/app/domain/auth/commands/inputs/get-user.input';
+import {GetUserResult} from 'src/app/domain/auth/models/results/get-user.result';
+import {LoginFacebookInput} from '../../../domain/auth/commands/inputs/login-facebook.input';
+import {LoginFacebookCommand} from '../../../domain/auth/commands/login-facebook.command';
+import {LoginGoogleInput} from '../../../domain/auth/commands/inputs/login-google.input';
+import {LoginGoogleCommand} from '../../../domain/auth/commands/login-google.command';
 
 @Injectable({
   providedIn: 'root'
@@ -45,7 +47,8 @@ export class AuthService implements IAuthRepository {
 
   constructor(
     private readonly loginCommand: LoginCommand,
-    private readonly facebookLoginCommand: FacebookLoginCommand,
+    private readonly loginFacebookCommand: LoginFacebookCommand,
+    private readonly loginGoogleCommand: LoginGoogleCommand,
     private readonly registerCommand: RegisterCommand,
     private readonly sendPasswordResetCommand: SendPasswordResetCodeCommand,
     private readonly validatePasswordRecoveryCommand: ValidatePasswordResetCodeCommand,
@@ -55,7 +58,7 @@ export class AuthService implements IAuthRepository {
     private readonly confirmEmailCommand: ConfirmEmailCommand,
     private readonly getTokenCommand: GetTokenCommand,
     private readonly getUserCommand: GetUserCommand,
-    private readonly updateUserCommand: UpdateUserCommand
+    private readonly updateUserCommand: UpdateUserCommand,
   ) {
     this.accessToken = this.getToken();
   }
@@ -64,8 +67,12 @@ export class AuthService implements IAuthRepository {
     return this.loginCommand.execute(input);
   }
 
-  facebookLogin(input?: FacebookLoginInput): void {
-    this.facebookLoginCommand.execute(input);
+  loginFacebok(input: LoginFacebookInput): Observable<LoginResult> {
+    return this.loginFacebookCommand.execute(input);
+  }
+
+  loginGoogle(input: LoginGoogleInput): Observable<LoginResult> {
+    return this.loginGoogleCommand.execute(input);
   }
 
   register(input: RegisterInput): Observable<RegisterResult> {

@@ -9,8 +9,8 @@ import {PetResult} from '../models/results/pet.result';
 import {GetPetInput} from '../commands/inputs/get-pet.input';
 import {UpdatePetInput} from '../commands/inputs/update-pet.input';
 import {UpdatePetResult} from '../models/results/update-pet.result';
-import {DonatePetInput} from '../commands/inputs/donate-pet.input';
-import {DonatePetResult} from '../models/results/donate-pet.result';
+import {DonatePetInput} from '../../donation/commands/inputs/donate-pet.input';
+import {DonatePetResult} from '../../donation/models/results/donate-pet.result';
 
 export abstract class IPetRepository {
   abstract getPets(input: GetPetsInput): Observable<PetsResult[]>;
@@ -22,6 +22,4 @@ export abstract class IPetRepository {
   abstract getPet(input: GetPetInput): Observable<PetResult>;
 
   abstract updatePet(input: UpdatePetInput): Observable<UpdatePetResult>;
-
-  abstract donatePet(input: DonatePetInput): Observable<DonatePetResult>;
 }

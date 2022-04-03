@@ -12,6 +12,7 @@ import {ToastModule} from 'primeng/toast';
 import {AppIndexLayoutComponent} from './layouts/app-index-layout/app-index-layout.component';
 import {AppAdminLayoutComponent} from './layouts/app-admin-layout/app-admin-layout.component';
 import {TooltipModule} from 'primeng/tooltip';
+import {DialogModule} from 'primeng/dialog';
 
 
 @NgModule({
@@ -29,17 +30,18 @@ import {TooltipModule} from 'primeng/tooltip';
     ButtonModule,
     DynamicDialogModule,
     ToastModule,
-    TooltipModule
+    TooltipModule,
+    DialogModule
   ],
   exports: [
     AppLoadingComponent,
     AppNavbarComponent,
     AppFooterComponent,
-    AppSidebarComponent
+    AppSidebarComponent,
   ],
   providers: [
     DialogService,
-    MessageService
+    MessageService,
   ]
 })
 export class SharedModule {

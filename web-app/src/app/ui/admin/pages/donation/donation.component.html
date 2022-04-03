@@ -1,1 +1,69 @@
-<p>donation works!</p>
+<p-toast [baseZIndex]="9999"></p-toast>
+
+<p-confirmDialog #cd
+                 [breakpoints]="{'960px': '50vw', '640px': '95vw'}" [style]="{width: '50vw'}" [closable]="false"
+                 position="bottom">
+  <ng-template pTemplate="footer">
+    <button (click)="cd.accept()" class="p-button-raised p-button-success p-button-rounded" icon="pi pi-check"
+            label="Sim" pButton type="button">
+    </button>
+    <button (click)="cd.reject()" class="p-button-raised p-button-danger p-button-rounded" icon="pi pi-times"
+            label="Não" pButton type="button">
+    </button>
+  </ng-template>
+</p-confirmDialog>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12">
+      <p-dataView #dv [value]="donations" [paginator]="true" [rows]="9" filterBy="name"
+                  layout="list">
+        <ng-template pTemplate="header">
+          <div class="flex flex-column flex-md-row justify-content-md-between">
+                <span class="p-input-icon-left mb-2 mb-md-0 mr-3">
+                  <i class="pi pi-search"></i>
+                  <input type="search" pInputText placeholder="Pesquisar" (input)="dv.filter($event.target.value)">
+                </span>
+            <span class="mb-2 mb-md-0">
+                  <p-dropdown [options]="optPetGenders"
+                              (onChange)="onChangePetGender($event.value)"
+                              emptyMessage="Nenhum registro foi encontrado."
+                              optionValue="value"
+                              placeholder="Selecione o gênero">
+                  </p-dropdown>
+                </span>
+          </div>
+        </ng-template>
+        <ng-template let-donation pTemplate="listItem">
+          <div class="col-12 col-md-12 p-3 d-inline-block">
+            <div class="card">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-12 col-md-2">
+                    <img [src]="donation?.petImg" [alt]="donation.petImg" height="128"/>
+                  </div>
+                  <div class="col-12 col-md-10">
+                    <h5>
+                      <strong>{{donation.petName}}</strong>
+                      <div class="float-right">
+                        <button (click)="confirmSignal(donation)"
+                                class="p-button-raised p-button-danger p-button-rounded"
+                                icon="fas fa-heart" pButton type="button">
+                        </button>
+                      </div>
+                    </h5>
+                    <hr>
+                    <h6>Localidade: <strong>{{donation.city}} - {{donation.state}}</strong></h6>
+                    <h6>Doador: <strong>{{donation.username}}</strong></h6>
+                    <h6>Distância: <strong>5 KM</strong></h6>
+                    <h6>Instituição: <strong>Particular</strong></h6>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </p-dataView>
+    </div>
+  </div>
+</div>

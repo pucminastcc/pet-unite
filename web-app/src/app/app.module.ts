@@ -7,6 +7,13 @@ import {SharedModule} from './ui/shared/shared.module';
 import {HashLocationStrategy, LocationStrategy} from '@angular/common';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {AuthModule} from './ui/auth/auth.module';
+import {
+  FacebookLoginProvider,
+  GoogleLoginProvider,
+  SocialAuthServiceConfig,
+  SocialLoginModule
+} from 'angularx-social-login';
+import {environment} from '../environments/environment';
 
 @NgModule({
   declarations: [
@@ -17,10 +24,27 @@ import {AuthModule} from './ui/auth/auth.module';
     BrowserAnimationsModule,
     AppRoutes,
     AuthModule,
-    SharedModule
+    SharedModule,
+    SocialLoginModule,
   ],
   providers: [
     {provide: LocationStrategy, useClass: HashLocationStrategy},
+    {
+      provide: 'SocialAuthServiceConfig',
+      useValue: {
+        autoLogin: false,
+        providers: [
+          {
+            id: FacebookLoginProvider.PROVIDER_ID,
+            provider: new FacebookLoginProvider(environment.facebookAppId),
+          },
+          {
+            id: GoogleLoginProvider.PROVIDER_ID,
+            provider: new GoogleLoginProvider(environment.googleAppId)
+          },
+        ],
+      } as SocialAuthServiceConfig,
+    },
   ],
   bootstrap: [AppComponent]
 })

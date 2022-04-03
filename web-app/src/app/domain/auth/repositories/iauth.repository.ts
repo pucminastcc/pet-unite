@@ -1,5 +1,7 @@
 import {Observable} from 'rxjs';
 import {LoginInput} from '../commands/inputs/login.input';
+import {LoginFacebookInput} from '../commands/inputs/login-facebook.input';
+import {LoginGoogleInput} from '../commands/inputs/login-google.input';
 import {LoginResult} from '../models/results/login.result';
 import {RegisterInput} from '../commands/inputs/register.input';
 import {RegisterResult} from '../models/results/register.result';
@@ -15,7 +17,6 @@ import {GetAuthenticatedUserInput} from '../commands/inputs/get-authenticated-us
 import {AuthenticatedUserModel} from '../models/authenticated-user.model';
 import {ConfirmEmailInput} from '../commands/inputs/confirm-email.input';
 import {ConfirmEmailResult} from '../models/results/confirm-email.result';
-import {FacebookLoginInput} from '../commands/inputs/facebook-login.input';
 import {GetTokenInput} from '../commands/inputs/get-token.input';
 import {UpdateUserInput} from '../commands/inputs/update-user.input';
 import {UpdateUserResult} from '../models/results/update-user.result';
@@ -25,7 +26,9 @@ import {GetUserResult} from '../models/results/get-user.result';
 export abstract class IAuthRepository {
   abstract login(input: LoginInput): Observable<LoginResult>;
 
-  abstract facebookLogin(input?: FacebookLoginInput): void;
+  abstract loginFacebok(input: LoginFacebookInput): Observable<LoginResult>;
+
+  abstract loginGoogle(input: LoginGoogleInput): Observable<LoginResult>;
 
   abstract register(input: RegisterInput): Observable<RegisterResult>;
 

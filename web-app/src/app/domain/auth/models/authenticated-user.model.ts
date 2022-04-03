@@ -1,14 +1,16 @@
 export interface AuthenticatedUserModel {
   id: string;
-  email: string;
   username: string;
+  email: string;
+  provider: string;
   img: string;
-  isSuperUser: boolean;
   personTypeId?: string;
+  isSuperUser: boolean;
   document?: string;
   zipCode?: string;
   address?: string;
   district?: string;
+  cityId?: string;
   city?: string;
   state?: string;
   complement?: string;

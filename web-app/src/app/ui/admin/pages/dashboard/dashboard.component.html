@@ -1,1 +1,17 @@
-<p>dashboard works!</p>
+<div class="container-fluid">
+  <div class="card">
+    <div class="card-header card-header-danger">
+      <h4 class="card-title">Estatísticas</h4>
+    </div>
+    <div class="card-body animate__animated animate__fadeIn">
+      <div class="row">
+        <div class="col-12 col-md-6">
+          <p-chart type="line" [data]="basicData" [options]="basicOptions"></p-chart>
+        </div>
+        <div class="col-12 col-md-6">
+          <p-chart type="line" [data]="basicData2" [options]="basicOptions"></p-chart>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

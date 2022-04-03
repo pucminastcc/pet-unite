@@ -8,6 +8,10 @@ import {GetPetGendersDto} from '../../../domain/config/dtos/get-pet-genders.dto'
 import {PetGenderResult} from '../../../domain/config/models/results/pet-gender.result';
 import {GetStatesDto} from '../../../domain/config/dtos/get-states.dto';
 import {BrazilStateResult} from '../../../domain/config/models/results/brazil-state.result';
+import {GetReportTypesDto} from '../../../domain/config/dtos/get-report-types.dto';
+import {ReportTypeResult} from '../../../domain/config/models/results/report-type.result';
+import {GetCitiesDto} from '../../../domain/config/dtos/get-cities.dto';
+import {BrazilCityResult} from '../../../domain/config/models/results/brazil-city.result';
 
 @Controller('config')
 export class ConfigController {
@@ -31,7 +35,7 @@ export class ConfigController {
     @Get('petGenders')
     @ApiTags('configuração')
     @ApiBearerAuth()
-    @ApiOperation({summary: 'Obter tipos de pessoas'})
+    @ApiOperation({summary: 'Obter gêneros de pets'})
     @ApiResponse({status: 200, description: 'Resposta padrão para solicitação HTTP bem-sucedida.'})
     @ApiResponse({status: 400, description: 'A solicitação não pode ser atendida devido a sintaxe incorreta.'})
     async getPetGenders(@Query() query: GetPetGendersDto): Promise<PetGenderResult[]> {
@@ -42,10 +46,32 @@ export class ConfigController {
     @Get('states')
     @ApiTags('configuração')
     @ApiBearerAuth()
-    @ApiOperation({summary: 'Obter Estados do Brasil'})
+    @ApiOperation({summary: 'Obter Estados brasileiros'})
     @ApiResponse({status: 200, description: 'Resposta padrão para solicitação HTTP bem-sucedida.'})
     @ApiResponse({status: 400, description: 'A solicitação não pode ser atendida devido a sintaxe incorreta.'})
     async getStates(@Query() query: GetStatesDto): Promise<BrazilStateResult[]> {
         return await this.configService.getStates(query);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('reportTypes')
+    @ApiTags('configuração')
+    @ApiBearerAuth()
+    @ApiOperation({summary: 'Obter tipos de relatórios'})
+    @ApiResponse({status: 200, description: 'Resposta padrão para solicitação HTTP bem-sucedida.'})
+    @ApiResponse({status: 400, description: 'A solicitação não pode ser atendida devido a sintaxe incorreta.'})
+    async reportTypes(@Query() query: GetReportTypesDto): Promise<ReportTypeResult[]> {
+        return await this.configService.getReportTypes(query);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('cities')
+    @ApiTags('configuração')
+    @ApiBearerAuth()
+    @ApiOperation({summary: 'Obter tipos de relatórios'})
+    @ApiResponse({status: 200, description: 'Resposta padrão para solicitação HTTP bem-sucedida.'})
+    @ApiResponse({status: 400, description: 'A solicitação não pode ser atendida devido a sintaxe incorreta.'})
+    async cities(@Query() query: GetCitiesDto): Promise<BrazilCityResult[]> {
+        return await this.configService.getCities(query);
     }
 }

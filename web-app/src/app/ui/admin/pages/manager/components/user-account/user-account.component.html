@@ -1,0 +1,123 @@
+<div *ngIf="isLoading" class="text-center">
+  <p-progressSpinner></p-progressSpinner>
+</div>
+<div class="p-fluid">
+  <div *ngIf="!isLoading" class="animate__animated animate__fadeIn">
+    <div class="row">
+      <div class="col-12 col-md-12">
+        <p-tabView>
+          <p-tabPanel header="Pessoa">
+            <p-scrollPanel [styleClass]="isMobile() ? 'custombar2' : ''"
+                           [style]="{height: getModalHeight().toString() + 'px'}">
+              <div class="row">
+                <div class="col-12 offset-md-4 col-md-4">
+                  <div class="text-center mb-3">
+                    <img #avatar
+                         (error)="avatar.src = './assets/img/avatar.png'" [src]="user?.img"
+                         alt="Logo" class="rounded-circle" height="128" width="128"/>
+                  </div>
+                  <div class="text-center">
+                    <span class="p-input-icon-left">
+                      <i [class]="provider?.icon" [ngStyle]="{color: provider?.color}"></i>
+                      <input [value]="provider?.label" [readOnly]="true" [spellcheck]="false"
+                             class="p-inputtext p-inputtext-sm" pInputText type="text">
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <hr/>
+              <div class="row">
+                <div class="col-12 col-md-7">
+                  <label>Email</label>
+                  <span class="p-input-icon-left">
+                    <i class="pi pi-envelope"></i>
+                    <input [value]="user?.email" [readOnly]="true" [spellcheck]="false"
+                           class="p-inputtext p-inputtext-sm" pInputText type="email">
+                  </span>
+                </div>
+                <div class="col-12 col-md-5">
+                  <label>Usuário</label>
+                  <span class="p-input-icon-left">
+                    <i class="pi pi-user"></i>
+                    <input [value]="user?.username" [readOnly]="true" [spellcheck]="false"
+                           class="p-inputtext p-inputtext-sm" pInputText type="text">
+                  </span>
+                </div>
+                <div class="col-12 col-md-4 mt-2">
+                  <label>Tipo Pessoa</label>
+                  <input [value]="user?.personType" [readOnly]="true" [spellcheck]="false"
+                         class="p-inputtext p-inputtext-sm" pInputText type="text">
+                </div>
+                <div class="col-12 col-md-3 mt-2">
+                  <label>Documento</label>
+                  <input [value]="user?.document" [readOnly]="true" [spellcheck]="false"
+                         class="p-inputtext p-inputtext-sm" pInputText type="text">
+                </div>
+              </div>
+            </p-scrollPanel>
+          </p-tabPanel>
+          <p-tabPanel header="Contato">
+            <p-scrollPanel [styleClass]="isMobile() ? 'custombar2' : ''"
+                           [style]="{height: getModalHeight().toString() + 'px'}">
+              <div class="row">
+                <div class="col-12 col-md-6 mt-2">
+                  <label>Telefone</label>
+                  <input [value]="user?.phone" [readOnly]="true" [spellcheck]="false"
+                         class="p-inputtext p-inputtext-sm" pInputText type="text">
+                </div>
+                <div class="col-12 col-md-6 mt-2">
+                  <label>Celular</label>
+                  <input [value]="user?.cell" [readOnly]="true" [spellcheck]="false"
+                         class="p-inputtext p-inputtext-sm" pInputText type="text">
+                </div>
+                <div class="col-12 col-md-6 mt-2">
+                  <label>Whatsapp</label>
+                  <input [value]="user?.whatsapp" [readOnly]="true" [spellcheck]="false"
+                         class="p-inputtext p-inputtext-sm" pInputText type="text">
+                </div>
+              </div>
+            </p-scrollPanel>
+          </p-tabPanel>
+          <p-tabPanel header="Endereço">
+            <p-scrollPanel [styleClass]="isMobile() ? 'custombar2' : ''"
+                           [style]="{height: getModalHeight().toString() + 'px'}">
+              <div class="row">
+                <div class="col-12 col-md-3 mt-2">
+                  <label>CEP</label>
+                  <input [value]="user?.zipCode" [readOnly]="true" [spellcheck]="false"
+                         class="p-inputtext p-inputtext-sm" pInputText type="text">
+                </div>
+                <div class="col-12 col-md-2 mt-2">
+                  <label>UF</label>
+                  <input [value]="user?.state" [readOnly]="true" [spellcheck]="false"
+                         class="p-inputtext p-inputtext-sm" pInputText type="text">
+                </div>
+                <div class="col-12 col-md-7 mt-2">
+                  <label>Cidade</label>
+                  <input [value]="user?.city" [readOnly]="true" [spellcheck]="false"
+                         class="p-inputtext p-inputtext-sm" pInputText type="text">
+                </div>
+                <div class="col-12 col-md-7 mt-2">
+                  <label>Logradouro</label>
+                  <input [value]="user?.address" [readOnly]="true" [spellcheck]="false"
+                         class="p-inputtext p-inputtext-sm" pInputText type="text">
+                </div>
+                <div class="col-12 col-md-5 mt-2">
+                  <label>Bairro</label>
+                  <input [value]="user?.district" [readOnly]="true" [spellcheck]="false"
+                         class="p-inputtext p-inputtext-sm" pInputText type="text">
+                </div>
+                <div class="col-12 col-md-12 mt-2">
+                  <label>Complemento</label>
+                  <input [value]="user?.complement" [readOnly]="true" [spellcheck]="false"
+                         class="p-inputtext p-inputtext-sm" pInputText type="text">
+                </div>
+              </div>
+            </p-scrollPanel>
+          </p-tabPanel>
+        </p-tabView>
+      </div>
+    </div>
+  </div>
+</div>
+

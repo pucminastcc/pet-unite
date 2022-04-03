@@ -13,13 +13,14 @@ import {ChangePasswordDto} from '../../../domain/auth/dtos/change-password.dto';
 import {ChangePasswordResult} from '../../../domain/auth/models/results/change-password.result';
 import {ValidateUserResult} from '../../../domain/auth/models/results/validate-user.result';
 import {ValidateLocalUserDto} from '../../../domain/auth/dtos/validate-local-user.dto';
-import {ValidateFacebookUserDto} from '../../../domain/auth/dtos/validate-facebook-user.dto';
 import {ConfirmEmailDto} from '../../../domain/auth/dtos/confirm-email.dto';
 import {ConfirmEmailResult} from '../../../domain/auth/models/results/email-confirmation.result';
 import {GetUserDto} from 'src/domain/auth/dtos/get-user.dto';
 import {GetUserResult} from 'src/domain/auth/models/results/get-user.result';
 import {UpdateUserDto} from '../../../domain/auth/dtos/update-user.dto';
 import {UpdateUserResult} from '../../../domain/auth/models/results/update-user.result';
+import {ValidateFacebookUserDto} from '../../../domain/auth/dtos/validate-facebook-user.dto';
+import {ValidateGoogleUserDto} from '../../../domain/auth/dtos/validate-google-user.dto';
 
 @Injectable()
 export class AuthService implements IAuthRepository {
@@ -34,6 +35,10 @@ export class AuthService implements IAuthRepository {
 
     async validateFacebookUser(input: ValidateFacebookUserDto): Promise<ValidateUserResult> {
         return await this.repository.validateFacebookUser(input);
+    }
+
+    async validateGoogleUser(input: ValidateGoogleUserDto): Promise<ValidateUserResult> {
+        return await this.repository.validateGoogleUser(input);
     }
 
     async login(input: LoginDto): Promise<LoginResult> {

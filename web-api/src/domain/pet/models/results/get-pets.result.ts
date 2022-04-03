@@ -4,6 +4,7 @@ export interface GetPetsResult {
     id: Types.ObjectId;
     img: string;
     name: string;
-    inDonation: boolean;
     userId?: Types.ObjectId;
+    inDonation: boolean;
+    donationId?: Types.ObjectId;
 }

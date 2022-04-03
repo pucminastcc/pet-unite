@@ -17,9 +17,6 @@ import {GetPetCommand} from '../../../domain/pet/commands/get-pet.command';
 import {UpdatePetInput} from '../../../domain/pet/commands/inputs/update-pet.input';
 import {UpdatePetResult} from '../../../domain/pet/models/results/update-pet.result';
 import {UpdatePetCommand} from '../../../domain/pet/commands/update-pet.command';
-import {DonatePetInput} from '../../../domain/pet/commands/inputs/donate-pet.input';
-import {DonatePetResult} from '../../../domain/pet/models/results/donate-pet.result';
-import {DonatePetCommand} from '../../../domain/pet/commands/donate-pet.command';
 
 @Injectable({
   providedIn: 'root'
@@ -34,7 +31,6 @@ export class PetService implements IPetRepository {
     private readonly deletePetCommand: DeletePetCommand,
     private readonly getPetCommand: GetPetCommand,
     private readonly updatePetCommand: UpdatePetCommand,
-    private readonly donatePetCommand: DonatePetCommand,
   ) {
     this.accessToken = authService.getToken();
   }
@@ -69,13 +65,6 @@ export class PetService implements IPetRepository {
 
   updatePet(input: UpdatePetInput): Observable<UpdatePetResult> {
     return this.updatePetCommand.execute({
-      ...input,
-      accessToken: this.accessToken
-    });
-  }
-
-  donatePet(input: DonatePetInput): Observable<DonatePetResult> {
-    return this.donatePetCommand.execute({
       ...input,
       accessToken: this.accessToken
     });

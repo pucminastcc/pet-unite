@@ -8,210 +8,213 @@
           <p class="card-category">Complete seu perfil</p>
         </div>
         <div class="card-body p-fluid">
-          <form [formGroup]="profileForm">
+          <div class="text-center">
+            <p-progressSpinner *ngIf="isLoading"></p-progressSpinner>
+          </div>
+          <div *ngIf="!isLoading" class="animate__animated animate__fadeIn">
+            <form [formGroup]="profileForm">
+              <div class="row">
+                <div class="col-12 col-md-12">
+                  <p-tabView>
+                    <p-tabPanel header="Pessoa" leftIcon="fas fa-user">
+                      <div class="row">
+                        <div class="col-12 offset-md-4 col-md-4">
+                          <div class="text-center py-3">
+                            <img #avatar
+                                 (error)="avatar.src = './assets/img/avatar.png'"
+                                 [src]="img"
+                                 alt="Logo" class="rounded-circle" height="128" width="128"/>
+                            <p-fileUpload #fileUploadInput
+                                          (onSelect)="onSelectFile($event)"
+                                          *ngIf="user.provider === 'application'"
+                                          accept="image/*" chooseIcon="pi pi-upload" chooseLabel="Upload"
+                                          invalidFileSizeMessageDetail="o tamanho máximo de upload é {0}."
+                                          invalidFileSizeMessageSummary="" maxFileSize="1000000" mode="basic"
+                                          styleClass="p-button p-button-rounded p-button-raised border-0 m-2">
+                            </p-fileUpload>
+                          </div>
+                        </div>
+                      </div>
+                      <hr/>
+                      <div class="row my-2">
+                        <div class="col-12 col-md-5 mt-md-0">
+                          <label>Email</label>
+                          <span class="p-input-icon-left">
+                            <i class="pi pi-envelope"></i>
+                            <input #emailInput
+                                   [formControl]="pf.email" [readOnly]="true" [spellcheck]="false"
+                                   class="p-inputtext p-inputtext-sm" pInputText
+                                   placeholder="" type="email">
+                          </span>
+                        </div>
+                        <div class="col-12 col-md-4 mt-2 mt-md-0">
+                          <label>Usuário</label>
+                          <span class="p-input-icon-left">
+                            <i class="pi pi-user"></i>
+                            <input #usernameInput
+                                   [formControl]="pf.username" [readOnly]="true" [spellcheck]="false"
+                                   class="p-inputtext p-inputtext-sm" pInputText
+                                   placeholder="" type="text">
+                          </span>
+                        </div>
+                        <div class="col-12 col-md-3 mt-2 mt-md-0">
+                          <label>Tipo Conta</label>
+                          <span class="p-input-icon-left">
+                            <i class="pi pi-id-card"></i>
+                            <input #providerInput
+                                   [formControl]="pf.provider" [readOnly]="true" [spellcheck]="false"
+                                   class="p-inputtext p-inputtext-sm" pInputText
+                                   placeholder="" type="text">
+                          </span>
+                        </div>
+                        <div class="col-12 col-md-3 mt-2">
+                          <label>Tipo Pessoa</label>
+                          <div class="p-inputtext-sm">
+                            <p-dropdown #personTypeInput
+                                        (onChange)="changePersonType($event.value)" [formControl]="pf.personTypeId"
+                                        [options]="optPersonTypes"
+                                        emptyMessage="Nenhum registro foi encontrado." optionValue="value.id"
+                                        placeholder="Selecione o tipo de pessoa">
+                            </p-dropdown>
+                          </div>
+                        </div>
+                        <div class="col-12 col-md-3 mt-2">
+                          <div class="p-inputtext-sm">
+                            <label>{{document}} (Opcional)</label>
+                            <p-inputMask #documentInput
+                                         *ngIf="documentMask"
+                                         [formControl]="pf.document" [mask]="documentMask" [autofocus]="true">
+                            </p-inputMask>
+                          </div>
+                          <div *ngIf="submitted">
+                            <p-message *ngIf="invalidDocument" severity="error"
+                                       text="Documento inválido">
+                            </p-message>
+                          </div>
+                        </div>
+                      </div>
+                    </p-tabPanel>
+                  </p-tabView>
+                  <p-tabView>
+                    <p-tabPanel header="Contato" leftIcon="fas fa-phone">
+                      <div class="row my-2">
+                        <div class="col-12 col-md-4 mt-md-0">
+                          <label>Telefone</label>
+                          <div class="p-inputtext-sm">
+                            <p-inputMask #phoneInput
+                                         [formControl]="pf.phone"
+                                         mask="(99)9999-9999">
+                            </p-inputMask>
+                          </div>
+                        </div>
+                        <div class="col-12 col-md-4 mt-2 mt-md-0">
+                          <label>Celular</label>
+                          <div class="p-inputtext-sm">
+                            <p-inputMask #cellphoneInput
+                                         [formControl]="pf.cell"
+                                         mask="(99)99999-9999">
+                            </p-inputMask>
+                          </div>
+                        </div>
+                        <div class="col-12 col-md-4 mt-2 mt-md-0">
+                          <label>Whatsapp</label>
+                          <div class="p-inputtext-sm">
+                            <p-inputMask #phoneInput
+                                         [formControl]="pf.whatsapp"
+                                         mask="(99)99999-9999">
+                            </p-inputMask>
+                          </div>
+                        </div>
+                      </div>
+                    </p-tabPanel>
+                  </p-tabView>
+                  <p-tabView>
+                    <p-tabPanel header="Endereço" leftIcon="fas fa-map-marker-alt">
+                      <div class="row my-2">
+                        <div class="col-12 col-md-2 mt-md-0">
+                          <label>CEP</label>
+                          <div class="p-inputtext-sm">
+                            <p-inputMask #zipCodeInput
+                                         (focusout)="getAddress(pf.zipCode.value)"
+                                         [formControl]="pf.zipCode"
+                                         mask="99.999-999">
+                            </p-inputMask>
+                          </div>
+                          <div *ngIf="!pf.zipCode.valid && (pf.zipCode.dirty || submitted)">
+                            <p-message *ngIf="pf.zipCode.errors.required" severity="error" text="Informe o CEP">
+                            </p-message>
+                          </div>
+                        </div>
+                        <div class="col-12 col-md-2 mt-2 mt-md-0">
+                          <label>UF</label>
+                          <div class="p-inputtext-sm">
+                            <p-dropdown #stateInput
+                                        (onChange)="onChangeState($event.value)"
+                                        [formControl]="pf.state" [options]="optStates"
+                                        emptyMessage="Nenhum registro foi encontrado." optionValue="value.initials"
+                                        placeholder="Selecione o Estado">
+                            </p-dropdown>
+                          </div>
+                          <div *ngIf="!pf.state.valid && (pf.state.dirty || submitted)">
+                            <p-message *ngIf="pf.state.errors.required" severity="error" text="Informe o UF"></p-message>
+                          </div>
+                        </div>
+                        <div class="col-12 col-md-4 mt-2 mt-md-0">
+                          <label>Cidade</label>
+                          <div class="p-inputtext-sm">
+                            <p-dropdown #cityInput
+                                        [formControl]="pf.cityId" [options]="optCities"
+                                        emptyMessage="Nenhum registro foi encontrado." optionValue="value.id"
+                                        placeholder="Selecione a Cidade">
+                            </p-dropdown>
+                          </div>
+                          <div *ngIf="!pf.cityId.valid && (pf.cityId.dirty || submitted)">
+                            <p-message *ngIf="pf.cityId.errors.required" severity="error" text="Informe a cidade"></p-message>
+                          </div>
+                        </div>
+                        <div class="col-12 col-md-4 mt-2 mt-md-0">
+                          <label>Logradouro</label>
+                          <input #addressInput
+                                 [formControl]="pf.address" [spellcheck]="false"
+                                 class="p-inputtext p-inputtext-sm" pInputText type="text">
+                          <div *ngIf="!pf.address.valid && (pf.address.dirty || submitted)">
+                            <p-message *ngIf="pf.address.errors.required" severity="error" text="Informe o logradouro">
+                            </p-message>
+                          </div>
+                        </div>
+                        <div class="col-12 col-md-4 mt-2">
+                          <label>Bairro</label>
+                          <input #districtInput
+                                 [formControl]="pf.district" [spellcheck]="false"
+                                 class="p-inputtext p-inputtext-sm" pInputText type="text">
+                          <div *ngIf="!pf.district.valid && (pf.district.dirty || submitted)">
+                            <p-message *ngIf="pf.district.errors.required" severity="error" text="Informe o bairro"></p-message>
+                          </div>
+                        </div>
+                        <div class="col-12 col-md-4 mt-2">
+                          <label>Complemento</label>
+                          <input #complementInput
+                                 [formControl]="pf.complement" [spellcheck]="false"
+                                 class="p-inputtext p-inputtext-sm" pInputText type="text">
+                        </div>
+                      </div>
+                    </p-tabPanel>
+                  </p-tabView>
+                </div>
+              </div>
+            </form>
+            <hr>
             <div class="row">
-              <div class="col-12 col-md-12">
-                <p-tabView>
-                  <p-tabPanel header="Pessoa" leftIcon="fas fa-user">
-                    <div class="row">
-                      <div class="col-12 col-md-4"></div>
-                      <div class="col-12 col-md-4">
-                        <div class="text-center py-3">
-                          <img #avatar
-                               (error)="avatar.src = './assets/img/avatar.png'"
-                               [src]="img"
-                               alt="Logo" class="rounded-circle" height="128" width="128"/>
-                          <p-fileUpload #fileUploadInput
-                                        (onSelect)="onSelectFile($event)"
-                                        accept="image/*" chooseIcon="pi pi-upload" chooseLabel="Upload"
-                                        invalidFileSizeMessageDetail="o tamanho máximo de upload é {0}."
-                                        invalidFileSizeMessageSummary="" maxFileSize="1000000" mode="basic"
-                                        styleClass="p-button p-button-rounded p-button-raised border-0 m-2">
-                          </p-fileUpload>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="col-12 col-md-12">
-                        <label for="email-input">Email</label>
-                        <span class="p-input-icon-left">
-                          <i class="pi pi-envelope"></i>
-                          <input #emailInput
-                                 [formControl]="pf.email" [readOnly]="true" [spellcheck]="false"
-                                 class="p-inputtext p-inputtext-sm" id="email-input" pInputText
-                                 placeholder="Email" type="email">
-                        </span>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="col-12 col-md-12 mt-2">
-                        <label>Usuário</label>
-                        <span class="p-input-icon-left">
-                          <i class="pi pi-user"></i>
-                          <input #usernameInput
-                                 [formControl]="pf.username" [readOnly]="true" [spellcheck]="false"
-                                 class="p-inputtext p-inputtext-sm" pInputText
-                                 placeholder="Usuário" type="text">
-                        </span>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="col-12 col-md-6 mt-2">
-                        <label>Tipo de Pessoa</label>
-                        <div class="p-inputtext-sm">
-                          <p-dropdown #personTypeInput
-                                      (onChange)="changePersonType($event.value)" [formControl]="pf.personTypeId"
-                                      [options]="optPersonTypes"
-                                      emptyMessage="Nenhum registro foi encontrado." optionValue="value.id"
-                                      placeholder="Selecione o tipo de pessoa">
-                          </p-dropdown>
-                        </div>
-                      </div>
-                      <div class="col-12 col-md-6 mt-2">
-                        <div class="p-inputtext-sm">
-                          <label>{{document}}</label>
-                          <p-inputMask #documentInput
-                                       *ngIf="documentMask"
-                                       [formControl]="pf.document" [mask]="documentMask" [autofocus]="true">
-                          </p-inputMask>
-                        </div>
-                        <div *ngIf="submitted">
-                          <p-message *ngIf="invalidDocument" severity="error" text="Informe um documento válido ou deixe em branco">
-                          </p-message>
-                        </div>
-                      </div>
-                    </div>
-                  </p-tabPanel>
-                </p-tabView>
+              <div class="col-12 offset-md-5 col-md-2">
+                  <button (click)="tryUpdate()"
+                          [ngStyle]="{backgroundColor:'var(--green-500)', borderColor:'var(--green-500)'}"
+                          class="p-button p-button-md p-button-raised p-button-rounded my-2" icon="pi pi-refresh"
+                          iconPos="left" label="Atualizar" pButton type="button">
+                  </button>
               </div>
-              <div class="col-12 col-md-12 mt-3">
-                <p-tabView>
-                  <p-tabPanel header="Contato" leftIcon="fas fa-phone">
-                    <div class="row">
-                      <div class="col-12 col-md-6 mt-2">
-                        <label>Telefone</label>
-                        <div class="p-inputtext-sm">
-                          <p-inputMask #phoneInput
-                                       [formControl]="pf.phone"
-                                       mask="(99)9999-9999">
-                          </p-inputMask>
-                        </div>
-                      </div>
-                      <div class="col-12 col-md-6 mt-2">
-                        <label>Celular</label>
-                        <div class="p-inputtext-sm">
-                          <p-inputMask #cellphoneInput
-                                       [formControl]="pf.cell"
-                                       mask="(99)99999-9999">
-                          </p-inputMask>
-                        </div>
-                      </div>
-                      <div class="col-12 col-md-6 mt-2">
-                        <label>Whatsapp</label>
-                        <div class="p-inputtext-sm">
-                          <p-inputMask #phoneInput
-                                       [formControl]="pf.whatsapp"
-                                       mask="(99)99999-9999">
-                          </p-inputMask>
-                        </div>
-                      </div>
-                    </div>
-                  </p-tabPanel>
-                </p-tabView>
-              </div>
-              <div class="col-12 col-md-12 mt-3">
-                <p-tabView>
-                  <p-tabPanel header="Endereço" leftIcon="fas fa-map-marker-alt">
-                    <div class="row">
-                      <div class="col-12 col-md-6 mt-2">
-                        <label>CEP</label>
-                        <div class="p-inputtext-sm">
-                          <p-inputMask #zipCodeInput
-                                       (focusout)="getAddress(pf.zipCode.value)"
-                                       [formControl]="pf.zipCode"
-                                       mask="99.999-999">
-                          </p-inputMask>
-                        </div>
-                        <div *ngIf="!pf.zipCode.valid && (pf.zipCode.dirty || submitted)">
-                          <p-message *ngIf="pf.zipCode.errors.required" severity="error" text="Informe o CEP">
-                          </p-message>
-                        </div>
-                      </div>
-                      <div class="col-12 col-md-6 mt-2">
-                        <label>Logradouro</label>
-                        <input #addressInput
-                               [formControl]="pf.address" [spellcheck]="false"
-                               class="p-inputtext p-inputtext-sm" pInputText type="text">
-                        <div *ngIf="!pf.address.valid && (pf.address.dirty || submitted)">
-                          <p-message *ngIf="pf.address.errors.required" severity="error" text="Informe o logradouro">
-                          </p-message>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="col-12 col-md-9 mt-2">
-                        <label>Cidade</label>
-                        <input #cityInput
-                               [formControl]="pf.city" [spellcheck]="false"
-                               class="p-inputtext p-inputtext-sm" pInputText type="text">
-                        <div *ngIf="!pf.city.valid && (pf.city.dirty || submitted)">
-                          <p-message *ngIf="pf.city.errors.required" severity="error" text="Informe a cidade">
-                          </p-message>
-                        </div>
-                      </div>
-                      <div class="col-12 col-md-3 mt-2">
-                        <label>UF</label>
-                        <div class="p-inputtext-sm">
-                          <p-dropdown #stateInput
-                                      [formControl]="pf.state" [options]="optStates"
-                                      emptyMessage="Nenhum registro foi encontrado." optionValue="value.initials"
-                                      placeholder="Selecione o tipo de pessoa">
-                          </p-dropdown>
-                        </div>
-                        <div *ngIf="!pf.state.valid && (pf.state.dirty || submitted)">
-                          <p-message *ngIf="pf.state.errors.required" severity="error" text="Informe o UF"></p-message>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="col-12 col-md-12 mt-2">
-                        <label>Bairro</label>
-                        <input #districtInput
-                               [formControl]="pf.district" [spellcheck]="false"
-                               class="p-inputtext p-inputtext-sm" pInputText type="text">
-                        <div *ngIf="!pf.district.valid && (pf.district.dirty || submitted)">
-                          <p-message *ngIf="pf.district.errors.required" severity="error" text="Informe o bairro">
-                          </p-message>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="col-12 col-md-12 mt-2">
-                        <label>Complemento</label>
-                        <input #complementInput
-                               [formControl]="pf.complement" [spellcheck]="false"
-                               class="p-inputtext p-inputtext-sm" pInputText type="text">
-                      </div>
-                    </div>
-                  </p-tabPanel>
-                </p-tabView>
-              </div>
-            </div>
-          </form>
-        </div>
-        <hr>
-        <div class="row">
-          <div class="col-12 col-md-12">
-            <div class="text-center pb-4">
-              <button (click)="tryUpdate()"
-                      [loading]="isLoading"
-                      [ngStyle]="{backgroundColor:'var(--green-500)', borderColor:'var(--green-500)'}"
-                      class="p-button p-button-md p-button-raised p-button-rounded" icon="pi pi-check-circle"
-                      iconPos="left" label="Atualizar" pButton type="button">
-              </button>
+              <div class="clearfix"></div>
             </div>
           </div>
-          <div class="clearfix"></div>
         </div>
       </div>
     </div>

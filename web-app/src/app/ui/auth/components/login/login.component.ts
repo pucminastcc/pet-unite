@@ -9,6 +9,7 @@ import {AccountActionModel} from '../../../../domain/auth/models/account-action.
 import {Subscription} from 'rxjs';
 import {LoginResult} from '../../../../domain/auth/models/results/login.result';
 import {AuthService} from '../../services/auth.service';
+import {FacebookLoginProvider, GoogleLoginProvider, SocialAuthService, SocialUser} from 'angularx-social-login';
 
 @Component({
   selector: 'app-login',
@@ -27,13 +28,16 @@ export class LoginComponent implements OnInit, OnDestroy {
   public loginForm: FormGroupTypeSafe<ILoginForm>;
 
   private loginSubscription: Subscription | undefined;
+  private facebookLoginSubscription: Subscription | undefined;
+  private googleLoginSubscription: Subscription | undefined;
 
   constructor(
     private ref: DynamicDialogRef,
     private config: DynamicDialogConfig,
     private readonly fb: FormBuilderTypeSafe,
     private readonly authenticationService: AuthService,
-    private readonly messageService: MessageService
+    private readonly messageService: MessageService,
+    private readonly socialAuthService: SocialAuthService
   ) {
     this.loginForm = this.fb.group<ILoginForm>({
       email: new FormControl('', [Validators.required, Validators.email]),
@@ -49,8 +53,15 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.unSubscribe();
+  }
+
+  private unSubscribe(): void {
     if (this.loginSubscription)
       this.loginSubscription.unsubscribe();
+
+    if (this.facebookLoginSubscription)
+      this.facebookLoginSubscription.unsubscribe();
   }
 
   private notify(severity: string = 'success', summary: string = '', detail: string = '', closable: boolean = false, life: number = 6500): void {
@@ -104,13 +115,71 @@ export class LoginComponent implements OnInit, OnDestroy {
           this.reset();
         }
       }
-    }, (error) => {
+    }, (err) => {
       this.notify('error', 'Erro', 'Ops, algo deu errado :(');
       this.reset();
     });
   }
 
-  public facebookLogin(): void {
-    this.authenticationService.facebookLogin();
+  public onClickFacebookButton(): void {
+    this.socialAuthService.signIn(FacebookLoginProvider.PROVIDER_ID)
+      .then((user: SocialUser) => {
+        if (user) {
+          this.facebookLoginSubscription = this.loginFacebook(user);
+        }
+      }, (err) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Autorização',
+          detail: 'Não foi possível realizar o login com o Facebook'
+        });
+      });
+  }
+
+  private loginFacebook(user: SocialUser): Subscription {
+    return this.authenticationService.loginFacebok(user)
+      .subscribe((data: LoginResult) => {
+        if (data) {
+          if (data.accessToken && data.user) {
+            this.notify('success', 'Sucesso', data.message);
+            setTimeout(() => window.location.reload(), 1500);
+          } else {
+            this.notify('error', 'Erro', data.message);
+            this.reset();
+          }
+        }
+      }, (err) => {
+      });
+  }
+
+  public onClickGoogleButton(): void {
+    this.socialAuthService.signIn(GoogleLoginProvider.PROVIDER_ID)
+      .then((user: SocialUser) => {
+        if (user) {
+          this.googleLoginSubscription = this.loginGoogle(user);
+        }
+      }, (err) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Autorização',
+          detail: 'Não foi possível realizar o login com o Google'
+        });
+      });
+  }
+
+  private loginGoogle(user: SocialUser): Subscription {
+    return this.authenticationService.loginGoogle(user)
+      .subscribe((data: LoginResult) => {
+        if (data) {
+          if (data.accessToken && data.user) {
+            this.notify('success', 'Sucesso', data.message);
+            setTimeout(() => window.location.reload(), 1500);
+          } else {
+            this.notify('error', 'Erro', data.message);
+            this.reset();
+          }
+        }
+      }, (err) => {
+      });
   }
 }

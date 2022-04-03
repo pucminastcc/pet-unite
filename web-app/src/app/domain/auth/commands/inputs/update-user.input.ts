@@ -5,7 +5,7 @@ export interface UpdateUserInput {
   zipCode: string;
   address: string;
   district: string;
-  city: string;
+  cityId: string;
   state: string;
   complement: string;
   phone: string;

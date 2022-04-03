@@ -4,6 +4,7 @@
       <span class="p-input-icon-left">
         <i class="pi pi-envelope"></i>
         <input #emailInput [formControl]="lf.email" [spellcheck]="false" class="p-inputtext p-inputtext-sm rounded"
+               (input)="lf.email.setValue($event.target.value.toLowerCase())"
                pInputText placeholder="Email" type="text">
       </span>
       <div *ngIf="!lf.email.valid && (lf.email.dirty || submitted)">
@@ -39,9 +40,15 @@
             icon="fas fa-sign-in-alt" iconPos="left" [label]="!isLoading ? 'Entrar' : 'Aguarde...'" pButton type="submit">
     </button>
   </form>
-  <button (click)="facebookLogin()" [disabled]="isLoading"
+  <hr/>
+  <button (click)="onClickFacebookButton()" [disabled]="isLoading"
           [ngStyle]="{backgroundColor:'var(--indigo-500)', borderColor:'var(--indigo-500)'}"
-          class="p-button p-button-raised p-button-rounded" icon="pi pi-facebook" iconPos="left" label="Facebook"
+          class="p-button p-button-raised p-button-rounded col-5 col-md-5" icon="pi pi-facebook" iconPos="left" label="Facebook"
+          pButton>
+  </button>
+  <button (click)="onClickGoogleButton()" [disabled]="isLoading"
+          [ngStyle]="{backgroundColor:'#d94933', borderColor:'#d94933'}"
+          class="p-button p-button-raised p-button-rounded offset-2 col-5 offset-md-2 col-md-5" icon="pi pi-google" iconPos="left" label="Google"
           pButton>
   </button>
 </div>

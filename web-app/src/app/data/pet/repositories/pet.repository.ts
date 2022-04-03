@@ -14,8 +14,6 @@ import {GetPetInput} from '../../../domain/pet/commands/inputs/get-pet.input';
 import {PetResult} from '../../../domain/pet/models/results/pet.result';
 import {UpdatePetInput} from '../../../domain/pet/commands/inputs/update-pet.input';
 import {UpdatePetResult} from '../../../domain/pet/models/results/update-pet.result';
-import {DonatePetInput} from '../../../domain/pet/commands/inputs/donate-pet.input';
-import {DonatePetResult} from '../../../domain/pet/models/results/donate-pet.result';
 
 @Injectable({
   providedIn: 'root'
@@ -63,14 +61,6 @@ export class PetRepository extends IPetRepository {
     const {accessToken} = input;
     return this.api.put<UpdatePetResult>(`${environment.apiUrl}/pet`, input, accessToken)
       .pipe(map((result: UpdatePetResult) => {
-        return result;
-      }));
-  }
-
-  donatePet(input: DonatePetInput): Observable<DonatePetResult> {
-    const {accessToken} = input;
-    return this.api.patch<DonatePetResult>(`${environment.apiUrl}/pet/donate`, input, accessToken)
-      .pipe(map((result: DonatePetResult) => {
         return result;
       }));
   }

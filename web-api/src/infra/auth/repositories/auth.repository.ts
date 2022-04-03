@@ -1,4 +1,4 @@
-import {Injectable} from '@nestjs/common';
+import {HttpService, Injectable} from '@nestjs/common';
 import {IAuthRepository} from '../../../domain/auth/repositories/iauth.repository';
 import {InjectModel} from '@nestjs/mongoose';
 import {Model} from 'mongoose';
@@ -6,7 +6,6 @@ import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import {User, UserModel} from '../../../domain/auth/models/user.model';
 import {ValidateLocalUserDto} from '../../../domain/auth/dtos/validate-local-user.dto';
-import {ValidateFacebookUserDto} from '../../../domain/auth/dtos/validate-facebook-user.dto';
 import {ValidateUserResult} from '../../../domain/auth/models/results/validate-user.result';
 import {LoginDto} from '../../../domain/auth/dtos/login.dto';
 import {LoginResult} from '../../../domain/auth/models/results/login.result';
@@ -35,6 +34,9 @@ import {GetUserDto} from '../../../domain/auth/dtos/get-user.dto';
 import {GetUserResult} from '../../../domain/auth/models/results/get-user.result';
 import {PasswordResetCode} from '../../../domain/auth/models/password-reset-code.model';
 import {Account} from '../../../domain/auth/models/account.model';
+import {UpdateUserMessage} from '../../../domain/auth/enums/update-user-message.enum';
+import {ValidateFacebookUserDto} from '../../../domain/auth/dtos/validate-facebook-user.dto';
+import {ValidateGoogleUserDto} from '../../../domain/auth/dtos/validate-google-user.dto';
 
 
 @Injectable()
@@ -46,7 +48,8 @@ export class AuthRepository extends IAuthRepository {
         @InjectModel('Account') private readonly accountModel: Model<Account>,
         private readonly mailService: MailService,
         private readonly utilService: UtilService,
-        private readonly jwtService: JwtService
+        private readonly jwtService: JwtService,
+        private readonly httpService: HttpService
     ) {
         super();
     }
@@ -54,14 +57,22 @@ export class AuthRepository extends IAuthRepository {
     private getPayload(doc): UserModel {
         return {
             id: doc.id,
-            email: doc.email,
             username: doc.username,
+            email: doc.email,
+            provider: doc.provider,
             img: doc.img,
+            isSuperUser: doc.isSuperUser,
             personTypeId: doc.personTypeId,
             document: doc.document,
             zipCode: doc.zipCode,
             address: doc.address,
-            isSuperUser: doc.isSuperUser
+            district: doc.district,
+            cityId: doc.cityId,
+            state: doc.state,
+            complement: doc.complement,
+            phone: doc.phone,
+            cell: doc.cell,
+            whatsapp: doc.whatsapp,
         };
     }
 
@@ -100,17 +111,86 @@ export class AuthRepository extends IAuthRepository {
     }
 
     async validateFacebookUser(input: ValidateFacebookUserDto): Promise<ValidateUserResult> {
-        let result: ValidateUserResult = {payload: undefined, message: LoginMessage.UserNotFound};
+        let result: ValidateUserResult;
 
-        const {email, img} = input;
-        let doc = await this.userModel.findOne({email, provider: 'facebook'}).exec();
-        doc.img = img;
+        const {email, firstName, photoUrl, provider, id, authToken} = input;
 
-        if (doc) {
+        let imageUrl = photoUrl.replace('type=normal', 'type=large');
+        imageUrl = `${imageUrl}&access_token=${authToken}`;
+
+        let image = await this.httpService.axiosRef.get(imageUrl, {responseType: 'arraybuffer'});
+        let returnedB64 = `data:image/jpeg;base64,${Buffer.from(image.data).toString('base64')}`;
+
+        const doc = await this.userModel.findOne({
+            password: id, provider: provider.toLowerCase()
+        }).exec();
+
+        if (!doc) {
+            const user: RegisterDto = {
+                username: firstName,
+                email: email,
+                password: id,
+                img: returnedB64,
+                terms: true,
+                activated: true,
+                provider: provider.toLowerCase()
+            };
+
+            const insert = await (await this.userModel.insertMany(user)).find(e => true);
+
+            result = {
+                payload: this.getPayload(insert),
+                message: LoginMessage.UserIsAuthenticated
+            };
+        } else {
+            doc.img = returnedB64;
+
             result = {
                 payload: this.getPayload(doc),
                 message: LoginMessage.UserIsAuthenticated
-            }
+            };
+        }
+        return result;
+    }
+
+    async validateGoogleUser(input: ValidateGoogleUserDto): Promise<ValidateUserResult> {
+        let result: ValidateUserResult;
+
+        const {email, firstName, photoUrl, provider, id, authToken} = input;
+
+        let imageUrl = photoUrl.replace('-c', '-p');
+
+        let image = await this.httpService.axiosRef.get(imageUrl, {responseType: 'arraybuffer'});
+        let returnedB64 = `data:image/jpeg;base64,${Buffer.from(image.data).toString('base64')}`;
+
+        const doc = await this.userModel.findOne({
+            password: id, provider: provider.toLowerCase()
+        }).exec();
+
+        if (!doc) {
+            const user: RegisterDto = {
+                username: firstName,
+                email: email,
+                password: id,
+                img: returnedB64,
+                terms: true,
+                activated: true,
+                provider: provider.toLowerCase()
+            };
+
+            const insert = await (await this.userModel.insertMany(user)).find(e => true);
+
+            result = {
+                payload: this.getPayload(insert),
+                message: LoginMessage.UserIsAuthenticated
+            };
+        } else {
+            doc.img = returnedB64;
+
+            result = {
+                payload: this.getPayload(doc),
+                message: LoginMessage.UserIsAuthenticated
+            };
         }
         return result;
     }
@@ -123,10 +203,13 @@ export class AuthRepository extends IAuthRepository {
             result = {
                 accessToken: this.jwtService.sign({...payload, img: ''}),
                 user: {
-                    email: payload.email,
+                    id: payload.id,
                     username: payload.username,
+                    provider: payload.provider,
+                    email: payload.email,
                     img: payload.img,
-                    isSuperUser: payload.isSuperUser
+                    isSuperUser: payload.isSuperUser,
+
                 },
                 message
             }
@@ -281,15 +364,17 @@ export class AuthRepository extends IAuthRepository {
                 success: true,
                 data: {
                     id: user.id,
-                    email: user.email,
                     username: user.username,
+                    email: user.email,
+                    provider: user.provider,
                     img: user.img,
+                    isSuperUser: user.isSuperUser,
                     personTypeId: user.personTypeId,
                     document: user.document,
                     zipCode: user.zipCode,
                     address: user.address,
                     district: user.district,
-                    city: user.city,
+                    cityId: user.cityId,
                     state: user.state,
                     complement: user.complement,
                     phone: user.phone,
@@ -302,23 +387,29 @@ export class AuthRepository extends IAuthRepository {
     }
 
     async updateUser(input: UpdateUserDto): Promise<UpdateUserResult> {
-        let result: UpdateUserResult = {success: false, message: ''};
+        let result: UpdateUserResult = {success: false, auth: null, message: UpdateUserMessage.Error};
         const {
-            id, username, personTypeId, document, zipCode, address, district, city, state, complement, cell,
+            id, username, personTypeId, document, zipCode, address, district, cityId, state, complement, cell,
             phone, whatsapp, img
         } = input;
 
         const update = await this.userModel.findOneAndUpdate({
             _id: id
         }, {
-            username, personTypeId, document, zipCode, address, district, city, state, complement, phone, cell,
+            username, personTypeId, document, zipCode, address, district, cityId, state, complement, phone, cell,
             whatsapp, img
-        });
+        }, {returnDocument: 'after'});
 
         if (update) {
+            const payload = this.getPayload(update);
+            const auth = await this.login({
+                payload
+            });
+
             result = {
                 success: true,
-                message: ''
+                auth,
+                message: UpdateUserMessage.Success
             }
         }
 

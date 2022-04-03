@@ -6,6 +6,7 @@ import {PetComponent} from './pages/pet/pet.component';
 import {DonationComponent} from './pages/donation/donation.component';
 import {AuthGuard} from '../shared/guards/auth.guard';
 import {ManagerComponent} from './pages/manager/manager.component';
+import {SupportComponent} from './pages/support/support.component';
 
 const routes: Routes = [
   {path: 'manager', canActivate: [AuthGuard], component: ManagerComponent},
@@ -13,6 +14,7 @@ const routes: Routes = [
   {path: 'profile', canActivate: [AuthGuard], component: ProfileComponent},
   {path: 'pet', canActivate: [AuthGuard], component: PetComponent},
   {path: 'donation', canActivate: [AuthGuard], component: DonationComponent},
+  {path: 'support', canActivate: [AuthGuard], component: SupportComponent},
   {path: '**', redirectTo: '/home'}
 ];
 

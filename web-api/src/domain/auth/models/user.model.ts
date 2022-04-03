@@ -5,6 +5,7 @@ export interface User extends Document {
     email: string;
     password: string;
     terms: boolean;
+    provider: string;
     activated: boolean;
     img: string;
     personTypeId: string;
@@ -12,30 +13,33 @@ export interface User extends Document {
     zipCode: string;
     address: string;
     district: string;
-    city: string;
+    cityId: string;
     state: string;
     complement: string;
     phone: string;
     cell: string;
     whatsapp: string;
     isSuperUser: boolean;
+    blocked: boolean;
+    deleted: boolean;
 }
 
 export interface UserModel {
     id?: string;
-    email: string;
     username: string;
+    email: string;
+    provider: string;
     img?: string;
+    isSuperUser: boolean;
     personTypeId?: string;
     document?: string;
     zipCode?: string;
     address?: string;
     district?: string;
-    city?: string;
+    cityId?: string;
     state?: string;
     complement?: string;
     phone?: string;
     cell?: string;
     whatsapp?: string;
-    isSuperUser?: boolean;
 }
