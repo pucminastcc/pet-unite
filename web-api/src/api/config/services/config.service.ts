@@ -7,6 +7,10 @@ import {GetPetGendersDto} from '../../../domain/config/dtos/get-pet-genders.dto'
 import {PetGenderResult} from '../../../domain/config/models/results/pet-gender.result';
 import {GetStatesDto} from '../../../domain/config/dtos/get-states.dto';
 import {BrazilStateResult} from '../../../domain/config/models/results/brazil-state.result';
+import {GetReportTypesDto} from '../../../domain/config/dtos/get-report-types.dto';
+import {ReportTypeResult} from '../../../domain/config/models/results/report-type.result';
+import {GetCitiesDto} from '../../../domain/config/dtos/get-cities.dto';
+import {BrazilCityResult} from '../../../domain/config/models/results/brazil-city.result';
 
 @Injectable()
 export class ConfigService implements IConfigRepository {
@@ -25,5 +29,13 @@ export class ConfigService implements IConfigRepository {
 
     async getStates(input?: GetStatesDto): Promise<BrazilStateResult[]> {
         return await this.repos.getStates(input);
+    }
+
+    async getReportTypes(input?: GetReportTypesDto): Promise<ReportTypeResult[]> {
+        return await this.repos.getReportTypes(input);
+    }
+
+    async getCities(input?: GetCitiesDto): Promise<BrazilCityResult[]> {
+        return this.repos.getCities(input);
     }
 }

@@ -1,0 +1,67 @@
+<p-toast baseZIndex="9999"></p-toast>
+<div class="container-fluid">
+  <div class="card">
+    <div class="card-header card-header-danger">
+      <h4 class="card-title">Relatório</h4>
+      <p class="card-category">Sua opinião é importante</p>
+    </div>
+    <div class="card-body p-fluid">
+      <div class="text-center">
+        <p-progressSpinner *ngIf="isLoading"></p-progressSpinner>
+      </div>
+      <div *ngIf="!isLoading" class="animate__animated animate__fadeIn">
+        <form [formGroup]="supportForm">
+          <div class="row">
+            <div class="col-12 col-md-4">
+              <label>Tipo</label>
+              <p-dropdown (onChange)="changeReportType($event.value)" [formControl]="sf?.reportTypeId"
+                          [options]="optReportTypes"
+                          emptyMessage="Nenhum registro foi encontrado." optionValue="value.id"
+                          placeholder="Selecione o tipo de relatório">
+              </p-dropdown>
+              <div *ngIf="!sf.reportTypeId.valid && (sf.reportTypeId.dirty || submitted)">
+                <p-message *ngIf="sf.reportTypeId.errors.required" severity="error" text="Informe o tipo de relatório">
+                </p-message>
+              </div>
+            </div>
+            <div class="col-12 col-md-8 mt-2 mt-md-0">
+              <label>Assunto</label>
+              <input [formControl]="sf?.subject" [spellcheck]="false" (input)="setUpperCase()"
+                     class="p-inputtext p-inputtext-sm" pInputText type="text">
+              <div *ngIf="!sf.subject.valid && (sf.subject.dirty || submitted)">
+                <p-message *ngIf="sf.subject.errors.required" severity="error" text="Informe o assunto">
+                </p-message>
+                <p-message *ngIf="sf.subject.errors.maxlength" severity="error" text="Limite máximo de caracteres excedidos">
+                </p-message>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12 col-md-12 mt-2">
+              <label>Descrição</label>
+              <p-editor [(ngModel)]="text" [formControl]="sf?.description" [style]="{'height':'320px'}">
+              </p-editor>
+              <div *ngIf="!sf.description.valid && (sf.description.dirty || submitted)">
+                <p-message *ngIf="sf.description.errors.required" severity="error" text="Informe a descrição">
+                </p-message>
+              </div>
+            </div>
+          </div>
+        </form>
+        <hr>
+        <div class="row">
+          <div class="col-12 offset-md-5 col-md-2">
+              <button (click)="trySend()"
+                      [ngStyle]="{backgroundColor:'var(--green-500)', borderColor:'var(--green-500)'}"
+                      class="p-button p-button-md p-button-raised p-button-rounded my-2" icon="pi pi-check-circle"
+                      iconPos="left" label="Confirmar" pButton type="button">
+              </button>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+

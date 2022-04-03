@@ -1,5 +1,13 @@
 export class ValidateFacebookUserDto {
-    email: string;
+    provider: string;
     id: string;
-    img: string;
+    email: string;
+    name: string;
+    photoUrl: string;
+    firstName: string;
+    lastName: string;
+    authToken: string;
+    idToken: string;
+    authorizationCode: string;
+    response: any;
 }

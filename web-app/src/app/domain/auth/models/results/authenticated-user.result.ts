@@ -1,8 +1,10 @@
 export interface AuthenticatedUserResult {
   id: string;
-  email: string;
   username: string;
+  email: string;
+  provider: string;
   img: string;
+  isSuperUser: boolean;
   personTypeId?: string;
   document?: string;
   zipCode?: string;
@@ -11,5 +13,4 @@ export interface AuthenticatedUserResult {
   city?: string;
   state?: string;
   complement?: string;
-  isSuperUser: boolean;
 }

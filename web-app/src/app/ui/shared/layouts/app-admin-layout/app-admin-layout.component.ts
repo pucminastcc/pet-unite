@@ -66,12 +66,13 @@ export class AppAdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy
     const routePrefix = '/admin';
     const routes = [];
     if (this.user?.isSuperUser) {
-      routes.push({path: `${routePrefix}/manager`, title: 'Admin', icon: 'fas fa-lock', class: ''});
+      routes.push({path: `${routePrefix}/manager`, title: 'Gestão', icon: 'fas fa-lock', class: ''});
     }
     routes.push({path: `${routePrefix}/dashboard`, title: 'Dashboard', icon: 'fas fa-chart-line', class: ''});
     routes.push({path: `${routePrefix}/profile`, title: 'Perfil', icon: 'fas fa-user', class: ''});
     routes.push({path: `${routePrefix}/pet`, title: 'Pets', icon: 'fas fa-dog', class: ''});
-    routes.push({path: `${routePrefix}/donation`, title: 'Doações', icon: 'fas fa-paw', class: ''});
+    routes.push({path: `${routePrefix}/donation`, title: 'Contribuições', icon: 'fas fa-paw', class: ''});
+    routes.push({path: `${routePrefix}/support`, title: 'Suporte', icon: 'fas fa-question-circle', class: ''});
 
     return routes;
   }

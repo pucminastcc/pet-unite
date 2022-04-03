@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng s -o ---ssl true",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
@@ -21,8 +21,13 @@
     "@angular/router": "~12.2.0",
     "@fortawesome/fontawesome-free": "^5.15.4",
     "angular-typesafe-reactive-forms-helper": "^2.0.2",
+    "angularx-social-login": "^4.1.0",
     "animate.css": "^4.1.1",
+    "chart.js": "^3.7.0",
     "crypto-js": "^4.1.1",
+    "file-saver": "^2.0.5",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.5.23",
     "jwt-decode": "^3.1.2",
     "ngx-cookie-service": "^13.0.0",
     "primeicons": "^4.1.0",
@@ -31,6 +36,7 @@
     "rxjs": "~6.6.0",
     "secure-web-storage": "^1.0.2",
     "tslib": "^2.3.0",
+    "xlsx": "^0.18.0",
     "zone.js": "~0.11.4"
   },
   "devDependencies": {
@@ -38,6 +44,7 @@
     "@angular/cli": "~12.2.9",
     "@angular/compiler-cli": "~12.2.0",
     "@types/crypto-js": "^4.0.2",
+    "@types/file-saver": "^2.0.5",
     "@types/jasmine": "~3.8.0",
     "@types/node": "^12.20.29",
     "jasmine-core": "~3.8.0",

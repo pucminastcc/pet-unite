@@ -16,8 +16,8 @@ export class UpdateUserDto {
     address: string;
     @ApiProperty({default: 'Centro', required: true})
     district: string;
-    @ApiProperty({default: 'Jales', required: true})
-    city: string;
+    @ApiProperty({default: '6208175ab016a03e00c60da0', required: true})
+    cityId: Types.ObjectId;
     @ApiProperty({default: 'SP', required: true})
     state: string;
     @ApiProperty({default: 'Casa', required: true})

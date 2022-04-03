@@ -4,8 +4,8 @@
       <span class="p-input-icon-left">
         <i class="pi pi-envelope"></i>
         <input #emailInput [formControl]="rf.email" [spellcheck]="false" class="p-inputtext p-inputtext-sm rounded"
-               pInputText
-               placeholder="Email" type="text">
+               (input)="rf.email.setValue($event.target.value.toLowerCase())"
+               pInputText placeholder="Email" type="text">
       </span>
       <div *ngIf="!rf.email.valid && (rf.email.dirty || submitted)">
         <p-message *ngIf="rf.email.errors.required" severity="error" text="Informe o email"></p-message>
@@ -50,7 +50,7 @@
     </div>
     <div class="p-col-12 p-md-12 d-flex mt-3">
       <p-checkbox [formControl]="rf.terms" [binary]="true"></p-checkbox>
-      <div class="ml-2 font-weight-normal">Concordo com os <a href="#">termos de uso e serviços</a></div>
+      <div class="ml-2 font-weight-normal">Concordo com os <a href="#/home" (click)="displayTerms()">termos de uso e serviços</a></div>
     </div>
     <button [disabled]="isLoading" [loading]="isLoading"
             class="p-button p-button-success p-button-raised p-button-rounded mt-4" icon="fas fa-user-plus"

@@ -12,9 +12,9 @@ import {ButtonModule} from 'primeng/button';
 import {MessageService} from 'primeng/api';
 import {MessageModule} from 'primeng/message';
 import {MessagesModule} from 'primeng/messages';
-import {HttpClient, HttpClientModule} from '@angular/common/http';
+import {HttpClientModule} from '@angular/common/http';
 import {CheckboxModule} from 'primeng/checkbox';
-import { EmailConfirmationComponent } from './components/email-confirmation/email-confirmation.component';
+import {EmailConfirmationComponent} from './components/email-confirmation/email-confirmation.component';
 import {SharedModule} from '../shared/shared.module';
 
 
@@ -26,18 +26,18 @@ import {SharedModule} from '../shared/shared.module';
     PasswordResetComponent,
     EmailConfirmationComponent
   ],
-    imports: [
-        CommonModule,
-        ReactiveFormsModule,
-        FormsModule,
-        ButtonModule,
-        MessageModule,
-        MessagesModule,
-        HttpClientModule,
-        CheckboxModule,
-        AuthRoutingModule,
-        SharedModule
-    ],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    FormsModule,
+    ButtonModule,
+    MessageModule,
+    MessagesModule,
+    HttpClientModule,
+    CheckboxModule,
+    AuthRoutingModule,
+    SharedModule,
+  ],
   providers: [
     FormBuilderTypeSafe,
     MessageService

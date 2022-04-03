@@ -1,3 +1,5 @@
+<p-toast [baseZIndex]="9999"></p-toast>
+
 <p-confirmDialog #cd
                  [breakpoints]="{'960px': '50vw', '640px': '95vw'}" [style]="{width: '50vw'}" [closable]="false"
                  position="bottom">
@@ -11,7 +13,11 @@
   </ng-template>
 </p-confirmDialog>
 
-<div class="container-fluid">
+<div class="text-center">
+  <p-progressSpinner *ngIf="isLoading"></p-progressSpinner>
+</div>
+
+<div *ngIf="!isLoading" class="container-fluid">
   <div class="row">
     <div class="col-md-12">
       <div class="pb-3">
@@ -36,13 +42,13 @@
         </ng-template>
         <ng-template let-pet pTemplate="gridItem">
           <div class="col-12 col-md-3 p-4 d-inline-block">
-            <div class="card">
+            <div *ngIf="!pet.inDonation" class="card {{isRequesting ? ' p-disabled': ''}}">
               <div class="card-header card-header-danger">
                 <p class="card-title">{{pet.name}}</p>
               </div>
               <div class="card-body">
                 <div class="text-center">
-                  <p-image [alt]="pet.name" [height]="150" [imageClass]="'w-100'" [preview]="false" [src]="pet.img"
+                  <p-image [alt]="pet.name" [height]="150" [imageClass]="'w-100'" [preview]="true" [src]="pet.img"
                            loading="lazy">
                   </p-image>
                 </div>

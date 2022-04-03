@@ -40,6 +40,7 @@
               "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
               "node_modules/quill/dist/quill.core.css",
               "node_modules/quill/dist/quill.snow.css",
+              "node_modules/chart.js/dist/Chart.js",
               "node_modules/animate.css/animate.min.css",
               "src/assets/css/material-dashboard.css",
               "src/styles.scss"
@@ -86,7 +87,8 @@
               "browserTarget": "web-app:build:production"
             },
             "development": {
-              "browserTarget": "web-app:build:development"
+              "browserTarget": "web-app:build:development",
+              "port": 3001
             }
           },
           "defaultConfiguration": "development"

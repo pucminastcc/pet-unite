@@ -1,6 +1,5 @@
 import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {FormBuilderTypeSafe, FormGroupTypeSafe} from 'angular-typesafe-reactive-forms-helper';
-import {IProfileForm} from '../../../../domain/admin/profile/models/forms/iprofile.form';
 import {FormControl, Validators} from '@angular/forms';
 import {AuthService} from '../../../auth/services/auth.service';
 import {AuthenticatedUserModel} from '../../../../domain/auth/models/authenticated-user.model';
@@ -13,7 +12,10 @@ import {AddressResult} from '../../../../domain/shared/services/models/results/a
 import {UpdateUserResult} from '../../../../domain/auth/models/results/update-user.result';
 import {LogoutResult} from '../../../../domain/auth/models/results/logout.result';
 import {StateResult} from '../../../../domain/shared/services/models/results/state.result';
-import {FileUpload} from 'primeng/fileupload';
+import {IProfileForm} from '../../../../domain/profile/models/forms/iprofile.form';
+import {CityResult} from '../../../../domain/shared/services/models/results/city.result';
+import {finalize} from 'rxjs/operators';
+import {LocalService} from '../../../shared/services/local.service';
 
 @Component({
   selector: 'app-profile',
@@ -21,28 +23,30 @@ import {FileUpload} from 'primeng/fileupload';
   styleUrls: ['./profile.component.scss']
 })
 export class ProfileComponent implements OnInit, OnDestroy {
-  @ViewChild('documentInput') documentInput: ElementRef<HTMLElement> | undefined;
-
   private userSubscription: Subscription | undefined;
   private forkSubscription: Subscription | undefined;
   private addressSubscription: Subscription | undefined
   private updateSubscription: Subscription | undefined;
 
+  private cities: CityResult[] = [];
   public img: string | ArrayBuffer | null = '';
   public profileForm: FormGroupTypeSafe<IProfileForm>;
   public isLoading: boolean = false;
   public submitted: boolean = false;
   public optPersonTypes: SelectItem<PersonTypeResult>[] = [];
-  public optStates: SelectItem<any>[] = [];
+  public optStates: SelectItem<StateResult>[] = [];
+  public optCities: SelectItem<CityResult>[] = [];
   public user: AuthenticatedUserModel | undefined;
 
   public documentMask: string = '';
   public document: string = '';
   public invalidDocument: boolean = false;
+  public activeIndex: number = 0;
 
   constructor(
     private readonly configService: ConfigService,
     private readonly authService: AuthService,
+    private readonly localService: LocalService,
     private readonly viaCepService: ViaCepService,
     private readonly fb: FormBuilderTypeSafe,
     private readonly messageService: MessageService
@@ -51,17 +55,22 @@ export class ProfileComponent implements OnInit, OnDestroy {
       img: new FormControl(''),
       email: new FormControl('', [Validators.required, Validators.email]),
       username: new FormControl('', [Validators.required, Validators.maxLength(25)]),
+      provider: new FormControl('', [Validators.required]),
       personTypeId: new FormControl([Validators.required]),
       document: new FormControl(''),
       zipCode: new FormControl('', [Validators.required, Validators.minLength(8)]),
       address: new FormControl('', [Validators.required]),
       district: new FormControl('', [Validators.required]),
-      city: new FormControl('', [Validators.required]),
-      state: new FormControl('', [Validators.required]),
+      cityId: new FormControl(null, [Validators.required]),
+      state: new FormControl(null, [Validators.required]),
       complement: new FormControl(''),
       phone: new FormControl(''),
       cell: new FormControl(''),
       whatsapp: new FormControl(''),
+    });
+
+    this.authService.getAuthenticatedUser().subscribe((user: AuthenticatedUserModel) => {
+      this.user = user;
     });
   }
 
@@ -70,13 +79,11 @@ export class ProfileComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.userSubscription = this.authService.getAuthenticatedUser()
-      .subscribe((data: AuthenticatedUserModel) => {
-      });
     this.forkSubscription = this.getDataFromAPI();
   }
 
   ngOnDestroy(): void {
+    this.cities = [];
     this.unSubscribe();
   }
 
@@ -100,19 +107,21 @@ export class ProfileComponent implements OnInit, OnDestroy {
     return forkJoin({
       personTypes: this.configService.getPersonTypes(),
       states: this.configService.getStates(),
+      cities: this.configService.getCities(),
       user: this.authService.getUser(),
-    }).subscribe((res) => {
+    }).pipe(finalize(() => {
+      this.isLoading = false;
+    })).subscribe((res) => {
       if (res) {
         this.optPersonTypes = this.getOptPersonTypes(res.personTypes);
         this.optStates = this.getOptStates(res.states);
+        this.cities = res.cities;
         this.setProfile(res.user.data);
       }
-      this.isLoading = false;
     }, (error) => {
       if (error.status === 401) {
         this.logout();
       }
-      this.isLoading = false;
     });
   }
 
@@ -134,11 +143,26 @@ export class ProfileComponent implements OnInit, OnDestroy {
     })
   }
 
+  private getOptCities(cities: CityResult[], state: string): SelectItem<CityResult>[] {
+    return cities.filter(e => e.state === state).map((city: CityResult) => {
+      return {
+        label: city.description,
+        value: city
+      }
+    })
+  }
+
+  public onChangeState(state: string): void {
+    this.pf.cityId.setValue(null);
+    this.optCities = this.getOptCities(this.cities, state);
+  }
+
   private setProfile(user: AuthenticatedUserModel): void {
     this.img = user.img;
     this.pf.img.setValue(user.img);
     this.pf.email.setValue(user.email);
     this.pf.username.setValue(user.username);
+    this.pf.provider.setValue(user.provider.toUpperCase());
     this.pf.personTypeId.setValue(user.personTypeId);
     this.changePersonType(user.personTypeId ?? '');
     this.pf.document.setValue(user.document);
@@ -146,8 +170,11 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.pf.address.setValue(user.address);
     this.pf.district.setValue(user.district);
     this.pf.complement.setValue(user.complement);
-    this.pf.city.setValue(user.city);
+    this.pf.cityId.setValue(user.cityId);
     this.pf.state.setValue(user.state);
+    if(user.state) {
+      this.optCities = this.getOptCities(this.cities, user.state);
+    }
     this.pf.phone.setValue(user.phone);
     this.pf.cell.setValue(user.cell);
     this.pf.whatsapp.setValue(user.whatsapp);
@@ -161,14 +188,19 @@ export class ProfileComponent implements OnInit, OnDestroy {
     if (zipCode.length === 8) {
       this.addressSubscription = this.viaCepService.getAddress({
         zipCode
-      }).subscribe((data: AddressResult) => {
+      }).subscribe(async (data: AddressResult) => {
         if (data) {
           this.pf.zipCode.setValue(data.cep);
           this.pf.address.setValue(data.logradouro);
           this.pf.district.setValue(data.bairro);
           this.pf.complement.setValue(data.complemento);
-          this.pf.city.setValue(data.localidade);
           this.pf.state.setValue(data.uf);
+          this.onChangeState(data.uf);
+          let city = this.optCities.filter(e => e.label?.toUpperCase() === data.localidade.toUpperCase());
+          if(city) {
+            const id = city.map(e => e.value.id).find(e => true);
+            this.pf.cityId.setValue(id);
+          }
         }
       });
     }
@@ -207,13 +239,30 @@ export class ProfileComponent implements OnInit, OnDestroy {
     if (this.profileForm.invalid) {
       return;
     }
+    const {phone, cell, whatsapp} = this.profileForm.value;
+
+    if (!phone && !cell && !whatsapp) {
+      this.activeIndex = 1;
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Erro',
+        detail: 'Informe pelo menos uma forma de contato!'
+      });
+      return;
+    }
 
     const {document} = this.profileForm.value;
-    if (document.length > 0) {
-      if (!this.isValidDocument(document)) {
-        this.pf.document.setValue('');
-        this.invalidDocument = true;
-      } else this.invalidDocument = false;
+    if (document && document.length > 0) {
+      if (this.document === 'CPF') {
+        if (!this.isValidDocument(document)) {
+          this.activeIndex = 0;
+          this.pf.document.setValue('');
+          this.invalidDocument = true;
+          return;
+        } else {
+          this.invalidDocument = false;
+        }
+      }
     }
 
     this.updateSubscription = this.updateProfile(
@@ -268,23 +317,25 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   private updateProfile(profileForm: IProfileForm): Subscription {
     const {
-      username, personTypeId, document, zipCode, address, district, city, state, complement, phone, cell, whatsapp, img
+      username, personTypeId, document, zipCode, address, district, cityId, state, complement, phone, cell, whatsapp, img
     } = profileForm;
     this.isLoading = true;
     return this.authService.updateUser({
-      username, personTypeId, document, zipCode, address, district, city, state, complement, phone, cell, whatsapp, img
-    }).subscribe((data: UpdateUserResult) => {
+      username, personTypeId, document, zipCode, address, district, cityId, state, complement, phone, cell, whatsapp, img
+    }).pipe(finalize(() => {
+      this.isLoading = false;
+      this.invalidDocument = false;
+    })).subscribe((data: UpdateUserResult) => {
       if (data) {
-        this.isLoading = false;
+        this.localService.setJsonValue('auth', JSON.stringify(data.auth));
         this.messageService.add({
-          severity: 'success',
-          summary: 'Sucesso',
-          detail: 'Seu perfil foi atualizado :)'
+          severity: data.success ? 'success' : 'error',
+          summary: data.success ? 'Sucesso' : 'Erro',
+          detail: data.message
         });
       }
     }, (error) => {
-      this.isLoading = false;
-      if(error.status === 401) {
+      if (error.status === 401) {
         this.logout();
       }
       this.messageService.add({severity: 'error', summary: 'Erro', detail: 'Ops, algo deu errado :('});

@@ -8,7 +8,9 @@
       </a>
     </div>
     <ng-template #titleBlock>
-      {{title}}
+      <div class="d-flex">
+        {{title}}
+      </div>
     </ng-template>
     <div (click)="toggle()" class="navbar-toggler p-2" type="button">
       <span class="sr-only">Toggle navigation</span>

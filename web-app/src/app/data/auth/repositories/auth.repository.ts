@@ -21,13 +21,14 @@ import {GetAuthenticatedUserInput} from 'src/app/domain/auth/commands/inputs/get
 import {AuthenticatedUserModel} from '../../../domain/auth/models/authenticated-user.model';
 import {ConfirmEmailInput} from '../../../domain/auth/commands/inputs/confirm-email.input';
 import {ConfirmEmailResult} from '../../../domain/auth/models/results/confirm-email.result';
-import {FacebookLoginInput} from '../../../domain/auth/commands/inputs/facebook-login.input';
 import {GetTokenInput} from '../../../domain/auth/commands/inputs/get-token.input';
 import {ApiDatasource} from '../../datasources/api.datasource';
 import {UpdateUserInput} from '../../../domain/auth/commands/inputs/update-user.input';
 import {UpdateUserResult} from '../../../domain/auth/models/results/update-user.result';
 import {GetUserInput} from '../../../domain/auth/commands/inputs/get-user.input';
 import {GetUserResult} from '../../../domain/auth/models/results/get-user.result';
+import {LoginFacebookInput} from '../../../domain/auth/commands/inputs/login-facebook.input';
+import {LoginGoogleInput} from '../../../domain/auth/commands/inputs/login-google.input';
 
 @Injectable({
   providedIn: 'root'
@@ -59,8 +60,28 @@ export class AuthRepository extends IAuthRepository {
       }));
   }
 
-  facebookLogin(input?: FacebookLoginInput): void {
-    window.location.href = `${environment.apiUrl}/auth/facebook`;
+  loginFacebok(input: LoginFacebookInput): Observable<LoginResult> {
+    return this.http.post<LoginResult>(`${environment.apiUrl}/auth/facebook`, input)
+      .pipe(map((result: LoginResult) => {
+        if (result.accessToken) {
+          const {accessToken, user} = result;
+          this.setAuthValue(accessToken, user);
+          // this.localService.decodePayloadJwt(result.accessToken);
+        }
+        return result;
+      }));
+  }
+
+  loginGoogle(input: LoginGoogleInput): Observable<LoginResult> {
+    return this.http.post<LoginResult>(`${environment.apiUrl}/auth/google`, input)
+      .pipe(map((result: LoginResult) => {
+        if (result.accessToken) {
+          const {accessToken, user} = result;
+          this.setAuthValue(accessToken, user);
+          // this.localService.decodePayloadJwt(result.accessToken);
+        }
+        return result;
+      }));
   }
 
   register(input: RegisterInput): Observable<RegisterResult> {

@@ -8,4 +8,5 @@ export interface Pet extends Document {
     description: string;
     userId: Types.ObjectId;
     inDonation: boolean;
+    donationId: Types.ObjectId;
 }

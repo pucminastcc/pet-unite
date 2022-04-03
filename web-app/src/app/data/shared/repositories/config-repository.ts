@@ -10,6 +10,10 @@ import {GetPetGendersInput} from '../../../domain/shared/services/commands/input
 import {PetGenderResult} from '../../../domain/shared/services/models/results/pet-gender.result';
 import {GetStatesInput} from '../../../domain/shared/services/commands/inputs/get-states.input';
 import {StateResult} from '../../../domain/shared/services/models/results/state.result';
+import {GetReportTypesInput} from '../../../domain/shared/services/commands/inputs/get-report-types.input';
+import {ReportTypeResult} from '../../../domain/shared/services/models/results/report-type.result';
+import {GetCitiesInput} from '../../../domain/shared/services/commands/inputs/get-cities.input';
+import {CityResult} from '../../../domain/shared/services/models/results/city.result';
 
 @Injectable({
   providedIn: 'root'
@@ -41,6 +45,22 @@ export class ConfigRepository extends IConfigRepository {
     const {accessToken} = input;
     return this.api.get<StateResult[]>(`${environment.apiUrl}/config/states`, accessToken)
       .pipe(map((result: StateResult[]) => {
+        return result;
+      }));
+  }
+
+  getReportTypes(input: GetReportTypesInput): Observable<ReportTypeResult[]> {
+    const {accessToken} = input;
+    return this.api.get<ReportTypeResult[]>(`${environment.apiUrl}/config/reportTypes`, accessToken)
+      .pipe(map((result: ReportTypeResult[]) => {
+        return result;
+      }));
+  }
+
+  getCities(input: GetCitiesInput): Observable<CityResult[]> {
+    const {accessToken} = input;
+    return this.api.get<CityResult[]>(`${environment.apiUrl}/config/cities`, accessToken)
+      .pipe(map((result: CityResult[]) => {
         return result;
       }));
   }

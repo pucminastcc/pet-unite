@@ -1,5 +1,4 @@
 import {ValidateLocalUserDto} from '../dtos/validate-local-user.dto';
-import {ValidateFacebookUserDto} from '../dtos/validate-facebook-user.dto';
 import {ValidateUserResult} from '../models/results/validate-user.result';
 import {LoginDto} from '../dtos/login.dto';
 import {LoginResult} from '../models/results/login.result';
@@ -17,12 +16,16 @@ import {GetUserDto} from '../dtos/get-user.dto';
 import {GetUserResult} from '../models/results/get-user.result';
 import {UpdateUserDto} from '../dtos/update-user.dto';
 import {UpdateUserResult} from '../models/results/update-user.result';
+import {ValidateFacebookUserDto} from '../dtos/validate-facebook-user.dto';
+import {ValidateGoogleUserDto} from '../dtos/validate-google-user.dto';
 
 
 export abstract class IAuthRepository {
     abstract validateLocalUser(input: ValidateLocalUserDto): Promise<ValidateUserResult>;
 
     abstract validateFacebookUser(input: ValidateFacebookUserDto): Promise<ValidateUserResult>;
+
+    abstract validateGoogleUser(input: ValidateGoogleUserDto): Promise<ValidateUserResult>;
 
     abstract login(input: LoginDto): Promise<LoginResult>;
 

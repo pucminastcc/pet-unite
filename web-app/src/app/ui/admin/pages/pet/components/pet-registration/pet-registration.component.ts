@@ -75,20 +75,26 @@ export class PetRegistrationComponent implements OnInit, OnDestroy {
   }
 
   private getPetById(id: string): Subscription {
+    this.isLoading = true;
     return this.petService.getPet({
       id
     }).subscribe((pet: PetResult) => {
-      this.rf.id.setValue(pet.id);
-      this.img = pet.img;
-      this.rf.img.setValue(pet.img);
-      this.rf.name.setValue(pet.name);
-      this.rf.petGenderId.setValue(pet.petGenderId);
-      this.rf.breed.setValue(pet.breed);
-      this.rf.description.setValue(pet.description);
+      if(pet) {
+        this.rf.id.setValue(pet.id);
+        this.img = pet.img;
+        this.rf.img.setValue(pet.img);
+        this.rf.name.setValue(pet.name);
+        this.rf.petGenderId.setValue(pet.petGenderId);
+        this.rf.breed.setValue(pet.breed);
+        this.text = pet.description;
+        this.rf.description.setValue(pet.description);
+      }
+      this.isLoading = false;
     }, (error) => {
       if (error.status === 401) {
         this.logout();
       }
+      this.isLoading = false;
     });
   }
 
@@ -215,7 +221,7 @@ export class PetRegistrationComponent implements OnInit, OnDestroy {
   }
 
   public getModalHeight(): number {
-    return this.getScreenHeight() - 220;
+    return this.getScreenHeight() - 260;
   }
 
   @HostListener('window:resize', ['$event'])

@@ -11,6 +11,7 @@ import {AuthenticatedUserModel} from '../../../../domain/auth/models/authenticat
 import {NavigationStart, Router} from '@angular/router';
 import {CookieService} from 'ngx-cookie-service';
 import {LoginResult} from '../../../../domain/auth/models/results/login.result';
+import {DataService} from '../../services/data.service';
 
 @Component({
   selector: 'app-index-layout',
@@ -23,6 +24,7 @@ export class AppIndexLayoutComponent implements OnInit, AfterViewInit, OnDestroy
 
   public user: AuthenticatedUserModel | undefined;
   public isLoading = false;
+  public displayTerms = false;
   public menuItems: NavbarMenuItemModel[] = [];
   private toggleButton: HTMLElement = document.createElement('div');
   private navMenu: HTMLElement = document.createElement('div');
@@ -33,7 +35,8 @@ export class AppIndexLayoutComponent implements OnInit, AfterViewInit, OnDestroy
     private readonly messageService: MessageService,
     private readonly authService: AuthService,
     private readonly router: Router,
-    private readonly cookieService: CookieService
+    private readonly cookieService: CookieService,
+    private readonly dataService: DataService
   ) {
     // @ts-ignore
     this.router.events.subscribe((event: NavigationStart) => {
@@ -56,7 +59,8 @@ export class AppIndexLayoutComponent implements OnInit, AfterViewInit, OnDestroy
 
   ngOnInit(): void {
     this.menuItems = this.getMenuItems();
-    // setTimeout(() => this.isLoading = false, 3000);
+    this.dataService.display.subscribe((display: boolean) => this.displayTerms = display);
+    setTimeout(() => this.isLoading = false, 2500);
   }
 
   ngAfterViewInit(): void {
@@ -93,7 +97,7 @@ export class AppIndexLayoutComponent implements OnInit, AfterViewInit, OnDestroy
   private getMenuItems(): NavbarMenuItemModel[] {
     return [
       {path: '/home', title: 'Home', icon: 'fas fa-home', class: ''},
-      {path: '/about', title: 'Sobre', icon: 'fas fa-book', class: ''},
+      // {path: '/about', title: 'Sobre', icon: 'fas fa-book', class: ''},
     ];
   }
 

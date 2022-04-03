@@ -4,12 +4,14 @@ import {PetsResult} from '../../../../domain/pet/models/results/pets.result';
 import {LogoutResult} from '../../../../domain/auth/models/results/logout.result';
 import {AuthService} from '../../../auth/services/auth.service';
 import {forkJoin, Subscription} from 'rxjs';
-import {ConfirmationService} from 'primeng/api';
+import {ConfirmationService, MessageService} from 'primeng/api';
 import {DeletePetResult} from '../../../../domain/pet/models/results/delete-pet.result';
 import {DialogService} from 'primeng/dynamicdialog';
 import {PetRegistrationComponent} from './components/pet-registration/pet-registration.component';
 import {ConfigService} from '../../../shared/services/config.service';
 import {PetGenderResult} from '../../../../domain/shared/services/models/results/pet-gender.result';
+import {DonationService} from '../../services/donation.service';
+import {DonatePetResult} from '../../../../domain/donation/models/results/donate-pet.result';
 
 @Component({
   selector: 'app-pet',
@@ -22,19 +24,23 @@ export class PetComponent implements OnInit, OnDestroy {
   private logoutSubscription: Subscription | undefined;
   private openRegistrationSubscription: Subscription | undefined;
   private openEditSubscription: Subscription | undefined;
+  private donatePetSubscription: Subscription | undefined;
 
   public pets: PetsResult[] = [];
   public petGenders: PetGenderResult[] = [];
   public isLoading: boolean = true;
+  public isRequesting: boolean = false;
   public display: boolean = false;
 
 
   constructor(
     private readonly petService: PetService,
+    private readonly donationService: DonationService,
     private readonly configService: ConfigService,
     private readonly authService: AuthService,
     private readonly confirmationService: ConfirmationService,
-    private readonly dialogService: DialogService
+    private readonly dialogService: DialogService,
+    private readonly messageService: MessageService,
   ) {
   }
 
@@ -74,10 +80,11 @@ export class PetComponent implements OnInit, OnDestroy {
         id: '',
         petGenders: this.petGenders
       },
-      closable: false,
+      closable: true,
       showHeader: true,
+      header: 'Cadastrando Pet...',
       width: this.isMobile() ? '90%' : '50%',
-      height: window.innerHeight.toString() + 'px'
+      // height: window.innerHeight.toString() + 'px'
     });
 
     this.openRegistrationSubscription = ref.onClose.subscribe((pet) => {
@@ -93,16 +100,17 @@ export class PetComponent implements OnInit, OnDestroy {
         id,
         petGenders: this.petGenders
       },
-      closable: false,
+      closable: true,
       showHeader: true,
+      header: 'Editando Pet...',
       width: this.isMobile() ? '90%' : '50%',
-      height: window.innerHeight.toString() + 'px'
+      // height: window.innerHeight.toString() + 'px'
     });
 
     this.openEditSubscription = ref.onClose.subscribe((data) => {
       if (data) {
         this.pets.forEach((pet: PetsResult) => {
-          if(pet.id === id) {
+          if (pet.id === id) {
             pet.name = data.name;
             pet.img = data.img;
           }
@@ -115,7 +123,7 @@ export class PetComponent implements OnInit, OnDestroy {
     this.confirmationService.confirm({
       header: `${pet.name}`,
       icon: `fas fa-hand-holding-heart`,
-      message: `Deseja colocar este Pet para adoação?`,
+      message: `<strong>Deseja colocar este Pet para adoação?</strong>`,
       accept: () => {
         this.donatePet(pet.id);
       },
@@ -125,14 +133,42 @@ export class PetComponent implements OnInit, OnDestroy {
   }
 
   private donatePet(id: string) {
+    this.isRequesting = true;
+    this.donatePetSubscription = this.donationService.donatePet({
+      petId: id
+    }).subscribe((data: DonatePetResult) => {
+      if (data) {
+        if(data.success) {
+          this.pets.forEach((pet: PetsResult) => {
+            if(pet.id === id) {
+              pet.inDonation = true;
+            }
+          });
+        }
+        this.messageService.add({
+          severity: data.success ? 'success' : 'error',
+          detail: data.message,
+          life: 100000
+        });
+      }
+      this.isRequesting = false;
+    }, (error) => {
+      if (error.status === 401) {
+        this.logout();
+      }
+      this.isRequesting = false;
+    })
+  }
 
+  public viewDonation(pet: PetsResult) {
+    console.log(pet.donationId);
   }
 
   public confirmDelete(pet: PetsResult): void {
     this.confirmationService.confirm({
       header: `${pet.name}`,
       icon: `fas fa-folder-minus`,
-      message: `Deseja excluir este registro?`,
+      message: `<strong class="text-danger">Atenção: Esta operação não pode ser desfeita.</strong> <br> <strong>Deseja realmente eliminar este cadastro?</strong> <br> <strong>Obs.: Se ele estiver em doação será retirado também.</strong>`,
       accept: () => {
         this.deletePet(pet.id)
       },
@@ -142,6 +178,7 @@ export class PetComponent implements OnInit, OnDestroy {
   }
 
   private deletePet(id: string): void {
+    this.isRequesting = true;
     this.deletePetSubscription = this.petService.deletePet({
       id
     }).subscribe((data: DeletePetResult) => {
@@ -151,10 +188,12 @@ export class PetComponent implements OnInit, OnDestroy {
           this.pets = this.pets.filter(obj => !toDelete.has(obj.id));
         }
       }
+      this.isRequesting = false;
     }, (error) => {
       if (error.status === 401) {
         this.logout();
       }
+      this.isRequesting = false;
     });
   }
 
@@ -165,10 +204,6 @@ export class PetComponent implements OnInit, OnDestroy {
           if (data.success) {
             window.location.href = '/';
           }
-        }
-      }, (error) => {
-        if (error.status === 401) {
-          this.logout();
         }
       });
   }

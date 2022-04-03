@@ -13,35 +13,19 @@ import {UpdateUserDto} from '../../../domain/auth/dtos/update-user.dto';
 import {UpdateUserResult} from '../../../domain/auth/models/results/update-user.result';
 import {LocalAuthGuard} from '../shared/guards/local-auth.guard';
 import {JwtAuthGuard} from '../shared/guards/jwt-auth.guard';
-import {FacebookAuthGuard} from '../shared/guards/facebook-auth.guard';
 import {ApiBearerAuth, ApiExcludeEndpoint, ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
 import {ValidateLocalUserDto} from '../../../domain/auth/dtos/validate-local-user.dto';
 import {ConfirmEmailDto} from '../../../domain/auth/dtos/confirm-email.dto';
 import {ConfirmEmailResult} from '../../../domain/auth/models/results/email-confirmation.result';
 import {GetUserResult} from '../../../domain/auth/models/results/get-user.result';
+import {ValidateFacebookUserDto} from '../../../domain/auth/dtos/validate-facebook-user.dto';
+import {ValidateGoogleUserDto} from '../../../domain/auth/dtos/validate-google-user.dto';
 
 @Controller('auth')
 export class AuthController {
     constructor(
         private readonly authService: AuthService
     ) {
-    }
-
-    @UseGuards(FacebookAuthGuard)
-    @Get('facebook')
-    @ApiExcludeEndpoint()
-    async facebook(): Promise<any> {
-        return HttpStatus.OK;
-    }
-
-    @UseGuards(FacebookAuthGuard)
-    @Get('facebook/redirect')
-    @ApiExcludeEndpoint()
-    async facebookLoginRedirect(@Req() req, @Res() res): Promise<any> {
-        const result = await this.authService.login(req.user);
-        res.cookie('facebook', result);
-
-        return res.redirect(`${process.env.APP_URL}`);
     }
 
     @Post('registration')
@@ -76,6 +60,22 @@ export class AuthController {
     @ApiResponse({status: 500, description: 'Erro do Servidor Interno.'})
     async login(@Body() body: ValidateLocalUserDto, @Request() req, @Res() res): Promise<LoginResult> {
         const result = await this.authService.login(req.user);
+        return res.status(HttpStatus.OK).json(result);
+    }
+
+    @Post('facebook')
+    @ApiTags('autenticação')
+    async facebook(@Body() body: ValidateFacebookUserDto, @Res() res): Promise<LoginResult> {
+        const user = await this.authService.validateFacebookUser(body);
+        const result = await this.authService.login(user);
+        return res.status(HttpStatus.OK).json(result);
+    }
+
+    @Post('google')
+    @ApiTags('autenticação')
+    async google(@Body() body: ValidateGoogleUserDto, @Res() res): Promise<LoginResult> {
+        const user = await this.authService.validateGoogleUser(body);
+        const result = await this.authService.login(user);
         return res.status(HttpStatus.OK).json(result);
     }
 

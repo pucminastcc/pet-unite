@@ -9,6 +9,7 @@ import {IRegisterForm} from '../../../../domain/auth/models/forms/iregister.form
 import {AccountActionModel} from '../../../../domain/auth/models/account-action.model';
 import {Subscription} from 'rxjs';
 import {RegisterResult} from '../../../../domain/auth/models/results/register.result';
+import {DataService} from '../../../shared/services/data.service';
 
 @Component({
   selector: 'app-register',
@@ -35,7 +36,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
     private config: DynamicDialogConfig,
     private readonly fb: FormBuilderTypeSafe,
     private readonly messageService: MessageService,
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+    private readonly dataService: DataService
   ) {
     this.registerForm = this.fb.group<IRegisterForm>({
       email: new FormControl('', [Validators.required, Validators.email, Validators.maxLength(150)]),
@@ -144,5 +146,9 @@ export class RegisterComponent implements OnInit, OnDestroy {
       this.isLoading = false;
       this.config.closable = true;
     });
+  }
+
+  public displayTerms(): void {
+    this.dataService.displayTerms(true);
   }
 }
