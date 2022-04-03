@@ -23,7 +23,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/web-app",
+            "outputPath": "dist/bundles",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -40,12 +40,14 @@
               "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
               "node_modules/quill/dist/quill.core.css",
               "node_modules/quill/dist/quill.snow.css",
-              "node_modules/chart.js/dist/Chart.js",
+              "node_modules/chart.js/dist/chart.js",
               "node_modules/animate.css/animate.min.css",
               "src/assets/css/material-dashboard.css",
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [
+              "node_modules/chart.js/dist/chart.esm.js"
+            ]
           },
           "configurations": {
             "production": {
