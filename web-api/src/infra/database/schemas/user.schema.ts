@@ -21,7 +21,7 @@ export const UserSchema = new mongoose.Schema({
     cell: {type: String},
     whatsapp: {type: String},
     isSuperUser: {type: Boolean, default: false},
+    isInstitution: {type: Boolean, default: false},
     blocked: {type: Boolean, default: false},
     deleted: {type: Boolean, default: false},
-    roleId: {type: Types.ObjectId},
 }, {timestamps: true, collection: 'users'});

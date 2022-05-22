@@ -11,7 +11,7 @@ import {PrimeNGConfig} from 'primeng/api';
 export class AppComponent implements OnInit {
   constructor(
     private readonly router: Router,
-    private primengConfig: PrimeNGConfig
+    private readonly primengConfig: PrimeNGConfig,
   ) {
   }
 

@@ -11,6 +11,8 @@ import {GetDonationsCommand} from '../../../domain/donation/commands/get-donatio
 import {SignalDonationCommand} from '../../../domain/donation/commands/signal-donation.command';
 import {SignalDonationInput} from '../../../domain/donation/commands/inputs/signal-donation.input';
 import {SignalDonationResult} from '../../../domain/donation/models/results/signal-donation.result';
+import {ViewDonationCommand} from '../../../domain/donation/commands/view-donation.command';
+import {ViewDonationInput} from '../../../domain/donation/commands/inputs/view-donation.input';
 
 @Injectable({
   providedIn: 'root'
@@ -24,6 +26,7 @@ export class DonationService implements IDonationRepository {
     private readonly donatePetCommand: DonatePetCommand,
     private readonly getDonationsCommand: GetDonationsCommand,
     private readonly signalDonationCommand: SignalDonationCommand,
+    private readonly viewDonationCommand: ViewDonationCommand
   ) {
     this.accessToken = this.authService.getToken();
   }
@@ -44,6 +47,13 @@ export class DonationService implements IDonationRepository {
 
   signalDonation(input: SignalDonationInput): Observable<SignalDonationResult> {
     return this.signalDonationCommand.execute({
+      ...input,
+      accessToken: this.accessToken
+    });
+  }
+
+  viewDonation(input: ViewDonationInput): Observable<DonationResult> {
+    return this.viewDonationCommand.execute({
       ...input,
       accessToken: this.accessToken
     });

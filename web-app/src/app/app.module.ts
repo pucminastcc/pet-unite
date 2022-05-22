@@ -14,14 +14,16 @@ import {
   SocialLoginModule
 } from 'angularx-social-login';
 import {environment} from '../environments/environment';
+import {NgwWowModule} from 'ngx-wow';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    NgwWowModule,
     AppRoutes,
     AuthModule,
     SharedModule,

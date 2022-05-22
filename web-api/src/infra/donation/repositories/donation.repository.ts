@@ -13,6 +13,7 @@ import {DonatePetMessage} from '../../../domain/donation/enums/donate-pet-messag
 import {SignalDonationInput} from '../../../domain/donation/dtos/signal-donation.input';
 import {SignalDonationResult} from '../../../domain/donation/models/results/signal-donation.result';
 import {BrazilCity} from '../../../domain/config/models/brazil-city.model';
+import {ViewDonationDto} from '../../../domain/donation/dtos/view-donation.dto';
 
 @Injectable()
 export class DonationRepository extends IDonationRepository {
@@ -128,6 +129,33 @@ export class DonationRepository extends IDonationRepository {
                 result = {success: false, message: 'Você atingiu o número máximo de sinalizações, aguarde respostas!'};
             }
         } catch (e) {
+        }
+        return result;
+    }
+
+    async getDonation(dto: ViewDonationDto): Promise<DonationResult> {
+        let result: DonationResult;
+
+        const donation = await this.donationModel.findById(dto.donationId).exec();
+
+        if (donation) {
+            result = {
+                id: donation.id,
+                userId: donation.userId,
+                username: donation.username,
+                petId: donation.petId,
+                petName: donation.petName,
+                petImg: donation.petImg,
+                petGenderId: donation.petGenderId,
+                state: donation.state,
+                city: donation.city,
+                lng: donation.lng,
+                lat: donation.lat,
+                contacts: donation.contacts,
+                interestedUserId: donation.interestedUserId,
+                interestedUsername: donation.interestedUsername,
+                interestedUserFlagged: donation.interestedUserFlagged,
+            };
         }
         return result;
     }

@@ -1,18 +1,128 @@
-<div class="mt-5" id="intro">
+<section class="mt-5" id="intro">
   <div class="mask">
     <div class="container-fluid d-flex align-items-center justify-content-center vh-100">
       <div class="row d-flex justify-content-center text-center">
         <div class="col-md-12">
-          <h6 class="display-4 font-weight-bold text-white animate__animated animate__fadeInDown">
-            Lorem Ipsum
-          </h6>
-          <hr>
-          <h4 class="text-white my-4 animate__animated animate__fadeInUp">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Deleniti
-            consequuntur.
+          <h4 class="text-white wow animate__fadeInDown home-title">
+            PET UNITE
           </h4>
+          <hr class="rounded">
+          <div class="text-white my-4 wow animate__fadeInUp home-subtitle">
+            Salve os animais de estimação e os ajude a encontrar o seu lar!
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+</section>
+
+<div class="separator"></div>
+<section id="services">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12 col-md-5 wow animate__fadeInLeft">
+        <img class="img-fluid" src="./assets/img/services-session.jpg" alt=""/>
+      </div>
+      <div class="col-12 col-md-7 wow animate__lightSpeedInRight">
+        <div class="text-wrapper">
+          <div class="title-wrapper">
+            <h5 class="section-title">Nossos Serviços</h5>
+          </div>
+          <div class="content-wrapper">
+            <p class="section-description">Oferecemos serviços de doação e adoação de animais de estimação. E também
+              para você que ama os animais e está disposto a cooperar com nossa comunidade, a fim de encontrar um lar
+              cheio de amor e carinho para eles. </p>
+            <p class="section-description">Se essa é sua intenção, entre agora e comece desfrutar de nossos serviços
+              totalmente gratuitos!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="separator"></div>
+<section id="pets">
+  <div class="container">
+    <div class="wow animate__zoomIn">
+      <div class="row">
+        <div class="col-12 col-md-6 mt-3">
+          <div class="mx-md-3 text-center">
+            <h5 class="font-weight-bold" style="font-size: 1.25rem;">Cães</h5>
+            <img src="./assets/img/pets-session-01.jpg" class="rounded-circle" height="256" alt=""/>
+            <hr/>
+            <p>Amorosos e brincalhões, são muito amigos de seus tutores. São fiéis, demonstram afeto e são sem
+              dúvida o melhor amigo. Desde que são tratados com carinho e amor eles retribuem tudo isso em dobro.</p>
+          </div>
+        </div>
+        <div class="col-12 col-md-6 mt-3">
+          <div class="mx-md-3 text-center">
+            <h5 class="font-weight-bold" style="font-size: 1.25rem;">Gatos</h5>
+            <img src="./assets/img/pets-session-02.jpg" class="rounded-circle" height="256" alt=""/>
+            <hr/>
+            <p>Apesar da personalidade forte, são animais extraordinários. Muito amorosos, carinhosos e
+              companheiros de seus tutores. Quem tem um gato como animal de estimação nunca está sozinho.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="separator"></div>
+<section id="about">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12 col-md-7 mb-2 wow animate__lightSpeedInLeft">
+        <div class="text-wrapper">
+          <div class="title-wrapper">
+            <h5 class="section-title">Quem somos?</h5>
+          </div>
+          <div class="content-wrapper">
+            <p class="section-description">Somos uma comunidade voltada para facilitar sua vida, se você está aqui em
+              busca
+              de um animalzinho de estimação chegou ao lugar certo. Iremos te ajudar encontrar seu melhor amigo, para te
+              dar muito carinho e amor, naquele momento que você mais precisa.</p>
+            <p class="section-description">Vamos cooperar ajudando a nossa comunidade, adote conosco seu animalzinho e
+              como consequência terá um companheiro para fazer seus dias mais felizes.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-5 wow animate__fadeInRight">
+        <img class="img-fluid" src="./assets/img/about-session.jpg" alt=""/>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="separator"></div>
+<section id="info">
+  <div class="mask-light">
+    <div class="col-12 col-md-4 text-white p-4 mask-blue wow animate__fadeInRight">
+      <h5 class="font-weight-bold" style="font-size: 1.25rem;">Ajude os Animais</h5>
+      <hr class="rounded"/>
+      <p>Seja um membro de nossa comunidade e ajude os animais a encontrarem um lar e uma família disposta a
+        amá-los.</p>
+      <p>Cadastre-se agora e tenha acesso a todos os serviços!</p>
+    </div>
+
+    <div class="col-12 col-md-4 text-white py-5 mask-black wow animate__fadeInRight">
+      <p-carousel [value]="infoSession" [numVisible]="1" [numScroll]="1" [autoplayInterval]="5000" [circular]="true">
+        <ng-template let-info pTemplate="item">
+          <div class="d-inline-flex align-items-center">
+            <i class="{{info.icon}} fa-2x"></i>
+            <span class="ml-3 font-weight-bold" style="font-size: 1.25rem;">{{info.title}}</span>
+          </div>
+          <hr class="rounded"/>
+          <p>{{info.description}}</p>
+        </ng-template>
+      </p-carousel>
+    </div>
+  </div>
+</section>
+
+
+
+
+
+

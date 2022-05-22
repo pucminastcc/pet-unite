@@ -68,6 +68,9 @@ export class AppAdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy
     if (this.user?.isSuperUser) {
       routes.push({path: `${routePrefix}/manager`, title: 'Gestão', icon: 'fas fa-lock', class: ''});
     }
+    if (this.user?.isInstitution) {
+      routes.push({path: `${routePrefix}/institution`, title: 'Instituição', icon: 'fas fa-lock', class: ''});
+    }
     routes.push({path: `${routePrefix}/dashboard`, title: 'Dashboard', icon: 'fas fa-chart-line', class: ''});
     routes.push({path: `${routePrefix}/profile`, title: 'Perfil', icon: 'fas fa-user', class: ''});
     routes.push({path: `${routePrefix}/pet`, title: 'Pets', icon: 'fas fa-dog', class: ''});
