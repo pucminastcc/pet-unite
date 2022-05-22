@@ -20,6 +20,7 @@ export interface User extends Document {
     cell: string;
     whatsapp: string;
     isSuperUser: boolean;
+    isInstitution: boolean;
     blocked: boolean;
     deleted: boolean;
 }
@@ -31,6 +32,7 @@ export interface UserModel {
     provider: string;
     img?: string;
     isSuperUser: boolean;
+    isInstitution: boolean;
     personTypeId?: string;
     document?: string;
     zipCode?: string;

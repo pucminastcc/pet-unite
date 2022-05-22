@@ -7,6 +7,7 @@ import {GetDonationsDto} from '../../../domain/donation/dtos/get-donations.dto';
 import {DonationResult} from '../../../domain/donation/models/results/donation.result';
 import {SignalDonationInput} from '../../../domain/donation/dtos/signal-donation.input';
 import {SignalDonationResult} from '../../../domain/donation/models/results/signal-donation.result';
+import {ViewDonationDto} from '../../../domain/donation/dtos/view-donation.dto';
 
 @Injectable()
 export class DonationService implements IDonationRepository {
@@ -25,5 +26,9 @@ export class DonationService implements IDonationRepository {
 
     async signalDonation(dto: SignalDonationInput): Promise<SignalDonationResult> {
         return await this.repository.signalDonation(dto);
+    }
+
+    async getDonation(dto: ViewDonationDto): Promise<DonationResult> {
+        return await this.repository.getDonation(dto);
     }
 }

@@ -6,6 +6,7 @@ export interface AuthenticatedUserModel {
   img: string;
   personTypeId?: string;
   isSuperUser: boolean;
+  isInstitution: boolean;
   document?: string;
   zipCode?: string;
   address?: string;

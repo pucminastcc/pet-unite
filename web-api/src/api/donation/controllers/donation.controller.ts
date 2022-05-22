@@ -8,6 +8,7 @@ import {GetDonationsDto} from '../../../domain/donation/dtos/get-donations.dto';
 import {DonationResult} from '../../../domain/donation/models/results/donation.result';
 import {SignalDonationInput} from '../../../domain/donation/dtos/signal-donation.input';
 import {SignalDonationResult} from '../../../domain/donation/models/results/signal-donation.result';
+import {ViewDonationDto} from '../../../domain/donation/dtos/view-donation.dto';
 
 @Controller('donation')
 export class DonationController {
@@ -68,6 +69,23 @@ export class DonationController {
             userId: req.user.id,
             username: req.user.username,
             ...body
+        });
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('viewDonation')
+    @ApiTags('donations')
+    @ApiBearerAuth()
+    @ApiOperation({summary: 'Obter animais de estimação em adoção'})
+    @ApiResponse({status: 200, description: 'Resposta padrão para solicitação HTTP bem-sucedida.'})
+    @ApiResponse({status: 400, description: 'A solicitação não pode ser atendida devido a sintaxe incorreta.'})
+    @ApiResponse({
+        status: 401,
+        description: 'A solicitação não foi aplicada porque não possui credenciais de autenticação válidas para o recurso de destino'
+    })
+    async getDonation(@Query() query: ViewDonationDto, @Request() req): Promise<DonationResult> {
+        return await this.donationService.getDonation({
+            donationId: query.donationId
         });
     }
 }

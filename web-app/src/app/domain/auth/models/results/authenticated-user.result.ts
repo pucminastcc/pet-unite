@@ -5,6 +5,7 @@ export interface AuthenticatedUserResult {
   provider: string;
   img: string;
   isSuperUser: boolean;
+  isInstitution: boolean;
   personTypeId?: string;
   document?: string;
   zipCode?: string;

@@ -4,11 +4,9 @@ import {ApiProperty} from '@nestjs/swagger';
 export class UpdateUserDto {
     id: Types.ObjectId;
     img: string;
-    @ApiProperty({default: 'sistema', required: true})
     username: string;
-    @ApiProperty({default: '61e490aafe62c3e403c9c4ab', required: true})
     personTypeId: string;
-    @ApiProperty({default: '974.202.530-48', required: true})
+    @ApiProperty({default: '000.000.000-00', required: true})
     document: string;
     @ApiProperty({default: '15.700-124', required: true})
     zipCode: string;
@@ -20,12 +18,12 @@ export class UpdateUserDto {
     cityId: Types.ObjectId;
     @ApiProperty({default: 'SP', required: true})
     state: string;
-    @ApiProperty({default: 'Casa', required: true})
+    @ApiProperty({default: 'de 2600/2601 a 3069/3070', required: true})
     complement: string;
-    @ApiProperty({default: ''})
+    @ApiProperty({default: '(17)3632-3632'})
     phone: string;
-    @ApiProperty({default: ''})
+    @ApiProperty({default: '(17)99799-9999'})
     cell: string;
-    @ApiProperty({default: ''})
+    @ApiProperty({default: '(17)99799-9999'})
     whatsapp: string;
 }

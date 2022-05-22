@@ -12,6 +12,7 @@ import {ConfigService} from '../../../shared/services/config.service';
 import {PetGenderResult} from '../../../../domain/shared/services/models/results/pet-gender.result';
 import {DonationService} from '../../services/donation.service';
 import {DonatePetResult} from '../../../../domain/donation/models/results/donate-pet.result';
+import {DonationResult} from '../../../../domain/donation/models/results/donation.result';
 
 @Component({
   selector: 'app-pet',
@@ -161,14 +162,20 @@ export class PetComponent implements OnInit, OnDestroy {
   }
 
   public viewDonation(pet: PetsResult) {
-    console.log(pet.donationId);
+    this.donationService.viewDonation({
+      donationId: pet.donationId
+    }).subscribe((data: DonationResult ) => {
+      if(data) {
+        console.log(data);
+      }
+    });
   }
 
   public confirmDelete(pet: PetsResult): void {
     this.confirmationService.confirm({
       header: `${pet.name}`,
       icon: `fas fa-folder-minus`,
-      message: `<strong class="text-danger">Atenção: Esta operação não pode ser desfeita.</strong> <br> <strong>Deseja realmente eliminar este cadastro?</strong> <br> <strong>Obs.: Se ele estiver em doação será retirado também.</strong>`,
+      message: `<strong class="text-danger">Atenção: Esta operação não pode ser desfeita.</strong> <br> <strong>Deseja realmente eliminar este cadastro?</strong> <br>`,
       accept: () => {
         this.deletePet(pet.id)
       },

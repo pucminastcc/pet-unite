@@ -27,57 +27,110 @@
       </div>
     </div>
   </div>
-  <div class="row">
-    <div class="col-md-12">
-      <p-dataView #dv
-                  [paginator]="true" [rows]="9" [value]="pets"
-                  emptyMessage="Nenhum registro encontrado..." filterBy="name" layout="grid">
-        <ng-template pTemplate="header">
-          <div class="flex flex-column flex-md-row justify-content-md-between">
+  <p-tabView>
+    <p-tabPanel header="Cadastros">
+      <div class="row">
+        <div class="col-md-12">
+          <p-dataView #dv
+                      [paginator]="true" [rows]="9" [value]="pets"
+                      emptyMessage="Nenhum registro encontrado..." filterBy="name" layout="grid">
+            <ng-template pTemplate="header">
+              <div class="flex flex-column flex-md-row justify-content-md-between">
             <span class="p-input-icon-left mb-2 mb-md-0">
               <i class="pi pi-search"></i>
               <input type="search" pInputText placeholder="Procura por Nome" (input)="dv.filter($event.target.value)">
             </span>
-          </div>
-        </ng-template>
-        <ng-template let-pet pTemplate="gridItem">
-          <div class="col-12 col-md-3 p-4 d-inline-block">
-            <div *ngIf="!pet.inDonation" class="card {{isRequesting ? ' p-disabled': ''}}">
-              <div class="card-header card-header-danger">
-                <p class="card-title">{{pet.name}}</p>
               </div>
-              <div class="card-body">
-                <div class="text-center">
-                  <p-image [alt]="pet.name" [height]="150" [imageClass]="'w-100'" [preview]="true" [src]="pet.img"
-                           loading="lazy">
-                  </p-image>
-                </div>
-                <hr>
-                <div class="float-left">
-                  <button class="p-button-raised p-button-info p-button-rounded" icon="fas fa-pencil-alt" pButton
-                          (click)="openEdit(pet.id)"
-                          type="button">
-                  </button>
-                  <button (click)="confirmDonation(pet)"
-                          class="p-button-raised p-button-success p-button-rounded ml-2"
-                          icon="fas fa-hand-holding-heart" pButton type="button">
-                  </button>
-                </div>
-                <div class="float-right">
-                  <button (click)="confirmDelete(pet)"
-                          class="p-button-raised p-button-danger p-button-rounded"
-                          icon="fas fa-folder-minus" pButton type="button">
-                  </button>
+            </ng-template>
+            <ng-template let-pet pTemplate="gridItem">
+              <div class="col-12 col-md-3 p-4 d-inline-block">
+                <div *ngIf="!pet.inDonation" class="card {{isRequesting ? ' p-disabled': ''}}">
+                  <div class="card-header card-header-danger">
+                    <p class="card-title">{{pet.name}}</p>
+                  </div>
+                  <div class="card-body">
+                    <div class="text-center">
+                      <p-image [alt]="pet.name" [height]="150" [imageClass]="'w-100'" [preview]="true" [src]="pet.img"
+                               loading="lazy">
+                      </p-image>
+                    </div>
+                    <hr>
+                    <div class="float-left">
+                      <button class="p-button-raised p-button-info p-button-rounded" icon="fas fa-pencil-alt" pButton
+                              (click)="openEdit(pet.id)"
+                              type="button">
+                      </button>
+                      <button (click)="confirmDonation(pet)"
+                              class="p-button-raised p-button-success p-button-rounded ml-2"
+                              icon="fas fa-hand-holding-heart" pButton type="button">
+                      </button>
+                    </div>
+                    <div class="float-right">
+                      <button (click)="confirmDelete(pet)"
+                              class="p-button-raised p-button-danger p-button-rounded"
+                              icon="fas fa-folder-minus" pButton type="button">
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </ng-template>
-        <ng-template pTemplate="footer">
-        </ng-template>
-      </p-dataView>
-    </div>
-  </div>
+            </ng-template>
+            <ng-template pTemplate="footer">
+            </ng-template>
+          </p-dataView>
+        </div>
+      </div>
+    </p-tabPanel>
+    <p-tabPanel header="Em doação">
+      <div class="row">
+        <div class="col-md-12">
+          <p-dataView #dv
+                      [paginator]="true" [rows]="9" [value]="pets"
+                      emptyMessage="Nenhum registro encontrado..." filterBy="name" layout="grid">
+            <ng-template pTemplate="header">
+              <div class="flex flex-column flex-md-row justify-content-md-between">
+            <span class="p-input-icon-left mb-2 mb-md-0">
+              <i class="pi pi-search"></i>
+              <input type="search" pInputText placeholder="Procura por Nome" (input)="dv.filter($event.target.value)">
+            </span>
+              </div>
+            </ng-template>
+            <ng-template let-pet pTemplate="gridItem">
+              <div class="col-12 col-md-3 p-4 d-inline-block">
+                <div *ngIf="pet.inDonation" class="card {{isRequesting ? ' p-disabled': ''}}">
+                  <div class="card-header card-header-danger">
+                    <p class="card-title">{{pet.name}}</p>
+                  </div>
+                  <div class="card-body">
+                    <div class="text-center">
+                      <p-image [alt]="pet.name" [height]="150" [imageClass]="'w-100'" [preview]="true" [src]="pet.img"
+                               loading="lazy">
+                      </p-image>
+                    </div>
+                    <hr>
+                    <div class="float-left">
+                      <button (click)="viewDonation(pet)"
+                              class="p-button-raised p-button-success p-button-rounded ml-2"
+                              icon="fas fa-hand-holding-heart" pButton type="button">
+                      </button>
+                    </div>
+                    <div class="float-right">
+                      <button (click)="confirmDelete(pet)"
+                              class="p-button-raised p-button-danger p-button-rounded"
+                              icon="fas fa-folder-minus" pButton type="button">
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-template>
+            <ng-template pTemplate="footer">
+            </ng-template>
+          </p-dataView>
+        </div>
+      </div>
+    </p-tabPanel>
+  </p-tabView>
 </div>
 
 

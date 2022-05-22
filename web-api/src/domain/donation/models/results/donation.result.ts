@@ -16,4 +16,5 @@ export interface DonationResult {
     contacts: Contacts[];
     interestedUserId: Types.ObjectId;
     interestedUsername: string;
+    interestedUserFlagged: boolean;
 }

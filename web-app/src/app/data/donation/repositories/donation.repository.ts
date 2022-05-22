@@ -10,6 +10,7 @@ import {GetDonationsInput} from '../../../domain/donation/commands/inputs/get-do
 import {DonationResult} from '../../../domain/donation/models/results/donation.result';
 import { SignalDonationInput } from 'src/app/domain/donation/commands/inputs/signal-donation.input';
 import { SignalDonationResult } from 'src/app/domain/donation/models/results/signal-donation.result';
+import {ViewDonationInput} from '../../../domain/donation/commands/inputs/view-donation.input';
 
 @Injectable({
   providedIn: 'root'
@@ -41,6 +42,14 @@ export class DonationRepository extends IDonationRepository {
     const {accessToken} = input;
     return this.api.patch<SignalDonationResult>(`${environment.apiUrl}/donation`, input, accessToken)
       .pipe(map((result: SignalDonationResult) => {
+        return result;
+      }));
+  }
+
+  viewDonation(input: ViewDonationInput): Observable<DonationResult> {
+    const {accessToken} = input;
+    return this.api.get<DonationResult>(`${environment.apiUrl}/donation/viewDonation`, accessToken)
+      .pipe(map((result: DonationResult) => {
         return result;
       }));
   }

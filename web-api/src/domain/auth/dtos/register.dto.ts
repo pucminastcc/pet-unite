@@ -1,11 +1,11 @@
 import {ApiProperty} from '@nestjs/swagger';
 
 export class RegisterDto {
-    @ApiProperty({default: 'petunite@hotmail.com', required: true})
+    @ApiProperty({default: 'email@exemplo.com', required: true})
     readonly email: string;
-    @ApiProperty({default: 'PetUnite', required: true})
+    @ApiProperty({default: 'usuario', required: true})
     readonly username: string;
-    @ApiProperty({default: '#@Senha!123', required: true})
+    @ApiProperty({default: '12345678', required: true})
     password: string;
     terms: boolean;
     activated: boolean;

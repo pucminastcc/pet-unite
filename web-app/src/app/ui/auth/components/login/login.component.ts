@@ -41,7 +41,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   ) {
     this.loginForm = this.fb.group<ILoginForm>({
       email: new FormControl('', [Validators.required, Validators.email]),
-      password: new FormControl('', [Validators.required, Validators.minLength(6), Validators.maxLength(12)])
+      password: new FormControl('', [Validators.required, Validators.minLength(6), Validators.maxLength(16)])
     });
   }
 
@@ -62,6 +62,9 @@ export class LoginComponent implements OnInit, OnDestroy {
 
     if (this.facebookLoginSubscription)
       this.facebookLoginSubscription.unsubscribe();
+
+    if (this.googleLoginSubscription)
+      this.googleLoginSubscription.unsubscribe();
   }
 
   private notify(severity: string = 'success', summary: string = '', detail: string = '', closable: boolean = false, life: number = 6500): void {

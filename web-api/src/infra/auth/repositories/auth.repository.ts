@@ -62,6 +62,7 @@ export class AuthRepository extends IAuthRepository {
             provider: doc.provider,
             img: doc.img,
             isSuperUser: doc.isSuperUser,
+            isInstitution: doc.isInstitution,
             personTypeId: doc.personTypeId,
             document: doc.document,
             zipCode: doc.zipCode,
@@ -207,9 +208,19 @@ export class AuthRepository extends IAuthRepository {
                     username: payload.username,
                     provider: payload.provider,
                     email: payload.email,
+                    document: payload.document,
                     img: payload.img,
                     isSuperUser: payload.isSuperUser,
-
+                    isInstitution: payload.isInstitution,
+                    zipCode: payload.zipCode,
+                    address: payload.address,
+                    district: payload.district,
+                    cityId: payload.cityId,
+                    state: payload.state,
+                    complement: payload.complement,
+                    phone: payload.phone,
+                    cell: payload.cell,
+                    whatsapp: payload.whatsapp,
                 },
                 message
             }
@@ -239,7 +250,10 @@ export class AuthRepository extends IAuthRepository {
                 const token = `${enc.content}${enc.iv}`
 
                 if (!activated) {
-                    await this.accountModel.insertMany({token, userId: user.id});
+                    await this.accountModel.insertMany({
+                        token, userId: user.id
+                    });
+
                     try {
                         await this.mailService.sendUserConfirmation(user, token);
                     } catch (error) {
@@ -269,7 +283,9 @@ export class AuthRepository extends IAuthRepository {
                 .slice(0, 10)
                 .toUpperCase();
 
-            const update = await this.passwordResetCodeModel.findOneAndUpdate({userId: doc._id}, {
+            const update = await this.passwordResetCodeModel.findOneAndUpdate({
+                userId: doc._id
+            }, {
                 code: generatedCode
             }).exec();
 
@@ -369,6 +385,7 @@ export class AuthRepository extends IAuthRepository {
                     provider: user.provider,
                     img: user.img,
                     isSuperUser: user.isSuperUser,
+                    isInstitution: user.isInstitution,
                     personTypeId: user.personTypeId,
                     document: user.document,
                     zipCode: user.zipCode,

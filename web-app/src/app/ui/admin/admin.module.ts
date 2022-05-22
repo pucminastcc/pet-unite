@@ -38,6 +38,7 @@ import {ChartModule} from 'primeng/chart';
 import { ReportComponent } from './pages/manager/components/report/report.component';
 import {InputTextareaModule} from 'primeng/inputtextarea';
 import {BadgeModule} from 'primeng/badge';
+import { InstitutionComponent } from './pages/institution/institution.component';
 
 
 @NgModule({
@@ -50,7 +51,8 @@ import {BadgeModule} from 'primeng/badge';
     PetRegistrationComponent,
     UserAccountComponent,
     SupportComponent,
-    ReportComponent
+    ReportComponent,
+    InstitutionComponent
   ],
   imports: [
     CommonModule,

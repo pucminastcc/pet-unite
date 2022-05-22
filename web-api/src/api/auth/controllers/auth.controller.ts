@@ -1,4 +1,4 @@
-import {Body, Controller, Get, HttpStatus, Patch, Post, Put, Query, Req, Request, Res, UseGuards} from '@nestjs/common';
+import {Body, Controller, Get, HttpStatus, Patch, Post, Put, Query, Request, Res, UseGuards} from '@nestjs/common';
 import {AuthService} from '../services/auth.service';
 import {LoginResult} from '../../../domain/auth/models/results/login.result';
 import {RegisterDto} from '../../../domain/auth/dtos/register.dto';
@@ -32,11 +32,39 @@ export class AuthController {
     @ApiTags('autenticação')
     @ApiOperation({summary: 'Criar cadastro de usuário'})
     @ApiResponse({status: 200, description: 'Resposta padrão para solicitação HTTP bem-sucedida.'})
+    @ApiResponse({status: 201, description: 'Resposta de sucesso, indica que a requisição foi bem sucedida e que um novo recurso foi criado.'})
     @ApiResponse({status: 400, description: 'A solicitação não pode ser atendida devido a sintaxe incorreta.'})
     @ApiResponse({status: 500, description: 'Erro do Servidor Interno.'})
     async registration(@Body() body: RegisterDto, @Res() res): Promise<RegisterResult> {
         const result = await this.authService.register(body);
-        return res.status(HttpStatus.OK).json(result);
+        const httpStatus = result.success ? HttpStatus.CREATED : HttpStatus.OK;
+
+        return res.status(httpStatus).json(result);
+    }
+
+    @Post('login')
+    @UseGuards(LocalAuthGuard)
+    @ApiTags('autenticação')
+    @ApiOperation({summary: 'Obter token de acesso'})
+    @ApiResponse({status: 200, description: 'Resposta padrão para solicitação HTTP bem-sucedida.'})
+    @ApiResponse({status: 400, description: 'A solicitação não pode ser atendida devido a sintaxe incorreta.'})
+    @ApiResponse({status: 500, description: 'Erro do Servidor Interno.'})
+    async login(@Body() body: ValidateLocalUserDto, @Request() req): Promise<LoginResult> {
+        return await this.authService.login(req.user);
+    }
+
+    @Post('facebook')
+    @ApiExcludeEndpoint()
+    async facebook(@Body() body: ValidateFacebookUserDto): Promise<LoginResult> {
+        const user = await this.authService.validateFacebookUser(body);
+        return await this.authService.login(user);
+    }
+
+    @Post('google')
+    @ApiExcludeEndpoint()
+    async google(@Body() body: ValidateGoogleUserDto): Promise<LoginResult> {
+        const user = await this.authService.validateGoogleUser(body);
+        return await this.authService.login(user);
     }
 
     @Get('confirm')
@@ -49,34 +77,6 @@ export class AuthController {
     @ApiExcludeEndpoint()
     async confirmEmail(@Body() body: ConfirmEmailDto): Promise<ConfirmEmailResult> {
         return await this.authService.confirmEmail(body);
-    }
-
-    @Post('login')
-    @UseGuards(LocalAuthGuard)
-    @ApiTags('autenticação')
-    @ApiOperation({summary: 'Obter token de acesso'})
-    @ApiResponse({status: 200, description: 'Resposta padrão para solicitação HTTP bem-sucedida.'})
-    @ApiResponse({status: 400, description: 'A solicitação não pode ser atendida devido a sintaxe incorreta.'})
-    @ApiResponse({status: 500, description: 'Erro do Servidor Interno.'})
-    async login(@Body() body: ValidateLocalUserDto, @Request() req, @Res() res): Promise<LoginResult> {
-        const result = await this.authService.login(req.user);
-        return res.status(HttpStatus.OK).json(result);
-    }
-
-    @Post('facebook')
-    @ApiTags('autenticação')
-    async facebook(@Body() body: ValidateFacebookUserDto, @Res() res): Promise<LoginResult> {
-        const user = await this.authService.validateFacebookUser(body);
-        const result = await this.authService.login(user);
-        return res.status(HttpStatus.OK).json(result);
-    }
-
-    @Post('google')
-    @ApiTags('autenticação')
-    async google(@Body() body: ValidateGoogleUserDto, @Res() res): Promise<LoginResult> {
-        const user = await this.authService.validateGoogleUser(body);
-        const result = await this.authService.login(user);
-        return res.status(HttpStatus.OK).json(result);
     }
 
     @Post('passwordResetCode')
@@ -97,40 +97,38 @@ export class AuthController {
         return await this.authService.changePassword(body);
     }
 
-    @UseGuards(JwtAuthGuard)
     @Get('user')
-    @ApiTags('autenticação')
+    @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
+    @ApiTags('autenticação')
     @ApiOperation({summary: 'Obter cadastro de usuário autenticado'})
     @ApiResponse({status: 200, description: 'Resposta padrão para solicitação HTTP bem-sucedida.'})
     @ApiResponse({status: 400, description: 'A solicitação não pode ser atendida devido a sintaxe incorreta.'})
-    @ApiResponse({
-        status: 401,
-        description: 'A solicitação não foi aplicada porque não possui credenciais de autenticação válidas para o recurso de destino'
-    })
+    @ApiResponse({status: 401, description: 'A solicitação não foi aplicada porque não possui credenciais de autenticação válidas para o recurso de destino'})
     @ApiResponse({status: 500, description: 'Erro do Servidor Interno.'})
-    async getUser(@Request() req): Promise<GetUserResult> {
-        return await this.authService.getUser({
+    async getUser(@Request() req, @Res() res): Promise<GetUserResult> {
+        const result = await this.authService.getUser({
             id: req.user.id
         });
+
+        return res.status(HttpStatus.OK).json(result);
     }
 
-    @UseGuards(JwtAuthGuard)
     @Put('user')
-    @ApiTags('autenticação')
+    @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
+    @ApiTags('autenticação')
     @ApiOperation({summary: 'Alterar cadastro de usuário autenticado'})
     @ApiResponse({status: 200, description: 'Resposta padrão para solicitação HTTP bem-sucedida.'})
     @ApiResponse({status: 400, description: 'A solicitação não pode ser atendida devido a sintaxe incorreta.'})
-    @ApiResponse({
-        status: 401,
-        description: 'A solicitação não foi aplicada porque não possui credenciais de autenticação válidas para o recurso de destino'
-    })
+    @ApiResponse({status: 401, description: 'A solicitação não foi aplicada porque não possui credenciais de autenticação válidas para o recurso de destino'})
     @ApiResponse({status: 500, description: 'Erro do Servidor Interno.'})
-    async updateUser(@Body() body: UpdateUserDto, @Request() req): Promise<UpdateUserResult> {
-        return await this.authService.updateUser({
+    async updateUser(@Body() body: UpdateUserDto, @Request() req, @Res() res): Promise<UpdateUserResult> {
+        const result = await this.authService.updateUser({
             ...body,
             id: req.user.id
         });
+
+        return res.status(HttpStatus.OK).json(result);
     }
 }

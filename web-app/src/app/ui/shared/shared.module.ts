@@ -13,6 +13,7 @@ import {AppIndexLayoutComponent} from './layouts/app-index-layout/app-index-layo
 import {AppAdminLayoutComponent} from './layouts/app-admin-layout/app-admin-layout.component';
 import {TooltipModule} from 'primeng/tooltip';
 import {DialogModule} from 'primeng/dialog';
+import {AppTermsComponent} from './components/app-terms/app-terms.component';
 
 
 @NgModule({
@@ -22,7 +23,8 @@ import {DialogModule} from 'primeng/dialog';
     AppLoadingComponent,
     AppNavbarComponent,
     AppFooterComponent,
-    AppSidebarComponent
+    AppSidebarComponent,
+    AppTermsComponent
   ],
   imports: [
     CommonModule,
@@ -31,13 +33,14 @@ import {DialogModule} from 'primeng/dialog';
     DynamicDialogModule,
     ToastModule,
     TooltipModule,
-    DialogModule
+    DialogModule,
   ],
   exports: [
     AppLoadingComponent,
     AppNavbarComponent,
     AppFooterComponent,
     AppSidebarComponent,
+    AppTermsComponent
   ],
   providers: [
     DialogService,
