@@ -14,6 +14,8 @@ import {GetReportTypesInput} from '../../../domain/shared/services/commands/inpu
 import {ReportTypeResult} from '../../../domain/shared/services/models/results/report-type.result';
 import {GetCitiesInput} from '../../../domain/shared/services/commands/inputs/get-cities.input';
 import {CityResult} from '../../../domain/shared/services/models/results/city.result';
+import {GetPetTypesInput} from '../../../domain/shared/services/commands/inputs/get-pet-types.input';
+import {PetTypeResult} from '../../../domain/shared/services/models/results/pet-type.result';
 
 @Injectable({
   providedIn: 'root'
@@ -29,6 +31,14 @@ export class ConfigRepository extends IConfigRepository {
     const {accessToken} = input;
     return this.api.get<PersonTypeResult[]>(`${environment.apiUrl}/config/personTypes`, accessToken)
       .pipe(map((result: PersonTypeResult[]) => {
+        return result;
+      }));
+  }
+
+  getPetTypes(input: GetPetTypesInput): Observable<PetTypeResult[]> {
+    const {accessToken} = input;
+    return this.api.get<PetTypeResult[]>(`${environment.apiUrl}/config/petTypes`, accessToken)
+      .pipe(map((result: PetTypeResult[]) => {
         return result;
       }));
   }

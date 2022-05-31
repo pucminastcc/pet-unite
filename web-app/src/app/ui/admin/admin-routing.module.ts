@@ -8,14 +8,16 @@ import {AuthGuard} from '../shared/guards/auth.guard';
 import {ManagerComponent} from './pages/manager/manager.component';
 import {SupportComponent} from './pages/support/support.component';
 import {InstitutionComponent} from './pages/institution/institution.component';
+import {ContributionComponent} from './pages/contribution/contribution.component';
 
 const routes: Routes = [
   {path: 'manager', canActivate: [AuthGuard], component: ManagerComponent},
   {path: 'institution', canActivate: [AuthGuard], component: InstitutionComponent},
   {path: 'dashboard', canActivate: [AuthGuard], component: DashboardComponent},
   {path: 'profile', canActivate: [AuthGuard], component: ProfileComponent},
-  {path: 'pet', canActivate: [AuthGuard], component: PetComponent},
   {path: 'donation', canActivate: [AuthGuard], component: DonationComponent},
+  {path: 'pet', canActivate: [AuthGuard], component: PetComponent},
+  {path: 'contribution', canActivate: [AuthGuard], component: ContributionComponent},
   {path: 'support', canActivate: [AuthGuard], component: SupportComponent},
   {path: '**', redirectTo: '/home'}
 ];

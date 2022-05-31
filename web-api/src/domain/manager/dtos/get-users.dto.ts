@@ -1,5 +1,7 @@
 import {Types} from 'mongoose';
 
-export interface GetUsersDto {
+export class GetUsersDto {
     id: Types.ObjectId;
+    isInstitution: boolean;
+    state?: string;
 }

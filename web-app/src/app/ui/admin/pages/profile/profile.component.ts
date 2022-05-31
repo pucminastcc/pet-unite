@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {FormBuilderTypeSafe, FormGroupTypeSafe} from 'angular-typesafe-reactive-forms-helper';
 import {FormControl, Validators} from '@angular/forms';
 import {AuthService} from '../../../auth/services/auth.service';
@@ -23,6 +23,7 @@ import {LocalService} from '../../../shared/services/local.service';
   styleUrls: ['./profile.component.scss']
 })
 export class ProfileComponent implements OnInit, OnDestroy {
+  private authSubscription: Subscription | undefined;
   private userSubscription: Subscription | undefined;
   private forkSubscription: Subscription | undefined;
   private addressSubscription: Subscription | undefined
@@ -58,6 +59,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       provider: new FormControl('', [Validators.required]),
       personTypeId: new FormControl([Validators.required]),
       document: new FormControl(''),
+      permissionRequest: new FormControl(false),
       zipCode: new FormControl('', [Validators.required, Validators.minLength(8)]),
       address: new FormControl('', [Validators.required]),
       district: new FormControl('', [Validators.required]),
@@ -69,9 +71,16 @@ export class ProfileComponent implements OnInit, OnDestroy {
       whatsapp: new FormControl(''),
     });
 
-    this.authService.getAuthenticatedUser().subscribe((user: AuthenticatedUserModel) => {
-      this.user = user;
-    });
+    this.getAuthenticatedUser();
+  }
+
+  private getAuthenticatedUser(): void {
+    this.authSubscription = this.authService.getAuthenticatedUser()
+      .subscribe((user: AuthenticatedUserModel) => {
+        if (user) {
+          this.user = user;
+        }
+      });
   }
 
   get pf() {
@@ -79,7 +88,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.forkSubscription = this.getDataFromAPI();
+    this.forkSubscription = this.getConfigData();
   }
 
   ngOnDestroy(): void {
@@ -88,6 +97,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
   }
 
   private unSubscribe(): void {
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
+    }
     if (this.userSubscription) {
       this.userSubscription.unsubscribe();
     }
@@ -102,27 +114,31 @@ export class ProfileComponent implements OnInit, OnDestroy {
     }
   }
 
-  private getDataFromAPI(): Subscription {
+  private getConfigData(): Subscription {
     this.isLoading = true;
     return forkJoin({
       personTypes: this.configService.getPersonTypes(),
       states: this.configService.getStates(),
       cities: this.configService.getCities(),
       user: this.authService.getUser(),
-    }).pipe(finalize(() => {
-      this.isLoading = false;
-    })).subscribe((res) => {
-      if (res) {
-        this.optPersonTypes = this.getOptPersonTypes(res.personTypes);
-        this.optStates = this.getOptStates(res.states);
-        this.cities = res.cities;
-        this.setProfile(res.user.data);
-      }
-    }, (error) => {
-      if (error.status === 401) {
-        this.logout();
-      }
-    });
+    })
+      .pipe(
+        finalize(() => {
+          this.isLoading = false;
+        })
+      )
+      .subscribe((res) => {
+        if (res) {
+          this.optPersonTypes = this.getOptPersonTypes(res.personTypes);
+          this.optStates = this.getOptStates(res.states);
+          this.cities = res.cities;
+          this.setProfile(res.user.data);
+        }
+      }, (error) => {
+        if (error.status === 401) {
+          this.logout();
+        }
+      });
   }
 
   private getOptPersonTypes(personTypes: PersonTypeResult[]): SelectItem<PersonTypeResult>[] {
@@ -172,7 +188,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.pf.complement.setValue(user.complement);
     this.pf.cityId.setValue(user.cityId);
     this.pf.state.setValue(user.state);
-    if(user.state) {
+    if (user.state) {
       this.optCities = this.getOptCities(this.cities, user.state);
     }
     this.pf.phone.setValue(user.phone);
@@ -197,7 +213,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
           this.pf.state.setValue(data.uf);
           this.onChangeState(data.uf);
           let city = this.optCities.filter(e => e.label?.toUpperCase() === data.localidade.toUpperCase());
-          if(city) {
+          if (city) {
             const id = city.map(e => e.value.id).find(e => true);
             this.pf.cityId.setValue(id);
           }
@@ -317,29 +333,38 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   private updateProfile(profileForm: IProfileForm): Subscription {
     const {
-      username, personTypeId, document, zipCode, address, district, cityId, state, complement, phone, cell, whatsapp, img
+      username, personTypeId, document, zipCode, address, district, cityId, state, complement, phone, cell, whatsapp,
+      img, permissionRequest
     } = profileForm;
     this.isLoading = true;
     return this.authService.updateUser({
-      username, personTypeId, document, zipCode, address, district, cityId, state, complement, phone, cell, whatsapp, img
-    }).pipe(finalize(() => {
-      this.isLoading = false;
-      this.invalidDocument = false;
-    })).subscribe((data: UpdateUserResult) => {
-      if (data) {
-        this.localService.setJsonValue('auth', JSON.stringify(data.auth));
-        this.messageService.add({
-          severity: data.success ? 'success' : 'error',
-          summary: data.success ? 'Sucesso' : 'Erro',
-          detail: data.message
-        });
-      }
-    }, (error) => {
-      if (error.status === 401) {
-        this.logout();
-      }
-      this.messageService.add({severity: 'error', summary: 'Erro', detail: 'Ops, algo deu errado :('});
-    });
+      username, personTypeId, document, zipCode, address, district, cityId, state, complement, phone, cell, whatsapp,
+      img, permissionRequest
+    }).pipe(
+      finalize(() => {
+        this.isLoading = false;
+        this.invalidDocument = false;
+      }))
+      .subscribe((data: UpdateUserResult) => {
+        if (data) {
+          this.localService.setJsonValue('auth', JSON.stringify(data.auth));
+          this.messageService.add({
+            severity: data.success ? 'success' : 'error',
+            summary: data.success ? 'Sucesso' : 'Erro',
+            detail: data.message
+          });
+          this.getAuthenticatedUser();
+          this.pf.permissionRequest.reset();
+        }
+      }, (error) => {
+        error.status === 401 ?
+          this.logout() :
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erro',
+            detail: 'Ops, algo deu errado :('
+          });
+      });
   }
 
   public logout(): void {

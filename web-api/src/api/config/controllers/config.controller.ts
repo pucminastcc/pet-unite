@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Query, UseGuards} from '@nestjs/common';
+import {Controller, Get, Query, UseGuards} from '@nestjs/common';
 import {ConfigService} from '../services/config.service';
 import {JwtAuthGuard} from '../../auth/shared/guards/jwt-auth.guard';
 import {ApiBearerAuth, ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
@@ -12,6 +12,8 @@ import {GetReportTypesDto} from '../../../domain/config/dtos/get-report-types.dt
 import {ReportTypeResult} from '../../../domain/config/models/results/report-type.result';
 import {GetCitiesDto} from '../../../domain/config/dtos/get-cities.dto';
 import {BrazilCityResult} from '../../../domain/config/models/results/brazil-city.result';
+import {GetPetTypesDto} from '../../../domain/config/dtos/get-pet-types.dto';
+import {PetTypeResult} from '../../../domain/config/models/results/pet-type.result';
 
 @Controller('config')
 export class ConfigController {
@@ -27,8 +29,19 @@ export class ConfigController {
     @ApiOperation({summary: 'Obter tipos de pessoas'})
     @ApiResponse({status: 200, description: 'Resposta padrão para solicitação HTTP bem-sucedida.'})
     @ApiResponse({status: 400, description: 'A solicitação não pode ser atendida devido a sintaxe incorreta.'})
-    async getPersonTypes(@Query() query: GetPersonTypesDto): Promise<PersonTypeResult[]> {
+    async personTypes(@Query() query: GetPersonTypesDto): Promise<PersonTypeResult[]> {
         return await this.configService.getPersonTypes(query);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('petTypes')
+    @ApiTags('configuração')
+    @ApiBearerAuth()
+    @ApiOperation({summary: 'Obter tipos de pets'})
+    @ApiResponse({status: 200, description: 'Resposta padrão para solicitação HTTP bem-sucedida.'})
+    @ApiResponse({status: 400, description: 'A solicitação não pode ser atendida devido a sintaxe incorreta.'})
+    async petTypes(@Query() query: GetPetTypesDto): Promise<PetTypeResult[]> {
+        return await this.configService.getPetTypes(query);
     }
 
     @UseGuards(JwtAuthGuard)
@@ -38,19 +51,8 @@ export class ConfigController {
     @ApiOperation({summary: 'Obter gêneros de pets'})
     @ApiResponse({status: 200, description: 'Resposta padrão para solicitação HTTP bem-sucedida.'})
     @ApiResponse({status: 400, description: 'A solicitação não pode ser atendida devido a sintaxe incorreta.'})
-    async getPetGenders(@Query() query: GetPetGendersDto): Promise<PetGenderResult[]> {
+    async petGenders(@Query() query: GetPetGendersDto): Promise<PetGenderResult[]> {
         return await this.configService.getPetGenders(query);
-    }
-
-    @UseGuards(JwtAuthGuard)
-    @Get('states')
-    @ApiTags('configuração')
-    @ApiBearerAuth()
-    @ApiOperation({summary: 'Obter Estados brasileiros'})
-    @ApiResponse({status: 200, description: 'Resposta padrão para solicitação HTTP bem-sucedida.'})
-    @ApiResponse({status: 400, description: 'A solicitação não pode ser atendida devido a sintaxe incorreta.'})
-    async getStates(@Query() query: GetStatesDto): Promise<BrazilStateResult[]> {
-        return await this.configService.getStates(query);
     }
 
     @UseGuards(JwtAuthGuard)
@@ -65,10 +67,21 @@ export class ConfigController {
     }
 
     @UseGuards(JwtAuthGuard)
+    @Get('states')
+    @ApiTags('configuração')
+    @ApiBearerAuth()
+    @ApiOperation({summary: 'Obter listagem de estados'})
+    @ApiResponse({status: 200, description: 'Resposta padrão para solicitação HTTP bem-sucedida.'})
+    @ApiResponse({status: 400, description: 'A solicitação não pode ser atendida devido a sintaxe incorreta.'})
+    async states(@Query() query: GetStatesDto): Promise<BrazilStateResult[]> {
+        return await this.configService.getStates(query);
+    }
+
+    @UseGuards(JwtAuthGuard)
     @Get('cities')
     @ApiTags('configuração')
     @ApiBearerAuth()
-    @ApiOperation({summary: 'Obter tipos de relatórios'})
+    @ApiOperation({summary: 'Obter listagem de cidades'})
     @ApiResponse({status: 200, description: 'Resposta padrão para solicitação HTTP bem-sucedida.'})
     @ApiResponse({status: 400, description: 'A solicitação não pode ser atendida devido a sintaxe incorreta.'})
     async cities(@Query() query: GetCitiesDto): Promise<BrazilCityResult[]> {

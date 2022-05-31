@@ -1,4 +1,5 @@
 export enum DonatePetMessage {
-    Success = 'Agradecemos sua contribuição',
-    Error = 'Algumas informações estão faltando em seu perfil, complete-as antes de realizar a doação',
+    Success = 'Obrigado por sua contribuição, logo receberá boas notícias :)',
+    Error = 'Erro ao processar a doação, tente novamente :(',
+    HasFlaggedDonations = 'Há doações sinalizadas em seu interesse, não foi possível postar a doação.',
 }

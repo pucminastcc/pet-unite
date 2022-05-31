@@ -1,69 +1,169 @@
-<p-toast [baseZIndex]="9999"></p-toast>
+<div *ngIf="user.filledProfile; else messageBlock">
+  <p-toast [baseZIndex]="9999"></p-toast>
 
-<p-confirmDialog #cd
-                 [breakpoints]="{'960px': '50vw', '640px': '95vw'}" [style]="{width: '50vw'}" [closable]="false"
-                 position="bottom">
-  <ng-template pTemplate="footer">
-    <button (click)="cd.accept()" class="p-button-raised p-button-success p-button-rounded" icon="pi pi-check"
-            label="Sim" pButton type="button">
-    </button>
-    <button (click)="cd.reject()" class="p-button-raised p-button-danger p-button-rounded" icon="pi pi-times"
-            label="Não" pButton type="button">
-    </button>
-  </ng-template>
-</p-confirmDialog>
+  <p-confirmDialog #cd [breakpoints]="{'960px': '50vw', '640px': '95vw'}" [closable]="false" [style]="{width: '50vw'}"
+                   position="bottom">
+    <ng-template pTemplate="footer">
+      <button (click)="cd.accept()" class="p-button-raised p-button-success p-button-rounded" icon="pi pi-check"
+              label="Sim" pButton type="button">
+      </button>
+      <button (click)="cd.reject()" class="p-button-raised p-button-danger p-button-rounded" icon="pi pi-times"
+              label="Não" pButton type="button">
+      </button>
+    </ng-template>
+  </p-confirmDialog>
 
-<div class="container-fluid">
-  <div class="row">
-    <div class="col-md-12">
-      <p-dataView #dv [value]="donations" [paginator]="true" [rows]="9" filterBy="name"
-                  layout="list">
-        <ng-template pTemplate="header">
-          <div class="flex flex-column flex-md-row justify-content-md-between">
-                <span class="p-input-icon-left mb-2 mb-md-0 mr-3">
-                  <i class="pi pi-search"></i>
-                  <input type="search" pInputText placeholder="Pesquisar" (input)="dv.filter($event.target.value)">
-                </span>
-            <span class="mb-2 mb-md-0">
-                  <p-dropdown [options]="optPetGenders"
-                              (onChange)="onChangePetGender($event.value)"
-                              emptyMessage="Nenhum registro foi encontrado."
-                              optionValue="value"
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <p-tabView>
+          <p-tabPanel header="Postagens">
+            <form [formGroup]="formFilter">
+              <div class="row">
+                <div class="col-12 col-md-2 p-fluid">
+                  <p-dropdown [formControl]="ff.petTypeId" [options]="optPetTypes"
+                              class="mr-3" emptyMessage="Nenhum registro foi encontrado." optionValue="value"
+                              placeholder="Selecione o tipo">
+                  </p-dropdown>
+                </div>
+                <div class="col-12 col-md-3 p-fluid">
+                  <p-dropdown [formControl]="ff.petGenderId" [options]="optPetGenders"
+                              class="mr-3" emptyMessage="Nenhum registro foi encontrado." optionValue="value"
                               placeholder="Selecione o gênero">
                   </p-dropdown>
-                </span>
-          </div>
-        </ng-template>
-        <ng-template let-donation pTemplate="listItem">
-          <div class="col-12 col-md-12 p-3 d-inline-block">
-            <div class="card">
-              <div class="card-body">
-                <div class="row">
-                  <div class="col-12 col-md-2">
-                    <img [src]="donation?.petImg" [alt]="donation.petImg" height="128"/>
-                  </div>
-                  <div class="col-12 col-md-10">
-                    <h5>
-                      <strong>{{donation.petName}}</strong>
-                      <div class="float-right">
-                        <button (click)="confirmSignal(donation)"
-                                class="p-button-raised p-button-danger p-button-rounded"
-                                icon="fas fa-heart" pButton type="button">
-                        </button>
-                      </div>
-                    </h5>
-                    <hr>
-                    <h6>Localidade: <strong>{{donation.city}} - {{donation.state}}</strong></h6>
-                    <h6>Doador: <strong>{{donation.username}}</strong></h6>
-                    <h6>Distância: <strong>5 KM</strong></h6>
-                    <h6>Instituição: <strong>Particular</strong></h6>
+                </div>
+                <div class="col-12 col-md-3 p-fluid">
+                  <p-dropdown [formControl]="ff.state" [options]="optStates"
+                              class="mr-3" emptyMessage="Nenhum registro foi encontrado." optionValue="value"
+                              placeholder="Selecione o UF">
+                  </p-dropdown>
+                </div>
+                <div class="col-12 col-md-2 p-fluid">
+                  <button (click)="getDonations()"
+                          class="p-button-raised p-button-success p-button-rounded p-button-sm"
+                          icon="fas fa-search" iconPos="right" label="Procurar" pButton type="button">
+                  </button>
+                </div>
+              </div>
+              <div *ngIf="ff.petTypeId.value || ff.petGenderId.value || ff.state.value" class="row">
+                <div class="col-12 col-md-12 p-fluid">
+                  <div class="mt-3 mt-md-0">
+                    <span class="mr-2">Filtros:</span>
+                    <span *ngIf="ff.petTypeId.value" class="mr-3">
+                    <p-chip (onRemove)="removeFilter($event, ff.petTypeId)" [removable]="true"
+                            label="{{getSelectItemLabel(ff.petTypeId.value, optPetTypes)}}"></p-chip>
+                  </span>
+                    <span *ngIf="ff.petGenderId.value" class="mr-3">
+                    <p-chip (onRemove)="removeFilter($event, ff.petGenderId)" [removable]="true"
+                            label="{{getSelectItemLabel(ff.petGenderId.value, optPetGenders)}}"></p-chip>
+                  </span>
+                    <span *ngIf="ff.state.value" class="mr-3">
+                    <p-chip (onRemove)="removeFilter($event, ff.state)" [removable]="true"
+                            label="{{getSelectItemLabel(ff.state.value, optStates)}}"></p-chip>
+                  </span>
                   </div>
                 </div>
               </div>
+            </form>
+            <div class="text-center">
+              <p-progressSpinner *ngIf="isLoading"></p-progressSpinner>
             </div>
-          </div>
-        </ng-template>
-      </p-dataView>
+            <p-dataView #dv *ngIf="!isLoading" [paginator]="true" [rows]="9" [value]="donations"
+                        emptyMessage="Nenhum resultado encontrado" filterBy="petName" layout="list">
+              <ng-template pTemplate="header">
+                <div class="flex flex-column flex-md-row justify-content-md-between">
+                  <span class="p-input-icon-left mb-2 mb-md-0 mr-3">
+                    <i class="pi pi-search"></i>
+                    <input (input)="dv.filter($event.target.value)" pInputText placeholder="Pesquisar por nome"
+                           type="search">
+                  </span>
+                </div>
+              </ng-template>
+              <ng-template let-donation pTemplate="listItem">
+                <div class="col-12 col-md-12 p-3 d-inline-block">
+                  <div class="card">
+                    <div class="card-body">
+                      <div class="row">
+                        <div class="col-12 col-md-3">
+                          <div class="text-center pt-2">
+                            <h5>{{donation.petName}}</h5>
+                            <p-image [alt]="donation.petName" [height]="160" [imageClass]="'w-100'" [preview]="true"
+                                     [src]="donation.petImg" loading="lazy">
+                            </p-image>
+                            <div class="clearfix mb-2"></div>
+                            Data da Postagem: <b>{{donation.date}}</b>
+                          </div>
+                        </div>
+                        <div class="col-12 col-md-9">
+                          <div class="float-md-left text-center mt-3">
+                            <button class="p-button-raised p-button p-button-rounded p-button-sm mr-2"
+                                    (click)="onClickViewDonation(donation)"
+                                    icon="fas fa-dog" iconPos="right" label="Visualizar" pButton type="button">
+                            </button>
+                          </div>
+                          <div class="float-md-right mt-3 text-center">
+                            <button class="p-button-raised p-button-danger p-button-rounded p-button-sm"
+                                    (click)="onClickConfirmSignal(donation)"
+                                    icon="fas fa-heart" iconPos="right" label="Quero Adotar" pButton type="button">
+                            </button>
+                          </div>
+                          <div class="clearfix"></div>
+                          <hr/>
+                          <div class="row">
+                            <div class="col-12 col-md-6">
+                              <div>Localidade: <b>{{donation.city}} - {{donation.state}}</b></div>
+                              <div *ngIf="getDistanceFromLatLonInKm({lat: donation.lat, lng: donation.lng}, {lat: user.lat, lng: user.lng}) > 0">
+                                Distância: <b>{{getDistanceFromLatLonInKm({lat: donation.lat, lng: donation.lng}, {lat: user.lat, lng: user.lng})}} Km</b>
+                              </div>
+                              <div>Tipo: <b>{{donation.petType}}</b></div>
+                              <div>Raça: <b>{{donation.petBreed}}</b></div>
+                              <div>Gênero: <b>{{donation.petGender}}</b></div>
+                            </div>
+                            <div class="col-12 col-md-3">
+                              <div class="mt-3 mt-md-0 text-md-center">
+                                <div class="mt-2">
+                                  <b>Gosta de crianças:</b>
+                                  <p-rating [(ngModel)]="donation.rateLikesChild" [cancel]="false" [readonly]="true"></p-rating>
+                                </div>
+                                <div class="mt-2">
+                                  <b>Gosta de passeios:</b>
+                                  <p-rating [(ngModel)]="donation.rateLikesTours" [cancel]="false" [readonly]="true"></p-rating>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-12 col-md-3">
+                              <div class="text-md-center">
+                                <div class="mt-2">
+                                  <b>Amigável:</b>
+                                  <p-rating [(ngModel)]="donation.rateFriendly" [cancel]="false" [readonly]="true"></p-rating>
+                                </div>
+                                <div class="mt-2">
+                                  <b>Treinamento:</b>
+                                  <p-rating [(ngModel)]="donation.rateTraining" [cancel]="false" [readonly]="true"></p-rating>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ng-template>
+            </p-dataView>
+          </p-tabPanel>
+        </p-tabView>
+      </div>
     </div>
   </div>
 </div>
+
+<ng-template #messageBlock>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12 col-md-12">
+        <p-messages [(value)]="messages" [closable]="false"></p-messages>
+      </div>
+    </div>
+  </div>
+</ng-template>

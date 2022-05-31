@@ -17,5 +17,8 @@ export interface UserAccountResult {
     cell: string;
     whatsapp: string;
     isSuperUser: boolean;
+    isInstitution: boolean;
     blocked: boolean;
+    lng: number;
+    lat: number;
 }

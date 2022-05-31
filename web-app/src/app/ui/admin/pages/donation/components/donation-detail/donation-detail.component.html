@@ -1,0 +1,62 @@
+<div class="text-center">
+  <p-progressSpinner *ngIf="isLoading"></p-progressSpinner>
+</div>
+
+<div *ngIf="!isLoading">
+  <div class="row">
+    <div class="col-12 col-md-4">
+      <div class="text-center p-1">
+        <h4>{{donation.petName}}</h4>
+        <img #avatar
+             (error)="avatar.src = 'assets/img/default-image.png'"
+             [class]="getScreenWidth() <= 1024 ? 'w-100' : ''" [src]="donation.petImg"
+             alt="Logo" height="200" width="300"/>
+        <div>Data da Postagem: <b>{{donation.date}}</b></div>
+      </div>
+    </div>
+    <div class="col-12 col-md-4">
+      <div>Localidade: <b>{{donation.city}} - {{donation.state}}</b></div>
+      <div *ngIf="getDistanceFromLatLonInKm({lat: donation.lat, lng: donation.lng}, {lat: user.lat, lng: user.lng}) > 0">
+        Distância: <b>{{getDistanceFromLatLonInKm({lat: donation.lat, lng: donation.lng}, {lat: user.lat, lng: user.lng})}} Km</b>
+      </div>
+      <div>Tipo: <b>{{donation.petType}}</b></div>
+      <div>Raça: <b>{{donation.petBreed}}</b></div>
+      <div>Gênero: <b>{{donation.petGender}}</b></div>
+      <div>Idade: <b>{{donation.petAge}}</b></div>
+      <hr/>
+      <p-chip label="{{donation.username}}" image="{{!donation.userImg ? 'assets/img/avatar.png' : donation.userImg}}"></p-chip>
+      <div *ngFor="let cont of donation.contacts">
+        {{cont.description}}: <b>{{cont.value}}</b>
+      </div>
+    </div>
+    <div class="col-12 col-md-4">
+      <div class="text-center">
+        <div class="mt-2 mt-md-1">
+          <b>Gosta de crianças:</b>
+          <p-rating [(ngModel)]="donation.rateLikesChild" [cancel]="false" [readonly]="true"></p-rating>
+        </div>
+        <div class="mt-2 mt-md-1">
+          <b>Gosta de passeios:</b>
+          <p-rating [(ngModel)]="donation.rateLikesTours" [cancel]="false" [readonly]="true"></p-rating>
+        </div>
+        <div class="mt-2 mt-md-1">
+          <b>Amigável:</b>
+          <p-rating [(ngModel)]="donation.rateFriendly" [cancel]="false" [readonly]="true"></p-rating>
+        </div>
+        <div class="mt-2 mt-md-1">
+          <b>Treinamento:</b>
+          <p-rating [(ngModel)]="donation.rateTraining" [cancel]="false" [readonly]="true"></p-rating>
+        </div>
+      </div>
+    </div>
+  </div>
+  <hr/>
+  <div class="row">
+    <div class="col-12 col-md-12">
+      <p><b>Saiba um pouco mais sobre {{donation.petName}}:</b></p>
+      <p-scrollPanel [styleClass]="isMobile() ? 'custombar2' : ''" [style]="{height: getEditorHeight(isMobile() ? 265 : 550).toString() + 'px', border: '2px solid #e5e5e5'}">
+        <p [innerHTML]="donation.petDescription"></p>
+      </p-scrollPanel>
+    </div>
+  </div>
+</div>

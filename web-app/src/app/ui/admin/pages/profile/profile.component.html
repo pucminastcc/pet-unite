@@ -4,7 +4,7 @@
       <p-toast baseZIndex="9999"></p-toast>
       <div class="card">
         <div class="card-header card-header-danger">
-          <h4 class="card-title">Editando...</h4>
+          <h5 class="card-title">Editando...</h5>
           <p class="card-category">Complete seu perfil</p>
         </div>
         <div class="card-body p-fluid">
@@ -80,7 +80,7 @@
                         </div>
                         <div class="col-12 col-md-3 mt-2">
                           <div class="p-inputtext-sm">
-                            <label>{{document}} (Opcional)</label>
+                            <label>{{document}}</label>
                             <p-inputMask #documentInput
                                          *ngIf="documentMask"
                                          [formControl]="pf.document" [mask]="documentMask" [autofocus]="true">
@@ -90,6 +90,22 @@
                             <p-message *ngIf="invalidDocument" severity="error"
                                        text="Documento inválido">
                             </p-message>
+                          </div>
+                        </div>
+                        <div class="col-12 col-md-12 mt-4">
+                          <div *ngIf="user.isInstitution">
+                            <b>Status:</b> Perfil aprovado como Instituição <i class="fas fa-check-circle text-success ml-1"></i>
+                          </div>
+                          <div *ngIf="!user.isInstitution && user.requestedPermission">
+                            <b>Status:</b> Seu perfil está em análise, entraremos em contato por Email
+                          </div>
+                          <div *ngIf="!user.isInstitution && !user.requestedPermission">
+                            <div class="d-flex">
+                              <p-checkbox [formControl]="pf.permissionRequest" [binary]="true"></p-checkbox>
+                              <div class="ml-2 font-weight-normal">
+                                <b>Sou uma Instituição ou ONG de ajuda e proteção aos animais</b>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>

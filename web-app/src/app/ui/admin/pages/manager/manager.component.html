@@ -1,5 +1,6 @@
-<p-confirmDialog #cd
-                 [breakpoints]="{'960px': '50vw', '640px': '95vw'}" [style]="{width: '50vw'}" [closable]="false"
+<p-toast baseZIndex="9999"></p-toast>
+
+<p-confirmDialog #cd [breakpoints]="{'960px': '50vw', '640px': '95vw'}" [closable]="false" [style]="{width: '50vw'}"
                  position="bottom">
   <ng-template pTemplate="footer">
     <button (click)="cd.accept()" class="p-button-raised p-button-success p-button-rounded" icon="pi pi-check"
@@ -14,67 +15,94 @@
 <div class="container-fluid">
   <div class="row">
     <div class="col-12 col-md-12">
-      <p-toast baseZIndex="9999"></p-toast>
       <div class="card">
         <div class="card-header card-header-danger">
-          <p class="card-title">Gerenciador</p>
+          <h5 class="card-title">Gerenciador</h5>
         </div>
         <div class="card-body">
           <div class="animate__animated animate__fadeIn">
             <p-tabView (onChange)="handleChange($event)" [(activeIndex)]="activeIndex">
+              <form *ngIf="activeIndex === tabViewIndex.Users" [formGroup]="formFilter">
+                <div class="row">
+                  <div class="col-12 col-md-3 p-fluid">
+                    <p-dropdown [formControl]="ff.role" [options]="optRoles"
+                                class="mr-3" emptyMessage="Nenhum registro foi encontrado." optionValue="value"
+                                placeholder="Selecione o tipo">
+                    </p-dropdown>
+                  </div>
+                  <div class="col-12 col-md-2 p-fluid">
+                    <p-dropdown [formControl]="ff.state" [options]="optStates"
+                                class="mr-3" emptyMessage="Nenhum registro foi encontrado." optionValue="value"
+                                placeholder="Selecione o UF">
+                    </p-dropdown>
+                  </div>
+                  <div class="col-12 col-md-2 p-fluid">
+                    <button (click)="getUsers()"
+                            class="p-button-raised p-button-success p-button-rounded p-button-sm"
+                            icon="fas fa-search" iconPos="right" label="Procurar" pButton type="button">
+                    </button>
+                  </div>
+                </div>
+                <div *ngIf="ff.role.value !== null || ff.state.value" class="row">
+                  <div class="col-12 col-md-12 p-fluid">
+                    <div class="my-3 mt-md-0">
+                      <span class="mr-2">Filtros:</span>
+                      <span *ngIf="ff.role.value !== null" class="mr-3">
+                        <p-chip (onRemove)="removeFilter($event, ff.role)" [removable]="true"
+                                label="{{getSelectItemLabel(ff.role.value, optRoles)}}">
+                        </p-chip>
+                      </span>
+                      <span *ngIf="ff.state.value" class="mr-3">
+                        <p-chip (onRemove)="removeFilter($event, ff.state)" [removable]="true"
+                                label="{{getSelectItemLabel(ff.state.value, optStates)}}">
+                        </p-chip>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </form>
               <div class="text-center">
                 <p-progressSpinner *ngIf="isLoading"></p-progressSpinner>
               </div>
               <p-tabPanel header="Usuários">
                 <p-table #dt *ngIf="!isLoading"
-                         [globalFilterFields]="['username', 'email', 'provider']" [paginator]="true" [rowHover]="true"
-                         [rows]="10" [showCurrentPageReport]="true" [value]="users"
-                         [responsive]="true" responsiveLayout="stack"
+                         [globalFilterFields]="['username', 'email', 'provider']" [paginator]="true" [responsive]="true"
+                         [rowHover]="true" [rows]="10" [showCurrentPageReport]="true" [value]="users"
                          currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
-                         dataKey="id">
+                         dataKey="id" responsiveLayout="stack">
                   <ng-template pTemplate="caption">
                     <div class="flex align-items-center justify-content-between">
                       <span class="p-input-icon-left">
                         <i class="pi pi-search"></i>
-                        <input (input)="dt.filterGlobal($event.target.value, 'contains')"
-                               pInputText placeholder="Pesquisar..." type="text"/>
+                        <input (input)="dt.filterGlobal($event.target.value, 'contains')" pInputText
+                               placeholder="Pesquisar..." type="text"/>
                       </span>
                     </div>
                   </ng-template>
                   <ng-template pTemplate="header">
                     <tr>
                       <th class="text-center"></th>
-                      <th>
-                        <i class="fas fa-user"></i> Usuário
-                      </th>
-                      <th>
-                        <i class="fas fa-envelope"></i> Email
-                      </th>
-                      <th class="text-center">
-                        <i class="fas fa-lock"></i> Role
-                      </th>
-                      <th class="text-center">
-                        <i class="fas fa-id-card"></i> Conta
-                      </th>
-                      <th class="text-center">
-                        <i class="fas fa-info"></i> Situação
-                      </th>
+                      <th><i class="fas fa-user mr-2"></i>Usuário</th>
+                      <th><i class="fas fa-envelope mr-2"></i>Email</th>
+                      <th class="text-center"><i class="fas fa-lock mr-2"></i>Permissão</th>
+                      <th class="text-center"><i class="fas fa-id-card mr-2"></i>Conta</th>
+                      <th class="text-center"><i class="fas fa-info mr-2"></i>Situação</th>
                       <th class="text-center"></th>
                     </tr>
                   </ng-template>
                   <ng-template pTemplate="body" let-user>
                     <tr>
                       <td class="text-center">
-                        <img #avatar (error)="avatar.src = './assets/img/avatar.png'"
-                             alt="Logo" class="rounded-circle" height="32" src="{{user?.img}}"/>
+                        <img #avatar (error)="avatar.src = './assets/img/avatar.png'" [src]="user?.img" alt="Logo"
+                             class="rounded-circle" height="32"/>
                       </td>
                       <td>{{user.username}}</td>
                       <td>{{user.email}}</td>
-                      <td class="text-center">{{user.isSuperUser ? 'Administrador' : 'Usuário'}}</td>
+                      <td class="text-center">{{user.isSuperUser ? 'Administrador' : user.isInstitution ? 'Instituição' : 'Usuário'}}</td>
                       <td class="text-center">
-                        <i [class]="getProvider(user.provider).icon"
-                           [ngStyle]="{fontSize: '1.5rem', color: getProvider(user.provider).color}"
-                           [pTooltip]="getProvider(user.provider).name" tooltipPosition="top">
+                        <i [class]="getAccountProvider(user.provider).icon"
+                           [ngStyle]="{fontSize: '1.5rem', color: getAccountProvider(user.provider).color}"
+                           [pTooltip]="getAccountProvider(user.provider).name" tooltipPosition="top">
                         </i>
                       </td>
                       <td class="text-center">
@@ -86,13 +114,13 @@
                         </i>
                       </td>
                       <td class="text-center">
-                        <button (click)="viewUser(user.id)"
-                                class="p-button-rounded p-button-raised p-button-info mr-2" icon="fas fa-id-card"
-                                pButton pRipple>
+                        <button (click)="onClickViewUser(user.id)"
+                                class="p-button-rounded p-button-raised p-button-info mr-3" icon="fas fa-id-card"
+                                pButton pRipple pTooltip="Visualizar" tooltipPosition="top">
                         </button>
-                        <button (click)="confirmDelete(user)" *ngIf="!user.deleted"
+                        <button (click)="onClickDeleteUser(user)" *ngIf="!user.deleted"
                                 class="p-button-rounded p-button-raised p-button-danger" icon="pi pi-trash" pButton
-                                pRipple>
+                                pRipple pTooltip="Excluir" tooltipPosition="top">
                         </button>
                       </td>
                     </tr>
@@ -104,43 +132,34 @@
               </p-tabPanel>
               <p-tabPanel header="Relatórios">
                 <p-table #dt *ngIf="!isLoading"
-                         [globalFilterFields]="['name']" [paginator]="true" [rowHover]="true"
-                         [rows]="10" [showCurrentPageReport]="true" [value]="reports"
-                         [responsive]="true" responsiveLayout="stack"
+                         [globalFilterFields]="['name']" [paginator]="true" [responsive]="true"
+                         [rowHover]="true" [rows]="10" [showCurrentPageReport]="true" [value]="reports"
                          currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
-                         dataKey="id">
+                         dataKey="id" responsiveLayout="stack">
                   <ng-template pTemplate="caption">
                     <div class="flex align-items-center justify-content-between">
                       <span class="p-input-icon-left">
                         <i class="pi pi-search"></i>
-                        <input (input)="dt.filterGlobal($event.target.value, 'contains')"
-                               pInputText placeholder="Pesquisar..." type="text"/>
+                        <input (input)="dt.filterGlobal($event.target.value, 'contains')" pInputText
+                               placeholder="Pesquisar..." type="text"/>
                       </span>
-                      <button (click)="exportExcel(reports)" [disabled]="isLoading" class="p-button-success p-button-raised mt-2 mt-md-0 ml-2" icon="pi pi-file-excel" pButton pRipple
-                              pTooltip="XLS" tooltipPosition="bottom" type="button">
+                      <button (click)="onClickExportExcel(reports)" [disabled]="isLoading"
+                              class="p-button-success p-button-raised mt-2 mt-md-0 ml-2" icon="pi pi-file-excel" pButton
+                              pRipple pTooltip="XLS" tooltipPosition="bottom" type="button">
                       </button>
-                      <button (click)="exportPdf(reports, 'reports')" [disabled]="isLoading" class="p-button-warning p-button-raised mt-2 mt-md-0 ml-2" icon="pi pi-file-pdf" pButton pRipple
-                              pTooltip="PDF" tooltipPosition="bottom" type="button">
+                      <button (click)="onClickExportPdf(reports, 'reports')" [disabled]="isLoading"
+                              class="p-button-warning p-button-raised mt-2 mt-md-0 ml-2" icon="pi pi-file-pdf" pButton
+                              pRipple pTooltip="PDF" tooltipPosition="bottom" type="button">
                       </button>
                     </div>
                   </ng-template>
                   <ng-template pTemplate="header">
                     <tr>
-                      <th>
-                        <i class="fas fa-user"></i> Usuário
-                      </th>
-                      <th>
-                        <i class="fas fa-envelope"></i> Email
-                      </th>
-                      <th>
-                        <i class="fas fa-exclamation-circle"></i> Tipo
-                      </th>
-                      <th>
-                        <i class="fas fa-pencil-alt"></i> Assunto
-                      </th>
-                      <th class="text-center">
-                        <i class="fas fa-calendar"></i> Data
-                      </th>
+                      <th><i class="fas fa-user mr-2"></i>Usuário</th>
+                      <th><i class="fas fa-envelope mr-2"></i>Email</th>
+                      <th><i class="fas fa-exclamation-circle mr-2"></i>Tipo</th>
+                      <th><i class="fas fa-pencil-alt mr-2"></i>Assunto</th>
+                      <th class="text-center"><i class="fas fa-calendar mr-2"></i>Data</th>
                       <th class="text-center"></th>
                     </tr>
                   </ng-template>
@@ -152,29 +171,74 @@
                       <td>{{report?.subject}}</td>
                       <td class="text-center">{{report?.date}}</td>
                       <td class="text-center">
-                        <button (click)="viewReport(report.id)"
+                        <button (click)="onClickViewReport(report.id)"
                                 class="p-button-rounded p-button-raised p-button-info mr-2"
-                                icon="fas fa-envelope-open-text" pButton pRipple>
+                                icon="fas fa-envelope-open-text" pButton pRipple pTooltip="Visualizar"
+                                tooltipPosition="top">
                         </button>
                       </td>
                     </tr>
                   </ng-template>
-                  <ng-template pTemplate="summary">
-                    <div class="flex align-items-center justify-content-between"></div>
+                </p-table>
+              </p-tabPanel>
+              <p-tabPanel header="Solicitações">
+                <p-table #dt *ngIf="!isLoading"
+                         [globalFilterFields]="['name']" [paginator]="true" [responsive]="true"
+                         [rowHover]="true" [rows]="10" [showCurrentPageReport]="true" [value]="permissionRequests"
+                         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+                         dataKey="id" responsiveLayout="stack">
+                  <ng-template pTemplate="caption">
+                    <div class="flex align-items-center justify-content-between">
+                      <span class="p-input-icon-left">
+                        <i class="pi pi-search"></i>
+                        <input (input)="dt.filterGlobal($event.target.value, 'contains')" pInputText
+                               placeholder="Pesquisar..." type="text"/>
+                      </span>
+                    </div>
+                  </ng-template>
+                  <ng-template pTemplate="header">
+                    <tr>
+                      <th><i class="fas fa-user mr-2"></i>Usuário</th>
+                      <th><i class="fas fa-envelope mr-2"></i>Email</th>
+                      <th class="text-center"><i class="fas fa-id-card mr-2"></i>Conta</th>
+                      <th class="text-center"><i class="fas fa-calendar mr-2"></i>Data</th>
+                      <th class="text-center"></th>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-request>
+                    <tr>
+                      <td>{{request?.username}}</td>
+                      <td>{{request?.email}}</td>
+                      <td class="text-center">
+                        <i [class]="getAccountProvider(request.provider).icon"
+                           [ngStyle]="{fontSize: '1.5rem', color: getAccountProvider(request.provider).color}"
+                           [pTooltip]="getAccountProvider(request.provider).name" tooltipPosition="top">
+                        </i>
+                      </td>
+                      <td class="text-center">{{request?.date}}</td>
+                      <td class="text-center">
+                        <button (click)="onClickConfirmPermissionRequest(request)"
+                                class="p-button-rounded p-button-raised p-button-success mr-2"
+                                icon="fas fa-check" pButton pRipple>
+                        </button>
+                        <button (click)="onClickDeclinePermissionRequest(request)"
+                                class="p-button-rounded p-button-raised p-button-danger"
+                                icon="fas fa-times" pButton pRipple>
+                        </button>
+                      </td>
+                    </tr>
                   </ng-template>
                 </p-table>
               </p-tabPanel>
-              <p-tabPanel header="Estatisticas">
-                <div class="container-fluid">
-                  <div class="card">
-                    <div class="card-body animate__animated animate__fadeIn">
-                      <div class="row">
-                        <div class="col-12 col-md-6">
-                          <p-chart type="line" [data]="basicData" [options]="basicOptions"></p-chart>
-                        </div>
-                        <div class="col-12 col-md-6">
-                          <p-chart type="line" [data]="basicData2" [options]="basicOptions"></p-chart>
-                        </div>
+              <p-tabPanel header="Estatísticas">
+                <div class="card">
+                  <div class="card-body animate__animated animate__fadeIn">
+                    <div class="row">
+                      <div class="col-12 col-md-6">
+                        <p-chart type="line" [data]="basicData" [options]="basicOptions"></p-chart>
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <p-chart type="line" [data]="basicData2" [options]="basicOptions"></p-chart>
                       </div>
                     </div>
                   </div>
@@ -187,4 +251,3 @@
     </div>
   </div>
 </div>
-

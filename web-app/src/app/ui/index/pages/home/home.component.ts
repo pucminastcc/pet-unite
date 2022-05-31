@@ -47,12 +47,12 @@ export class HomeComponent implements OnInit, AfterViewInit {
       },
       {
         title: 'Animal de Estimação',
-        description: 'Animais tem o dom de transmitir bem-estar por serem carinhosos e cuidar de sua familia por meio de uma forma pura e sincera.',
+        description: 'Animais tem o dom de transmitir bem-estar por serem carinhosos e cuidar de sua família por meio de uma forma pura e sincera.',
         icon: 'fas fa-paw'
       },
       {
         title: 'Adoção',
-        description: 'Estudos mostram como adotar um animalzinho faz bem a saúde do ser humano. Além de ser uma companhia, evita doenças como anisedade, depressão e estresses diários.',
+        description: 'Estudos mostram como adotar um animalzinho faz bem a saúde do ser humano. Além de ser uma companhia, evita doenças como ansiedade, depressão e estresses diários.',
         icon: 'fas fa-hand-holding-heart'
       },
       {

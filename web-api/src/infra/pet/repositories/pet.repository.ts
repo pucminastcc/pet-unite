@@ -36,6 +36,7 @@ export class PetRepository extends IPetRepository {
                     name: pet.name,
                     img: pet.img,
                     inDonation: pet.inDonation,
+                    isDonated: pet.isDonated,
                     donationId: pet.donationId
                 });
             }
@@ -55,8 +56,14 @@ export class PetRepository extends IPetRepository {
                 img: pet.img,
                 name: pet.name,
                 petGenderId: pet.petGenderId,
+                petTypeId: pet.petTypeId,
                 breed: pet.breed,
-                description: pet.description
+                description: pet.description,
+                rateLikesChild: pet.rateLikesChild,
+                rateLikesTours: pet.rateLikesTours,
+                rateFriendly: pet.rateFriendly,
+                rateTraining: pet.rateTraining,
+                age: pet.age
             }
         }
         return result;
@@ -64,10 +71,14 @@ export class PetRepository extends IPetRepository {
 
     async createPet(dto: CreatePetDto): Promise<CreatePetResult> {
         let result: CreatePetResult = {success: false, id: ''};
-        const {userId, img, name, petGenderId, breed, description} = dto;
+        const {
+            userId, img, name, petGenderId, petTypeId, breed, description, rateLikesChild, rateLikesTours, rateFriendly,
+            rateTraining, age
+        } = dto;
 
         const inserted = await this.petModel.insertMany({
-            img, name, petGenderId, breed, description, userId
+            img, name, petGenderId, petTypeId, breed, description, userId, rateLikesChild, rateLikesTours, rateFriendly,
+            rateTraining, age
         });
 
         if (inserted) {
@@ -79,13 +90,17 @@ export class PetRepository extends IPetRepository {
 
     async updatePet(dto: UpdatePetDto): Promise<UpdatePetResult> {
         let result: UpdatePetResult = {success: false};
-        const {userId, id, img, name, petGenderId, breed, description} = dto;
+        const {
+            userId, id, img, name, petGenderId, petTypeId, breed, description, rateLikesChild, rateLikesTours,
+            rateFriendly, rateTraining, age
+        } = dto;
 
         const updated = await this.petModel.findByIdAndUpdate(id, {
-            img, name, petGenderId, breed, description, userId
+            img, name, petGenderId, petTypeId, breed, description, userId, rateLikesChild, rateLikesTours, rateFriendly,
+            rateTraining, age
         }).exec();
 
-        if(updated) {
+        if (updated) {
             result = {success: true};
         }
         return result;
@@ -100,7 +115,7 @@ export class PetRepository extends IPetRepository {
             userId
         }).exec();
 
-        if(deleted) {
+        if (deleted) {
             await this.donationModel.deleteOne({
                 petId: id,
                 userId

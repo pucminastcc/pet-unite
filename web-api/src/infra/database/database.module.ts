@@ -5,13 +5,15 @@ import {PasswordResetCodeSchema} from './schemas/password-reset-code.schema';
 import {AccountSchema} from './schemas/account.schema';
 import {PersonTypeSchema} from './schemas/person-type.schema';
 import {PetSchema} from './schemas/pet.schema';
-import {PetGendersSchema} from './schemas/pet-gender.schema';
 import {BrazilStateSchema} from './schemas/state.schema';
 import {ReportSchema} from './schemas/report.schema';
 import {ReportTypeSchema} from './schemas/report-type.schema';
 import {DonationSchema} from './schemas/donation.schema';
 import {BrazilCitySchema} from './schemas/city.schema';
 import {RoleSchema} from './schemas/role.schema';
+import {PetTypeSchema} from './schemas/pet-type.schema';
+import {PetGenderSchema} from './schemas/pet-gender.schema';
+import {PermissionRequestSchema} from './schemas/permission-request.schema';
 
 @Module({
     imports: [
@@ -25,13 +27,15 @@ import {RoleSchema} from './schemas/role.schema';
             {name: 'Account', schema: AccountSchema},
             {name: 'PersonType', schema: PersonTypeSchema},
             {name: 'Pet', schema: PetSchema},
-            {name: 'PetGender', schema: PetGendersSchema},
+            {name: 'PetType', schema: PetTypeSchema},
+            {name: 'PetGender', schema: PetGenderSchema},
             {name: 'BrazilState', schema: BrazilStateSchema},
             {name: 'Report', schema: ReportSchema},
             {name: 'ReportType', schema: ReportTypeSchema},
             {name: 'Donation', schema: DonationSchema},
             {name: 'BrazilCity', schema: BrazilCitySchema},
             {name: 'Role', schema: RoleSchema},
+            {name: 'PermissionRequest', schema: PermissionRequestSchema},
         ]),
     ],
     exports: [MongooseModule]

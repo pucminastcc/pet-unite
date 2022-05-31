@@ -3,5 +3,6 @@ export interface PetsResult {
   img: string;
   name: string;
   inDonation: boolean;
+  isDonated?: boolean;
   donationId?: string;
 }

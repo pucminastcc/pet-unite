@@ -9,9 +9,12 @@ import {GetReportTypesInput} from '../commands/inputs/get-report-types.input';
 import {ReportTypeResult} from '../models/results/report-type.result';
 import {GetCitiesInput} from '../commands/inputs/get-cities.input';
 import {CityResult} from '../models/results/city.result';
+import {GetPetTypesInput} from '../commands/inputs/get-pet-types.input';
+import {PetTypeResult} from '../models/results/pet-type.result';
 
 export abstract class IConfigRepository {
   abstract getPersonTypes(input: GetPersonTypesInput): Observable<PersonTypeResult[]>;
+  abstract getPetTypes(input: GetPetTypesInput): Observable<PetTypeResult[]>;
   abstract getPetGenders(input: GetPetGendersInput): Observable<PetGenderResult[]>;
   abstract getStates(input: GetStatesInput): Observable<StateResult[]>;
   abstract getReportTypes(input: GetReportTypesInput): Observable<ReportTypeResult[]>;

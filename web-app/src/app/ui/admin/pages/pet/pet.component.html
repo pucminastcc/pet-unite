@@ -1,136 +1,136 @@
-<p-toast [baseZIndex]="9999"></p-toast>
+<div *ngIf="user.filledProfile; else messageBlock">
+  <p-toast [baseZIndex]="9999"></p-toast>
 
-<p-confirmDialog #cd
-                 [breakpoints]="{'960px': '50vw', '640px': '95vw'}" [style]="{width: '50vw'}" [closable]="false"
-                 position="bottom">
-  <ng-template pTemplate="footer">
-    <button (click)="cd.accept()" class="p-button-raised p-button-success p-button-rounded" icon="pi pi-check"
-            label="Sim" pButton type="button">
-    </button>
-    <button (click)="cd.reject()" class="p-button-raised p-button-danger p-button-rounded" icon="pi pi-times"
-            label="Não" pButton type="button">
-    </button>
-  </ng-template>
-</p-confirmDialog>
+  <p-confirmDialog #cd [breakpoints]="{'960px': '50vw', '640px': '95vw'}" [style]="{width: '50vw'}" [closable]="false"
+                   position="bottom">
+    <ng-template pTemplate="footer">
+      <button (click)="cd.accept()" class="p-button-raised p-button-success p-button-rounded" icon="pi pi-check"
+              label="Sim" pButton type="button">
+      </button>
+      <button (click)="cd.reject()" class="p-button-raised p-button-danger p-button-rounded" icon="pi pi-times"
+              label="Não" pButton type="button">
+      </button>
+    </ng-template>
+  </p-confirmDialog>
 
-<div class="text-center">
-  <p-progressSpinner *ngIf="isLoading"></p-progressSpinner>
-</div>
+  <p-dialog #dc [(visible)]="display" [breakpoints]="{'960px': '75vw', '640px': '90vw'}" [modal]="true"
+            [style]="{width: '40vw'}">
+    <div *ngIf="isSearchingInstitution; else donationBlock" class="text-center">
+      <p-progressSpinner></p-progressSpinner>
+      <div>Estamos buscando Instituições próximas à sua região, aguarde...</div>
+    </div>
+    <ng-template #donationBlock>
+      <div class="mt-3 mt-md-0">
+        <i class="fas fa-hand-holding-heart fa-2x mr-3"></i>
+        <b>Deseja colocar {{pet?.name}} para adoção?</b>
+      </div>
+      <div *ngIf="!user.isInstitution && !isSearchingInstitution" class="mt-3 p-fluid">
+        <form [formGroup]="formFilter">
+          <p-dropdown [formControl]="ff.institutionId"
+                      [options]="optInstitution"
+                      class="mr-3" emptyMessage="Nenhuma Instituição próxima foi encontrada." optionValue="value"
+                      placeholder="Selecione uma Instituição (Opcional)">
+          </p-dropdown>
+        </form>
+      </div>
+      <hr/>
+      <div class="float-right">
+        <button class="p-button-raised p-button-success p-button-rounded mr-2" label="Confirmar" pButton
+                (click)="display = false; donatePet(pet?.id)" type="button">
+        </button>
+        <button (click)="display = false" class="p-button-raised p-button-danger p-button-rounded" label="Cancelar"
+                pButton type="button">
+        </button>
+      </div>
+    </ng-template>
+  </p-dialog>
 
-<div *ngIf="!isLoading" class="container-fluid">
-  <div class="row">
-    <div class="col-md-12">
-      <div class="pb-3">
+  <div class="text-center">
+    <p-progressSpinner *ngIf="isLoading"></p-progressSpinner>
+  </div>
+
+  <div *ngIf="!isLoading" class="container-fluid">
+    <div class="row">
+      <div class="col-md-12 pb-3">
         <button class="p-button-raised p-button-success p-button-rounded" icon="fas fa-folder-plus" label="Cadastrar"
-                pButton type="button" (click)="openRegistration()">
+                pButton type="button" (click)="onClickRegister()">
         </button>
       </div>
     </div>
+
+    <p-tabView>
+      <p-tabPanel header="Listagem">
+        <div class="row">
+          <div class="col-md-12">
+            <p-dataView #dv [paginator]="true" [rows]="9" [value]="pets"
+                        emptyMessage="Nenhum resultado encontrado" filterBy="name" layout="grid">
+              <ng-template pTemplate="header">
+                <div class="flex flex-column flex-md-row justify-content-md-between">
+                <span class="p-input-icon-left mb-2 mb-md-0">
+                  <i class="pi pi-search"></i>
+                  <input type="search" pInputText placeholder="Pesquisar por nome"
+                         (input)="dv.filter($event.target.value)">
+                </span>
+                </div>
+              </ng-template>
+              <ng-template let-pet pTemplate="gridItem">
+                <div class="col-12 col-md-3 p-4 d-inline-block">
+                  <div class="card">
+                    <div class="card-header card-header-danger">
+                      <p class="card-title">{{pet.name}}</p>
+                    </div>
+                    <div class="card-body">
+                      <div class="text-center">
+                        <p-image [alt]="pet.name" [height]="150" [imageClass]="'w-100'" [preview]="true" [src]="pet.img"
+                                 loading="lazy">
+                        </p-image>
+                      </div>
+                      <hr>
+                      <div class="float-left">
+                        <button (click)="onClickUpdate(pet.id)" *ngIf="!pet.isDonated"
+                                class="p-button-raised p-button-info p-button-rounded" icon="fas fa-pencil-alt"
+                                pButton pTooltip="Editar" tooltipPosition="bottom" type="button">
+                        </button>
+                        <button (click)="onClickDonate(pet)" *ngIf="!pet.inDonation && !pet.isDonated"
+                                class="p-button-raised p-button-success p-button-rounded ml-2"
+                                icon="fas fa-hand-holding-heart" pButton pTooltip="Doar" tooltipPosition="bottom"
+                                type="button">
+                        </button>
+                      </div>
+                      <div class="float-right">
+                        <button (click)="onClickDelete(pet)" *ngIf="!pet.inDonation && !pet.isDonated"
+                                class="p-button-raised p-button-danger p-button-rounded" icon="fas fa-folder-minus"
+                                pButton pTooltip="Excluir" tooltipPosition="bottom" type="button">
+                        </button>
+                        <div *ngIf="pet.inDonation">
+                          <p-tag styleClass="p-mr-2" severity="info"
+                                 value="Em fase de doação" [rounded]="true">
+                          </p-tag>
+                        </div>
+                        <div *ngIf="pet.isDonated">
+                          <p-tag styleClass="p-mr-2" severity="success"
+                                 value="Doação concluída" [rounded]="true">
+                          </p-tag>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ng-template>
+            </p-dataView>
+          </div>
+        </div>
+      </p-tabPanel>
+    </p-tabView>
   </div>
-  <p-tabView>
-    <p-tabPanel header="Cadastros">
-      <div class="row">
-        <div class="col-md-12">
-          <p-dataView #dv
-                      [paginator]="true" [rows]="9" [value]="pets"
-                      emptyMessage="Nenhum registro encontrado..." filterBy="name" layout="grid">
-            <ng-template pTemplate="header">
-              <div class="flex flex-column flex-md-row justify-content-md-between">
-            <span class="p-input-icon-left mb-2 mb-md-0">
-              <i class="pi pi-search"></i>
-              <input type="search" pInputText placeholder="Procura por Nome" (input)="dv.filter($event.target.value)">
-            </span>
-              </div>
-            </ng-template>
-            <ng-template let-pet pTemplate="gridItem">
-              <div class="col-12 col-md-3 p-4 d-inline-block">
-                <div *ngIf="!pet.inDonation" class="card {{isRequesting ? ' p-disabled': ''}}">
-                  <div class="card-header card-header-danger">
-                    <p class="card-title">{{pet.name}}</p>
-                  </div>
-                  <div class="card-body">
-                    <div class="text-center">
-                      <p-image [alt]="pet.name" [height]="150" [imageClass]="'w-100'" [preview]="true" [src]="pet.img"
-                               loading="lazy">
-                      </p-image>
-                    </div>
-                    <hr>
-                    <div class="float-left">
-                      <button class="p-button-raised p-button-info p-button-rounded" icon="fas fa-pencil-alt" pButton
-                              (click)="openEdit(pet.id)"
-                              type="button">
-                      </button>
-                      <button (click)="confirmDonation(pet)"
-                              class="p-button-raised p-button-success p-button-rounded ml-2"
-                              icon="fas fa-hand-holding-heart" pButton type="button">
-                      </button>
-                    </div>
-                    <div class="float-right">
-                      <button (click)="confirmDelete(pet)"
-                              class="p-button-raised p-button-danger p-button-rounded"
-                              icon="fas fa-folder-minus" pButton type="button">
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </ng-template>
-            <ng-template pTemplate="footer">
-            </ng-template>
-          </p-dataView>
-        </div>
-      </div>
-    </p-tabPanel>
-    <p-tabPanel header="Em doação">
-      <div class="row">
-        <div class="col-md-12">
-          <p-dataView #dv
-                      [paginator]="true" [rows]="9" [value]="pets"
-                      emptyMessage="Nenhum registro encontrado..." filterBy="name" layout="grid">
-            <ng-template pTemplate="header">
-              <div class="flex flex-column flex-md-row justify-content-md-between">
-            <span class="p-input-icon-left mb-2 mb-md-0">
-              <i class="pi pi-search"></i>
-              <input type="search" pInputText placeholder="Procura por Nome" (input)="dv.filter($event.target.value)">
-            </span>
-              </div>
-            </ng-template>
-            <ng-template let-pet pTemplate="gridItem">
-              <div class="col-12 col-md-3 p-4 d-inline-block">
-                <div *ngIf="pet.inDonation" class="card {{isRequesting ? ' p-disabled': ''}}">
-                  <div class="card-header card-header-danger">
-                    <p class="card-title">{{pet.name}}</p>
-                  </div>
-                  <div class="card-body">
-                    <div class="text-center">
-                      <p-image [alt]="pet.name" [height]="150" [imageClass]="'w-100'" [preview]="true" [src]="pet.img"
-                               loading="lazy">
-                      </p-image>
-                    </div>
-                    <hr>
-                    <div class="float-left">
-                      <button (click)="viewDonation(pet)"
-                              class="p-button-raised p-button-success p-button-rounded ml-2"
-                              icon="fas fa-hand-holding-heart" pButton type="button">
-                      </button>
-                    </div>
-                    <div class="float-right">
-                      <button (click)="confirmDelete(pet)"
-                              class="p-button-raised p-button-danger p-button-rounded"
-                              icon="fas fa-folder-minus" pButton type="button">
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </ng-template>
-            <ng-template pTemplate="footer">
-            </ng-template>
-          </p-dataView>
-        </div>
-      </div>
-    </p-tabPanel>
-  </p-tabView>
 </div>
 
-
+<ng-template #messageBlock>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12 col-md-12">
+        <p-messages [(value)]="messages" [closable]="false"></p-messages>
+      </div>
+    </div>
+  </div>
+</ng-template>

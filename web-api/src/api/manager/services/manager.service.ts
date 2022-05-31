@@ -11,6 +11,10 @@ import {ReportBaseResult} from '../../../domain/manager/models/results/report-ba
 import {GetReportsDto} from '../../../domain/manager/dtos/get-reports.dto';
 import {GetReportDto} from '../../../domain/manager/dtos/get-report.dto';
 import {ReportResult} from '../../../domain/manager/models/results/report.result';
+import {GetPermissionRequestsDto} from '../../../domain/manager/dtos/get-permission-requests.dto';
+import {PermissionResquestBaseResult} from '../../../domain/manager/models/results/permission-resquest-base.result';
+import {ReplyPermissionRequestDto} from '../../../domain/manager/dtos/reply-permission-request.dto';
+import {ReplyPermissionRequestResult} from '../../../domain/manager/models/results/reply-permission-request.result';
 
 @Injectable()
 export class ManagerService implements IManagerRepository{
@@ -37,5 +41,13 @@ export class ManagerService implements IManagerRepository{
 
     async getReport(input: GetReportDto): Promise<ReportResult> {
         return await this.repository.getReport(input);
+    }
+
+    async getPermissionRequests(input: GetPermissionRequestsDto): Promise<PermissionResquestBaseResult[]> {
+        return await this.repository.getPermissionRequests(input);
+    }
+
+    async replyPermissionRequest(input: ReplyPermissionRequestDto): Promise<ReplyPermissionRequestResult> {
+        return await this.repository.replyPermissionRequest(input);
     }
 }

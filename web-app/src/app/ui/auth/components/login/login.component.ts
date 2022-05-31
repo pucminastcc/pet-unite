@@ -125,6 +125,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   public onClickFacebookButton(): void {
+    this.messageService.clear();
     this.socialAuthService.signIn(FacebookLoginProvider.PROVIDER_ID)
       .then((user: SocialUser) => {
         if (user) {
@@ -156,6 +157,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   public onClickGoogleButton(): void {
+    this.messageService.clear();
     this.socialAuthService.signIn(GoogleLoginProvider.PROVIDER_ID)
       .then((user: SocialUser) => {
         if (user) {

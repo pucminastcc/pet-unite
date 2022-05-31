@@ -39,7 +39,17 @@
           <div class="row">
             <div class="col-12 col-md-12 mt-2">
               <label>Descrição</label>
-              <p-editor [(ngModel)]="text" [formControl]="sf?.description" [style]="{'height':'320px'}">
+              <p-editor #editor [(ngModel)]="text" [formControl]="sf.description" [style]="{'height':'320px'}">
+                <ng-template pTemplate="header">
+                 <span class="ql-formats">
+                    <button type="button" class="ql-bold" aria-label="Bold"></button>
+                    <button type="button" class="ql-underline" aria-label="Underline"></button>
+                    <button type="button" class="ql-list" aria-label="Ordered List" value="ordered"></button>
+                    <button type="button" class="ql-list" aria-label="Unordered List" value="bullet"></button>
+                    <button type="button" class="ql-link" aria-label="Insert Link"></button>
+                    <button type="button" class="ql-clean" aria-label="Remove Styles"></button>
+                 </span>
+                </ng-template>
               </p-editor>
               <div *ngIf="!sf.description.valid && (sf.description.dirty || submitted)">
                 <p-message *ngIf="sf.description.errors.required" severity="error" text="Informe a descrição">

@@ -1,4 +1,4 @@
-export interface ViewDonationInput {
+export interface GetDonationInput {
   donationId: string;
   accessToken?: string;
 }

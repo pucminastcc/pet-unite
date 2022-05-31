@@ -15,11 +15,16 @@ import {GetReportsInput} from '../../../domain/manager/commands/inputs/get-repor
 import {ReportBaseResult} from '../../../domain/manager/models/results/report-base.result';
 import {GetReportInput} from '../../../domain/manager/commands/inputs/get-report.input';
 import {ReportResult} from '../../../domain/manager/models/results/report.result';
+import {GetPermissionRequestsInput} from '../../../domain/manager/commands/inputs/get-permission-requests.input';
+import {PermissionRequestBaseResult} from '../../../domain/manager/models/results/permission-request-base.result';
+import { ReplyPermissionRequestInput } from 'src/app/domain/manager/commands/inputs/reply-permission-request.input';
+import { ReplyPermissionRequestResult } from 'src/app/domain/manager/models/results/reply-permission-request.result';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ManagerRepository extends IManagerRepository{
+export class ManagerRepository extends IManagerRepository {
+
   constructor(
     private readonly api: ApiDatasource
   ) {
@@ -27,8 +32,8 @@ export class ManagerRepository extends IManagerRepository{
   }
 
   getUsers(input: GetUsersInput): Observable<UserBaseResult[]> {
-    const {accessToken} = input;
-    return this.api.get<UserBaseResult[]>(`${environment.apiUrl}/manager/users`, accessToken)
+    const {isInstitution, state, accessToken} = input;
+    return this.api.get<UserBaseResult[]>(`${environment.apiUrl}/manager/users?isInstitution=${isInstitution}&state=${state}`, accessToken)
       .pipe(map((result: UserBaseResult[]) => {
         return result;
       }));
@@ -62,6 +67,22 @@ export class ManagerRepository extends IManagerRepository{
     const {id, accessToken} = input;
     return this.api.get<ReportResult>(`${environment.apiUrl}/manager/report?id=${id}`, accessToken)
       .pipe(map((result: ReportResult) => {
+        return result;
+      }));
+  }
+
+  getPermissionRequests(input: GetPermissionRequestsInput): Observable<PermissionRequestBaseResult[]> {
+    const {accessToken} = input;
+    return this.api.get<PermissionRequestBaseResult[]>(`${environment.apiUrl}/manager/requests`, accessToken)
+      .pipe(map((result: PermissionRequestBaseResult[]) => {
+        return result;
+      }));
+  }
+
+  replyPermissionRequest(input: ReplyPermissionRequestInput): Observable<ReplyPermissionRequestResult> {
+    const {accessToken} = input;
+    return this.api.put<ReplyPermissionRequestResult>(`${environment.apiUrl}/manager/requests`, input, accessToken)
+      .pipe(map((result: ReplyPermissionRequestResult) => {
         return result;
       }));
   }

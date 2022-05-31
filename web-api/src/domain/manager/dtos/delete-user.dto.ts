@@ -1,5 +1,5 @@
 import {Types} from 'mongoose';
 
-export interface DeleteUserDto {
+export class DeleteUserDto {
     id: Types.ObjectId;
 }

@@ -12,5 +12,6 @@ export interface UpdateUserInput {
   cell: string;
   whatsapp: string;
   img: string;
+  permissionRequest: boolean;
   accessToken?: string;
 }

@@ -8,8 +8,8 @@ import {GetUsersCommand} from '../../../domain/manager/commands/get-users.comman
 import {DeleteUserInput} from '../../../domain/manager/commands/inputs/delete-user.input';
 import {DeleteUserResult} from '../../../domain/manager/models/results/delete-user.result';
 import {DeleteUserCommand} from '../../../domain/manager/commands/delete-user.command';
-import { GetUserAccountInput } from 'src/app/domain/manager/commands/inputs/get-user-account.input';
-import { UserAccountResult } from 'src/app/domain/manager/models/results/user-account.result';
+import {GetUserAccountInput} from 'src/app/domain/manager/commands/inputs/get-user-account.input';
+import {UserAccountResult} from 'src/app/domain/manager/models/results/user-account.result';
 import {GetUserAccountCommand} from '../../../domain/manager/commands/get-user-account.command';
 import {GetReportsCommand} from '../../../domain/manager/commands/get-reports.command';
 import {GetReportsInput} from '../../../domain/manager/commands/inputs/get-reports.input';
@@ -17,6 +17,12 @@ import {ReportBaseResult} from '../../../domain/manager/models/results/report-ba
 import {GetReportInput} from '../../../domain/manager/commands/inputs/get-report.input';
 import {ReportResult} from '../../../domain/manager/models/results/report.result';
 import {GetReportCommand} from '../../../domain/manager/commands/get-report.command';
+import {PermissionRequestBaseResult} from 'src/app/domain/manager/models/results/permission-request-base.result';
+import {GetPermissionRequestsInput} from '../../../domain/manager/commands/inputs/get-permission-requests.input';
+import {GetPermissionRequestsCommand} from '../../../domain/manager/commands/get-permission-requests.command';
+import {ReplyPermissionRequestInput} from '../../../domain/manager/commands/inputs/reply-permission-request.input';
+import {ReplyPermissionRequestResult} from '../../../domain/manager/models/results/reply-permission-request.result';
+import {ReplyPermissionRequestCommand} from '../../../domain/manager/commands/reply-permission-request.command';
 
 @Injectable({
   providedIn: 'root'
@@ -31,6 +37,8 @@ export class ManagerService implements IManagerRepository {
     private readonly getUserAccountCommand: GetUserAccountCommand,
     private readonly getReportsCommand: GetReportsCommand,
     private readonly getReportCommand: GetReportCommand,
+    private readonly getPermissionRequestsCommand: GetPermissionRequestsCommand,
+    private readonly replyPermissionRequestCommand: ReplyPermissionRequestCommand,
   ) {
     this.accessToken = this.authService.getToken();
   }
@@ -65,6 +73,20 @@ export class ManagerService implements IManagerRepository {
 
   getReport(input: GetReportInput): Observable<ReportResult> {
     return this.getReportCommand.execute({
+      ...input,
+      accessToken: this.accessToken
+    });
+  }
+
+  getPermissionRequests(input?: GetPermissionRequestsInput): Observable<PermissionRequestBaseResult[]> {
+    return this.getPermissionRequestsCommand.execute({
+      ...input,
+      accessToken: this.accessToken
+    });
+  }
+
+  replyPermissionRequest(input: ReplyPermissionRequestInput): Observable<ReplyPermissionRequestResult> {
+    return this.replyPermissionRequestCommand.execute({
       ...input,
       accessToken: this.accessToken
     });
