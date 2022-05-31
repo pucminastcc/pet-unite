@@ -1,5 +1,5 @@
 import {Types} from 'mongoose';
 
-export interface GetDonationsDto {
+export class GetUserDonationsDto {
     userId: Types.ObjectId;
 }

@@ -1,2 +1,2 @@
-export interface GetReportsDto {
+export class GetReportsDto {
 }

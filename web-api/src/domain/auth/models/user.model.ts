@@ -23,6 +23,8 @@ export interface User extends Document {
     isInstitution: boolean;
     blocked: boolean;
     deleted: boolean;
+    filledProfile: boolean;
+    requestedPermission: boolean;
 }
 
 export interface UserModel {
@@ -44,4 +46,8 @@ export interface UserModel {
     phone?: string;
     cell?: string;
     whatsapp?: string;
+    lat?: string;
+    lng?: string;
+    filledProfile: boolean;
+    requestedPermission: boolean;
 }

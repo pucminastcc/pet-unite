@@ -14,4 +14,5 @@ export interface IProfileForm {
   phone: string;
   cell: string;
   whatsapp: string;
+  permissionRequest: boolean;
 }

@@ -18,4 +18,8 @@ export interface AuthenticatedUserModel {
   phone?: string;
   cell?: string;
   whatsapp?: string;
+  lat?: number;
+  lng?: number;
+  filledProfile: boolean;
+  requestedPermission?: boolean;
 }

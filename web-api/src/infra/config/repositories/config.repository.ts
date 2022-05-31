@@ -17,11 +17,15 @@ import {ReportType} from '../../../domain/config/models/report-type.model';
 import {BrazilCity} from '../../../domain/config/models/brazil-city.model';
 import {GetCitiesDto} from '../../../domain/config/dtos/get-cities.dto';
 import {BrazilCityResult} from '../../../domain/config/models/results/brazil-city.result';
+import {GetPetTypesDto} from '../../../domain/config/dtos/get-pet-types.dto';
+import {PetTypeResult} from '../../../domain/config/models/results/pet-type.result';
+import { PetType } from 'src/domain/config/models/pet-type.model';
 
 @Injectable()
 export class ConfigRepository extends IConfigRepository {
     constructor(
         @InjectModel('PersonType') private readonly personTypesModel: Model<PersonType>,
+        @InjectModel('PetType') private readonly petTypesModel: Model<PetType>,
         @InjectModel('PetGender') private readonly petGendersModel: Model<PetGender>,
         @InjectModel('BrazilState') private readonly statesModel: Model<BrazilState>,
         @InjectModel('ReportType') private readonly reportTypesModel: Model<ReportType>,
@@ -40,6 +44,20 @@ export class ConfigRepository extends IConfigRepository {
                     description: data.description,
                     document: data.document,
                     documentMask: data.documentMask
+                });
+            });
+        }
+        return result;
+    }
+
+    async getPetTypes(input?: GetPetTypesDto): Promise<PetTypeResult[]> {
+        let result: PetTypeResult[] = [];
+        const doc = await this.petTypesModel.find().exec();
+        if (doc) {
+            doc.forEach((data: PetType) => {
+                result.push({
+                    id: data.id,
+                    description: data.description,
                 });
             });
         }
@@ -86,7 +104,6 @@ export class ConfigRepository extends IConfigRepository {
                 });
             });
         }
-
         return result;
     }
 
@@ -107,7 +124,6 @@ export class ConfigRepository extends IConfigRepository {
                 }
             })
         }
-
         return result;
     }
 }

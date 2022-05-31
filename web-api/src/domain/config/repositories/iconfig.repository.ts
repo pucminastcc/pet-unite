@@ -8,9 +8,12 @@ import {GetReportTypesDto} from '../dtos/get-report-types.dto';
 import {ReportTypeResult} from '../models/results/report-type.result';
 import {GetCitiesDto} from '../dtos/get-cities.dto';
 import {BrazilCityResult} from '../models/results/brazil-city.result';
+import {GetPetTypesDto} from '../dtos/get-pet-types.dto';
+import {PetTypeResult} from '../models/results/pet-type.result';
 
 export abstract class IConfigRepository {
     abstract getPersonTypes(input?: GetPersonTypesDto): Promise<PersonTypeResult[]>;
+    abstract getPetTypes(input?: GetPetTypesDto): Promise<PetTypeResult[]>;
     abstract getPetGenders(input?: GetPetGendersDto): Promise<PetGenderResult[]>;
     abstract getStates(input?: GetStatesDto): Promise<BrazilStateResult[]>;
     abstract getReportTypes(input?: GetReportTypesDto): Promise<ReportTypeResult[]>;

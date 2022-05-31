@@ -1,70 +1,81 @@
-<div *ngIf="isLoading" class="text-center">
+<div *ngIf="isLoading; else reportBlock" class="text-center">
   <p-progressSpinner></p-progressSpinner>
 </div>
-<div *ngIf="!isLoading" class="container-fluid p-fluid">
-  <p-scrollPanel [styleClass]="isMobile() ? 'custombar2' : ''"
-                 [style]="{height: getModalHeight().toString() + 'px'}">
-    <div class="row">
-      <div class="col-12 col-md-3">
-        <div class="text-center mt-3">
-          <img #avatar
-               (error)="avatar.src = './assets/img/avatar.png'"
-               [src]="report?.img"
-               alt="Logo" class="rounded-circle" height="128" width="128"/>
+
+<ng-template #reportBlock>
+  <div class="container-fluid p-fluid">
+    <p-scrollPanel [styleClass]="isMobile() ? 'custombar2' : ''" [style]="{height: getModalHeight().toString() + 'px'}">
+      <div class="row">
+        <div class="col-12 col-md-3">
+          <div class="text-center mt-3">
+            <img #avatar
+                 (error)="avatar.src = './assets/img/avatar.png'" [src]="report?.img" alt="Logo" class="rounded-circle"
+                 height="128" width="128"/>
+          </div>
         </div>
-      </div>
-      <div class="col-12 col-md-9">
-        <div class="row">
-          <div class="col-12 col-md-7 mt-2 mt-md-0">
-            <label>Email</label>
-            <span class="p-input-icon-left">
+        <div class="col-12 col-md-9">
+          <div class="row">
+            <div class="col-12 col-md-7 mt-2 mt-md-0">
+              <label>Email</label>
+              <span class="p-input-icon-left">
               <i class="pi pi-envelope"></i>
               <input [readOnly]="true" [spellcheck]="false" [value]="report?.email"
                      class="p-inputtext p-inputtext-sm" pInputText type="email">
             </span>
-          </div>
-          <div class="col-12 col-md-5 mt-2 mt-md-0">
-            <label>Usuário</label>
-            <span class="p-input-icon-left">
+            </div>
+            <div class="col-12 col-md-5 mt-2 mt-md-0">
+              <label>Usuário</label>
+              <span class="p-input-icon-left">
             <i class="pi pi-user"></i>
               <input [readOnly]="true" [spellcheck]="false" [value]="report?.username"
                      class="p-inputtext p-inputtext-sm" pInputText type="text">
             </span>
-          </div>
-          <div class="col-12 col-md-7 mt-2">
-            <label>Tipo de Relatório</label>
-            <span class="p-input-icon-left">
+            </div>
+            <div class="col-12 col-md-7 mt-2">
+              <label>Tipo de Relatório</label>
+              <span class="p-input-icon-left">
               <i class="pi pi-info-circle"></i>
               <input [readOnly]="true" [spellcheck]="false" [value]="report?.type"
                      class="p-inputtext p-inputtext-sm" pInputText type="text">
             </span>
-          </div>
-          <div class="col-12 col-md-5 mt-2">
-            <label>Data</label>
-            <span class="p-input-icon-left">
+            </div>
+            <div class="col-12 col-md-5 mt-2">
+              <label>Data</label>
+              <span class="p-input-icon-left">
               <i class="pi pi-calendar"></i>
               <input [readOnly]="true" [spellcheck]="false" [value]="report?.date"
                      class="p-inputtext p-inputtext-sm" pInputText type="text">
             </span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <hr/>
-    <div class="row">
-      <div class="col-12 col-md-12">
-        <label>Assunto</label>
-        <span class="p-input-icon-left">
+      <hr/>
+      <div class="row">
+        <div class="col-12 col-md-12">
+          <label>Assunto</label>
+          <span class="p-input-icon-left">
           <i class="pi pi-pencil"></i>
           <input [readOnly]="true" [spellcheck]="false" [value]="report?.subject"
                  class="p-inputtext p-inputtext-sm" pInputText type="text">
         </span>
+        </div>
+        <div class="col-12 col-md-12 my-2">
+          <label>Descrição</label>
+          <p-editor [(ngModel)]="report.description" [readonly]="true" [style]="{'height':'320px'}">
+            <ng-template pTemplate="header">
+             <span class="ql-formats">
+                <button type="button" class="ql-bold" aria-label="Bold"></button>
+                <button type="button" class="ql-underline" aria-label="Underline"></button>
+                <button type="button" class="ql-list" aria-label="Ordered List" value="ordered"></button>
+                <button type="button" class="ql-list" aria-label="Unordered List" value="bullet"></button>
+                <button type="button" class="ql-link" aria-label="Insert Link"></button>
+                <button type="button" class="ql-clean" aria-label="Remove Styles"></button>
+             </span>
+            </ng-template>
+          </p-editor>
+        </div>
       </div>
-      <div class="col-12 col-md-12 my-2">
-        <label>Descrição</label>
-        <p-editor [(ngModel)]="report.description" [readonly]="true" [style]="{'height':'320px'}">
-        </p-editor>
-      </div>
-    </div>
-  </p-scrollPanel>
-</div>
+    </p-scrollPanel>
+  </div>
+</ng-template>

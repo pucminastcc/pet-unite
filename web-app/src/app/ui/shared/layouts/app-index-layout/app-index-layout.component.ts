@@ -3,7 +3,6 @@ import {NavbarMenuItemModel} from '../../../../domain/shared/components/app-navb
 import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {MessageService} from 'primeng/api';
 import {AccountActionComponent} from '../../../auth/components/account-action/account-action.component';
-import {AuthenticatedUserResult} from '../../../../domain/auth/models/results/authenticated-user.result';
 import {AuthService} from '../../../auth/services/auth.service';
 import {Subscription} from 'rxjs';
 import {LogoutResult} from '../../../../domain/auth/models/results/logout.result';
@@ -50,7 +49,7 @@ export class AppIndexLayoutComponent implements OnInit, AfterViewInit, OnDestroy
     this.getAuthenticatedUserSubscription = this.authService.getAuthenticatedUser({
       accessToken: data?.accessToken,
       user: data?.user
-    }).subscribe((data: AuthenticatedUserResult) => {
+    }).subscribe((data: AuthenticatedUserModel) => {
       if (data) {
         this.user = data;
       }
@@ -97,7 +96,6 @@ export class AppIndexLayoutComponent implements OnInit, AfterViewInit, OnDestroy
   private getMenuItems(): NavbarMenuItemModel[] {
     return [
       {path: '/home', title: 'Home', icon: 'fas fa-home', class: ''},
-      // {path: '/about', title: 'Sobre', icon: 'fas fa-book', class: ''},
     ];
   }
 

@@ -24,4 +24,6 @@ export const UserSchema = new mongoose.Schema({
     isInstitution: {type: Boolean, default: false},
     blocked: {type: Boolean, default: false},
     deleted: {type: Boolean, default: false},
+    filledProfile: {type: Boolean, default: false},
+    requestedPermission: {type: Boolean, default: false},
 }, {timestamps: true, collection: 'users'});

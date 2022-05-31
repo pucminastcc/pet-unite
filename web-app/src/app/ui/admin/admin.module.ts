@@ -21,7 +21,7 @@ import {ToolbarModule} from 'primeng/toolbar';
 import {FileUploadModule} from 'primeng/fileupload';
 import {ConfirmDialogModule} from 'primeng/confirmdialog';
 import {ConfirmationService} from 'primeng/api';
-import { PetRegistrationComponent } from './pages/pet/components/pet-registration/pet-registration.component';
+import {PetRegistrationComponent} from './pages/pet/components/pet-registration/pet-registration.component';
 import {DynamicDialogModule} from 'primeng/dynamicdialog';
 import {MessageModule} from 'primeng/message';
 import {MessagesModule} from 'primeng/messages';
@@ -32,13 +32,20 @@ import {ChipModule} from 'primeng/chip';
 import {TableModule} from 'primeng/table';
 import {ProgressSpinnerModule} from 'primeng/progressspinner';
 import {TooltipModule} from 'primeng/tooltip';
-import { UserAccountComponent } from './pages/manager/components/user-account/user-account.component';
-import { SupportComponent } from './pages/support/support.component';
+import {UserAccountComponent} from './pages/manager/components/user-account/user-account.component';
+import {SupportComponent} from './pages/support/support.component';
 import {ChartModule} from 'primeng/chart';
-import { ReportComponent } from './pages/manager/components/report/report.component';
+import {ReportComponent} from './pages/manager/components/report/report.component';
 import {InputTextareaModule} from 'primeng/inputtextarea';
 import {BadgeModule} from 'primeng/badge';
-import { InstitutionComponent } from './pages/institution/institution.component';
+import {InstitutionComponent} from './pages/institution/institution.component';
+import {RatingModule} from 'primeng/rating';
+import {InputNumberModule} from 'primeng/inputnumber';
+import {DonationDetailComponent} from './pages/donation/components/donation-detail/donation-detail.component';
+import {ContributionComponent} from './pages/contribution/contribution.component';
+import {TagModule} from 'primeng/tag';
+import {CheckboxModule} from 'primeng/checkbox';
+import { DonationStatusComponent } from './pages/donation/components/donation-status/donation-status.component';
 
 
 @NgModule({
@@ -52,7 +59,10 @@ import { InstitutionComponent } from './pages/institution/institution.component'
     UserAccountComponent,
     SupportComponent,
     ReportComponent,
-    InstitutionComponent
+    InstitutionComponent,
+    DonationDetailComponent,
+    ContributionComponent,
+    DonationStatusComponent,
   ],
   imports: [
     CommonModule,
@@ -83,7 +93,11 @@ import { InstitutionComponent } from './pages/institution/institution.component'
     TooltipModule,
     ChartModule,
     InputTextareaModule,
-    BadgeModule
+    BadgeModule,
+    RatingModule,
+    InputNumberModule,
+    TagModule,
+    CheckboxModule
   ],
   providers: [
     AuthService,

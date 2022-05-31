@@ -1,18 +1,42 @@
 import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
 import {Subscription} from 'rxjs';
-import {LogoutResult} from '../../../../domain/auth/models/results/logout.result';
 import {AuthService} from '../../../auth/services/auth.service';
 import {ManagerService} from '../../services/manager.service';
-import {UserBaseResult} from '../../../../domain/manager/models/results/user-base.result';
-import {ConfirmationService} from 'primeng/api';
-import {DeleteUserResult} from '../../../../domain/manager/models/results/delete-user.result';
+import {AbstractControlTypeSafe, FormBuilderTypeSafe, FormGroupTypeSafe} from 'angular-typesafe-reactive-forms-helper';
+import {ConfirmationService, MessageService, SelectItem} from 'primeng/api';
 import {DialogService} from 'primeng/dynamicdialog';
-import {UserAccountComponent} from './components/user-account/user-account.component';
+import {AuthenticatedUserModel} from '../../../../domain/auth/models/authenticated-user.model';
+import {UserBaseResult} from '../../../../domain/manager/models/results/user-base.result';
 import {ReportBaseResult} from '../../../../domain/manager/models/results/report-base.result';
-import {ReportComponent} from './components/report/report.component';
+import {LogoutResult} from '../../../../domain/auth/models/results/logout.result';
 import {finalize} from 'rxjs/operators';
 import * as FileSaver from 'file-saver';
+import {ReportComponent} from './components/report/report.component';
+import {PermissionRequestBaseResult} from '../../../../domain/manager/models/results/permission-request-base.result';
+import {DeleteUserResult} from '../../../../domain/manager/models/results/delete-user.result';
+import {UserAccountComponent} from './components/user-account/user-account.component';
+import {ReplyPermissionRequestResult} from '../../../../domain/manager/models/results/reply-permission-request.result';
+import {FormControl} from '@angular/forms';
+import {ConfigService} from '../../../shared/services/config.service';
+import {StateResult} from '../../../../domain/shared/services/models/results/state.result';
 
+enum TabViewIndex {
+  Users = 0,
+  Reports = 1,
+  PermissionRequests = 2,
+  Charts = 3,
+}
+
+enum Provider {
+  Application = 'application',
+  Google = 'google',
+  Facebook = 'facebook',
+}
+
+interface FormFilter {
+  state: string;
+  role: boolean;
+}
 
 @Component({
   selector: 'app-manager',
@@ -20,32 +44,158 @@ import * as FileSaver from 'file-saver';
   styleUrls: ['./manager.component.scss']
 })
 export class ManagerComponent implements OnInit, OnDestroy {
+  public basicOptions: any;
   public basicData: any;
   public basicData2: any;
-  public basicOptions: any;
 
+  private authSubscription: Subscription | undefined;
   private getUsersSubscription: Subscription | undefined;
   private getReportsSubscription: Subscription | undefined;
+  private getPermissionRequestsSubscription: Subscription | undefined;
+  private getChartsSubscription: Subscription | undefined;
   private deleteUserSubscription: Subscription | undefined;
+  private replyPermissionRequestSubscription: Subscription | undefined;
   private logoutSubscription: Subscription | undefined;
 
+  public tabViewIndex = TabViewIndex;
+
+  public formFilter: FormGroupTypeSafe<FormFilter>;
+
+  public optRoles: SelectItem[] = [];
+  public optStates: SelectItem[] = [];
+
+  public user: AuthenticatedUserModel | undefined;
   public users: UserBaseResult[] = [];
   public reports: ReportBaseResult[] = [];
+  public permissionRequests: PermissionRequestBaseResult[] = [];
+
   public isLoading: boolean = false;
   public activeIndex: number = 0;
 
-  public exportColumns: { dataKey: string; title: string }[] = [];
+  private exportColumns: { dataKey: string; title: string }[] = [];
 
   constructor(
     private readonly authService: AuthService,
     private readonly managerService: ManagerService,
+    private readonly configService: ConfigService,
+    private readonly fb: FormBuilderTypeSafe,
+    private readonly messageService: MessageService,
     private readonly confirmationService: ConfirmationService,
-    private readonly dialogService: DialogService
+    private readonly dialogService: DialogService,
   ) {
+    this.formFilter = this.fb.group<FormFilter>({
+      state: new FormControl(''),
+      role: new FormControl(null)
+    });
+
+    this.authSubscription = this.authService.getAuthenticatedUser()
+      .subscribe((result: AuthenticatedUserModel) => {
+        if (result) {
+          this.user = result;
+        }
+      });
+  }
+
+  get ff() {
+    return this.formFilter.controls;
   }
 
   ngOnInit(): void {
-    this.getUsersSubscription = this.getUsers();
+    this.configService.getStates()
+      .subscribe((result: StateResult[]) => {
+        if (result) {
+          this.optStates = result.map((state: StateResult) => {
+            return {
+              label: state.description, value: state.initials
+            };
+          });
+
+          this.optRoles = [
+            {label: 'Usuário', value: false},
+            {label: 'Instituição', value: true},
+          ];
+        }
+      });
+
+    this.getUsers();
+  }
+
+  public getUsers(): void {
+    const {state, role} = this.formFilter.value;
+
+    this.isLoading = true;
+    this.getUsersSubscription = this.managerService.getUsers({
+      isInstitution: role ?? false,
+      state: state ?? ''
+    })
+      .pipe(
+        finalize(() => {
+          this.isLoading = false;
+        })
+      )
+      .subscribe((result: UserBaseResult[]) => {
+        if (result) {
+          this.users = result;
+        }
+      }, (error) => {
+        error.status === 401 ?
+          this.logout() :
+          this.messageService.add({
+            severity: 'error',
+            detail: 'Erro ao processar a solicitação, tente novamente!'
+          });
+      });
+  }
+
+  private getReports(): void {
+    this.isLoading = true;
+    this.getReportsSubscription = this.managerService.getReports()
+      .pipe(
+        finalize(() => {
+          this.isLoading = false
+        })
+      ).subscribe((result: ReportBaseResult[]) => {
+        if (result) {
+          this.reports = result;
+          const reportCols = [
+            {field: 'username', header: 'Usuário'},
+            {field: 'email', header: 'Email'},
+            {field: 'type', header: 'Tipo'},
+            {field: 'subject', header: 'Assunto'},
+            {field: 'date', header: 'Data'},
+          ];
+          this.exportColumns = reportCols.map(col => ({title: col.header, dataKey: col.field}));
+        }
+      }, (error) => {
+        error.status === 401 ?
+          this.logout() :
+          this.messageService.add({
+            severity: 'error',
+            detail: 'Erro ao processar a solicitação, tente novamente!'
+          });
+      });
+  }
+
+  private getPermissionRequests(): void {
+    this.isLoading = true;
+    this.getUsersSubscription = this.managerService.getPermissionRequests()
+      .pipe(
+        finalize(() => {
+          this.isLoading = false;
+        })
+      )
+      .subscribe((result: PermissionRequestBaseResult[]) => {
+        if (result) {
+          this.permissionRequests = result;
+        }
+      }, (error) => {
+        error.status === 401 ?
+          this.logout() :
+          this.messageService.add({
+            severity: 'error',
+            detail: 'Erro ao processar a solicitação, tente novamente!'
+          });
+      });
   }
 
   private getCharts(): void {
@@ -83,117 +233,86 @@ export class ManagerComponent implements OnInit, OnDestroy {
     };
   }
 
-  ngOnDestroy(): void {
-    if (this.getUsersSubscription) this.getUsersSubscription.unsubscribe();
-    if (this.getReportsSubscription) this.getReportsSubscription.unsubscribe();
-    if (this.deleteUserSubscription) this.deleteUserSubscription.unsubscribe();
-    if (this.logoutSubscription) this.logoutSubscription.unsubscribe();
-  }
-
-  private getUsers(): Subscription {
-    this.isLoading = true;
-    return this.managerService.getUsers()
-      .pipe(finalize(() => {
-        this.isLoading = false;
-      })).subscribe((data: UserBaseResult[]) => {
-        if (data) {
-          this.users = data;
-        }
-      }, (error) => {
-        if (error.status === 401) {
-          this.logout();
-        }
-      });
-  }
-
-  private getReports(): Subscription {
-    this.isLoading = true;
-    return this.managerService.getReports()
-      .pipe(finalize(() => {
-        this.isLoading = false
-      })).subscribe((data: ReportBaseResult[]) => {
-        if (data) {
-          this.reports = data;
-          const reportCols = [
-            {field: 'username', header: 'Usuário'},
-            {field: 'email', header: 'Email'},
-            {field: 'type', header: 'Tipo'},
-            {field: 'subject', header: 'Assunto'},
-            {field: 'date', header: 'Data'},
-          ];
-          this.exportColumns = reportCols.map(col => ({title: col.header, dataKey: col.field}));
-        }
-      }, (error) => {
-        if (error.status === 401) {
-          this.logout();
-        }
-      });
-  }
-
-  private logout(): void {
-    this.logoutSubscription = this.authService.logout()
-      .subscribe((data: LogoutResult) => {
-        if (data) {
-          if (data.success) {
-            window.location.href = '/';
-          }
-        }
-      });
-  }
-
-  public viewUser(id: string): void {
-    this.dialogService.open(UserAccountComponent, {
-      data: {
-        id
-      },
-      showHeader: true,
-      header: 'Dados do Usuário',
-      width: this.isMobile() ? '90%' : '50%',
-    });
-  }
-
-  public viewReport(id: string): void {
-    this.dialogService.open(ReportComponent, {
-      data: {
-        id
-      },
-      showHeader: true,
-      header: 'Dados do Relatório',
-      width: this.isMobile() ? '90%' : '60%',
-    });
-  }
-
-  public confirmDelete(user: UserBaseResult): void {
-    this.confirmationService.confirm({
-      header: `${user.username}`,
-      icon: `fas fa-trash`,
-      message: `<strong class="text-danger">Atenção: Esta operação não pode ser desfeita.</strong> <br> <strong>Deseja realmente eliminar este cadastro?</strong>`,
-      accept: () => {
-        this.deleteUser(user.id);
-      },
-      reject: () => {
-      }
-    });
-  }
-
   private deleteUser(id: string): void {
     this.deleteUserSubscription = this.managerService.deleteUser({
       id
-    }).subscribe((data: DeleteUserResult) => {
-      if (data) {
-        if (data.success) {
-          const toDelete = new Set([id]);
-          this.users = this.users.filter(obj => !toDelete.has(obj.id));
+    })
+      .subscribe((result: DeleteUserResult) => {
+        if (result) {
+          if (result.success) {
+            const toDelete = new Set([id]);
+            this.users = this.users.filter(obj => !toDelete.has(obj.id));
+          }
         }
-      }
-    }, (error) => {
-      if (error.status === 401) {
-        this.logout();
-      }
-    });
+      }, (error) => {
+        error.status === 401 ?
+          this.logout() :
+          this.messageService.add({
+            severity: 'error',
+            detail: 'Erro ao processar a solicitação, tente novamente!'
+          });
+      });
   }
 
-  public exportExcel(data): void {
+  private replyPermissionRequest(id: string, confirm: boolean): void {
+    this.replyPermissionRequestSubscription = this.managerService.replyPermissionRequest({
+      id, confirm
+    })
+      .subscribe((result: ReplyPermissionRequestResult) => {
+        if (result) {
+          if (result.success) {
+            const toDelete = new Set([id]);
+            this.permissionRequests = this.permissionRequests.filter(obj => !toDelete.has(obj.id));
+          }
+        }
+      }, (error) => {
+        error.status === 401 ?
+          this.logout() :
+          this.messageService.add({
+            severity: 'error',
+            detail: 'Erro ao processar a solicitação, tente novamente!'
+          });
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.unSubscribe();
+  }
+
+  private unSubscribe(): void {
+    if (this.authSubscription) this.authSubscription.unsubscribe();
+    if (this.getUsersSubscription) this.getUsersSubscription.unsubscribe();
+    if (this.getReportsSubscription) this.getReportsSubscription.unsubscribe();
+    if (this.getPermissionRequestsSubscription) this.getPermissionRequestsSubscription.unsubscribe();
+    if (this.getChartsSubscription) this.getChartsSubscription.unsubscribe();
+    if (this.deleteUserSubscription) this.deleteUserSubscription.unsubscribe();
+    if (this.replyPermissionRequestSubscription) this.replyPermissionRequestSubscription.unsubscribe();
+    if (this.logoutSubscription) this.logoutSubscription.unsubscribe();
+  }
+
+  public handleChange(e): void {
+    this.activeIndex = e.index;
+
+    switch (this.activeIndex) {
+      case TabViewIndex.Users:
+        this.getUsers();
+        return;
+
+      case TabViewIndex.Reports:
+        this.getReports();
+        return;
+
+      case TabViewIndex.PermissionRequests:
+        this.getPermissionRequests();
+        return;
+
+      case TabViewIndex.Charts:
+        this.getCharts();
+        return;
+    }
+  }
+
+  public onClickExportExcel(data): void {
     import("xlsx").then(xlsx => {
       const worksheet = xlsx.utils.json_to_sheet(data);
       const workbook = {Sheets: {'data': worksheet}, SheetNames: ['data']};
@@ -211,7 +330,7 @@ export class ManagerComponent implements OnInit, OnDestroy {
     FileSaver.saveAs(data, fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION);
   }
 
-  public exportPdf(data, fileName): void {
+  public onClickExportPdf(data, fileName): void {
     import("jspdf").then(jsPDF => {
       import("jspdf-autotable").then(x => {
         // @ts-ignore
@@ -219,48 +338,80 @@ export class ManagerComponent implements OnInit, OnDestroy {
         // @ts-ignore
         doc.autoTable(this.exportColumns, data);
         doc.save(`${fileName}.pdf`);
-      })
-    })
+      });
+    });
   }
 
-  public handleChange(e): void {
-    const index = e.index;
-    this.activeIndex = index;
-
-    switch (index) {
-      case 0:
-        this.getUsersSubscription = this.getUsers();
-        return;
-      case 1:
-        this.getReportsSubscription = this.getReports();
-        return;
-      case 2:
-        this.getCharts();
-        return;
-      default:
-        return;
-    }
+  public onClickViewUser(id: string): void {
+    this.dialogService.open(UserAccountComponent, {
+      data: {
+        id
+      },
+      showHeader: true,
+      header: 'Dados do Usuário',
+      width: this.isMobile() ? '90%' : '50%',
+    });
   }
 
-  public getProvider(provider: string) {
-    switch (provider) {
-      case 'application':
-        return {
-          color: '', icon: 'pi pi-id-card', name: 'Aplicativo'
-        };
-      case 'facebook':
-        return {
-          color: '#4267B2', icon: 'pi pi-facebook', name: 'Facebook'
-        };
-      case 'google':
-        return {
-          color: '#DB4437', icon: 'pi pi-google', name: 'Google'
-        };
-      default:
-        return {
-          color: '', icon: '', name: '', label: ''
-        };
-    }
+  public onClickDeleteUser(user: UserBaseResult): void {
+    this.confirmationService.confirm({
+      header: `${user.username}`,
+      icon: `fas fa-trash`,
+      message: `<strong class="text-danger">Atenção: Esta operação não pode ser desfeita.</strong> <br> <strong>Deseja realmente eliminar este cadastro?</strong>`,
+      accept: () => {
+        this.deleteUser(user.id);
+      },
+      reject: () => {
+      }
+    });
+  }
+
+  public onClickViewReport(id: string): void {
+    this.dialogService.open(ReportComponent, {
+      data: {
+        id
+      },
+      showHeader: true,
+      header: 'Dados do Relatório',
+      width: this.isMobile() ? '90%' : '60%',
+    });
+  }
+
+  public onClickConfirmPermissionRequest(request: PermissionRequestBaseResult): void {
+    this.confirmationService.confirm({
+      header: `${request.username}`,
+      icon: `fas fa-trash`,
+      message: `<strong class="text-danger">Atenção: Esta operação não pode ser desfeita.</strong> <br> <strong>Deseja realmente atribuir as permissões de Instituição à este cadastro?</strong>`,
+      accept: () => {
+        this.replyPermissionRequest(request.id, true);
+      },
+      reject: () => {
+      }
+    });
+  }
+
+  public onClickDeclinePermissionRequest(request: PermissionRequestBaseResult): void {
+    this.confirmationService.confirm({
+      header: `${request.username}`,
+      icon: `fas fa-trash`,
+      message: `<strong class="text-danger">Atenção: Esta operação não pode ser desfeita.</strong> <br> <strong>Deseja realmente recusar a solicitação deste cadastro?</strong>`,
+      accept: () => {
+        this.replyPermissionRequest(request.id, false);
+      },
+      reject: () => {
+      }
+    });
+  }
+
+  private logout(): void {
+    this.logoutSubscription = this.authService.logout()
+      .subscribe((data: LogoutResult) => {
+        if (data) {
+          if (data.success) {
+            window.location.href = '/';
+          }
+        }
+      });
   }
 
   public isMobile(): boolean {
@@ -270,5 +421,30 @@ export class ManagerComponent implements OnInit, OnDestroy {
   @HostListener('window:resize', ['$event'])
   public getScreenWidth(): number {
     return window.innerWidth;
+  }
+
+  public getAccountProvider(provider: string): { color: string, icon: string, name: string } {
+    switch (provider) {
+      case Provider.Application:
+        return {
+          color: '', icon: 'pi pi-id-card', name: 'Aplicativo'
+        };
+      case Provider.Facebook:
+        return {
+          color: '#4267B2', icon: 'pi pi-facebook', name: 'Facebook'
+        };
+      case Provider.Google:
+        return {
+          color: '#DB4437', icon: 'pi pi-google', name: 'Google'
+        };
+    }
+  }
+
+  public getSelectItemLabel(value: string | boolean, array: SelectItem[]): string {
+    return array.find(f => f.value === value).label;
+  }
+
+  public removeFilter(event: Event, control: AbstractControlTypeSafe<string> | AbstractControlTypeSafe<boolean>): void {
+    control.setValue(null);
   }
 }

@@ -4,8 +4,7 @@ export interface Donation extends Document {
     userId: Types.ObjectId;
     username: string;
     petId: Types.ObjectId;
-    petImg: string;
-    petName: string;
+    petTypeId: Types.ObjectId;
     petGenderId: Types.ObjectId;
     state: string;
     city: string;
@@ -15,8 +14,14 @@ export interface Donation extends Document {
     interestedUserId: Types.ObjectId;
     interestedUsername: string;
     interestedUserFlagged: boolean;
-    userFlagged: boolean;
     status: string;
+    statusSeverity: string;
+    rating: number;
+    feedback: string;
+    date: string;
+    signalDate: string;
+    donated: boolean;
+    donatedToInstitution: boolean;
 }
 
 export interface Contacts {

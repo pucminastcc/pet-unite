@@ -22,9 +22,9 @@ export class PetController {
 
     @UseGuards(JwtAuthGuard)
     @Get('')
-    @ApiTags('pets')
+    @ApiTags('pet')
     @ApiBearerAuth()
-    @ApiOperation({summary: 'Obter todos os cadastros de animal de estimação'})
+    @ApiOperation({summary: 'Obter todos os cadastros dos animais de estimação'})
     @ApiResponse({status: 200, description: 'Resposta padrão para solicitação HTTP bem-sucedida.'})
     @ApiResponse({status: 400, description: 'A solicitação não pode ser atendida devido a sintaxe incorreta.'})
     @ApiResponse({
@@ -39,7 +39,7 @@ export class PetController {
 
     @UseGuards(JwtAuthGuard)
     @Get('detail')
-    @ApiTags('pets')
+    @ApiTags('pet')
     @ApiBearerAuth()
     @ApiOperation({summary: 'Obter cadastro do animal de estimação'})
     @ApiResponse({status: 200, description: 'Resposta padrão para solicitação HTTP bem-sucedida.'})
@@ -57,7 +57,7 @@ export class PetController {
 
     @UseGuards(JwtAuthGuard)
     @Post()
-    @ApiTags('pets')
+    @ApiTags('pet')
     @ApiBearerAuth()
     @ApiOperation({summary: 'Cadastrar animal de estimação'})
     @ApiResponse({status: 201, description: 'Recurso criado no servidor.'})
@@ -75,7 +75,7 @@ export class PetController {
 
     @UseGuards(JwtAuthGuard)
     @Put()
-    @ApiTags('pets')
+    @ApiTags('pet')
     @ApiBearerAuth()
     @ApiOperation({summary: 'Alterar cadastro do animal de estimação'})
     @ApiResponse({status: 200, description: 'Resposta padrão para solicitação HTTP bem-sucedida.'})
@@ -93,7 +93,7 @@ export class PetController {
 
     @UseGuards(JwtAuthGuard)
     @Delete()
-    @ApiTags('pets')
+    @ApiTags('pet')
     @ApiBearerAuth()
     @ApiOperation({summary: 'Deletar cadastro do animal de estimação'})
     @ApiResponse({status: 200, description: 'Resposta padrão para solicitação HTTP bem-sucedida.'})

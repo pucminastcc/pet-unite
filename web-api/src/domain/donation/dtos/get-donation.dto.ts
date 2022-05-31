@@ -1,7 +1,7 @@
 import {ApiProperty} from '@nestjs/swagger';
 import {Types} from 'mongoose';
 
-export class ViewDonationDto {
+export class GetDonationDto {
     @ApiProperty({default: '', required: true})
-    donationId: Types.ObjectId;
+    donationId: string;
 }

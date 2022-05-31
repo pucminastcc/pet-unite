@@ -17,4 +17,6 @@ export interface UserAccountResult {
   phone?: string;
   cell?: string;
   whatsapp?: string;
+  lat?: number;
+  lng?: number;
 }

@@ -17,6 +17,9 @@ import {ReportTypeResult} from '../../../domain/shared/services/models/results/r
 import {GetCitiesInput} from '../../../domain/shared/services/commands/inputs/get-cities.input';
 import {CityResult} from '../../../domain/shared/services/models/results/city.result';
 import {GetCitiesCommand} from '../../../domain/shared/services/commands/get-cities.command';
+import {GetPetTypesInput} from '../../../domain/shared/services/commands/inputs/get-pet-types.input';
+import {PetTypeResult} from '../../../domain/shared/services/models/results/pet-type.result';
+import {GetPetTypesCommand} from '../../../domain/shared/services/commands/get-pet-types.command';
 
 @Injectable({
   providedIn: 'root'
@@ -27,6 +30,7 @@ export class ConfigService implements IConfigRepository {
   constructor(
     private readonly authService: AuthService,
     private readonly getPersonTypesCommand: GetPersonTypesCommand,
+    private readonly getPetTypesCommand: GetPetTypesCommand,
     private readonly getPetGendersCommand: GetPetGendersCommand,
     private readonly getStatesCommand: GetStatesCommand,
     private readonly getReportTypesCommand: GetReportTypesCommand,
@@ -37,6 +41,13 @@ export class ConfigService implements IConfigRepository {
 
   getPersonTypes(input?: GetPersonTypesInput): Observable<PersonTypeResult[]> {
     return this.getPersonTypesCommand.execute({
+      ...input,
+      accessToken: this.accessToken
+    });
+  }
+
+  getPetTypes(input?: GetPetTypesInput): Observable<PetTypeResult[]> {
+    return this.getPetTypesCommand.execute({
       ...input,
       accessToken: this.accessToken
     });

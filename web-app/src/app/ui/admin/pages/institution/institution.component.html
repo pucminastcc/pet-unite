@@ -1,1 +1,90 @@
-<p>institution works!</p>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12">
+      <div *ngIf="user.filledProfile; else messageBlock" class="card">
+        <div class="card-header card-header-danger">
+          <h5 class="card-title">Doações Indicadas</h5>
+        </div>
+        <div class="card-body">
+          <div class="animate__animated animate__fadeIn">
+            <div class="text-center">
+              <p-progressSpinner *ngIf="isLoading"></p-progressSpinner>
+            </div>
+            <p-table #dt *ngIf="!isLoading"
+                     [globalFilterFields]="['username']" [paginator]="true" [responsive]="true"
+                     [rowHover]="true" [rows]="10" [showCurrentPageReport]="true" [value]="donations"
+                     currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+                     dataKey="id" responsiveLayout="stack">
+              <ng-template pTemplate="caption">
+                <div class="flex align-items-center justify-content-between">
+                  <span class="p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <input (input)="dt.filterGlobal($event.target.value, 'contains')" pInputText
+                           placeholder="Pesquisar..." type="text"/>
+                  </span>
+                </div>
+              </ng-template>
+              <ng-template pTemplate="header">
+                <tr>
+                  <th class="text-center"></th>
+                  <th><i class="fas fa-paw mr-2"></i>Nome</th>
+                  <th><i class="fas fa-map-marker-alt mr-2"></i>Localidade</th>
+                  <th><i class="fas fa-road mr-2"></i>Distância</th>
+                  <th><i class="fas fa-info-circle mr-2"></i>Status</th>
+                  <th class="text-center"><i class="fas fa-star mr-2"></i>Avaliação</th>
+                  <th class="text-center"></th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-donation>
+                <tr>
+                  <td class="text-center">
+                    <img #petImg (error)="petImg.src = './assets/img/avatar.png'" [src]="donation?.petImg" alt="Logo"
+                         class="" height="50"/>
+                  </td>
+                  <td>{{donation?.petName}}</td>
+                  <td>{{donation?.city}} - {{donation?.state}}</td>
+                  <td>{{getDistanceFromLatLonInKm({lat: donation?.lat, lng: donation?.lng}, {lat: user?.lat, lng: user?.lng})}} Km</td>
+                  <td>
+                    <i *ngIf="donation?.donated" class="fas fa-check-circle text-success fa-2x"
+                       pTooltip="Doação concluída" tooltipPosition="top">
+                    </i>
+                    <i *ngIf="!donation?.donated" class="fas fa-spinner text-info fa-2x"
+                       pTooltip="Doação em andamento" tooltipPosition="top">
+                    </i>
+                  </td>
+                  <td class="text-center">
+                    <div *ngIf="donation.donated && donation.rating !== 0">
+                      <p-rating [(ngModel)]="donation.rating" [cancel]="false"
+                                [iconOnStyle]="{color: 'var(--orange-500)', borderColor: 'var(--orange-500)'}"
+                                [readonly]="true">
+                      </p-rating>
+                    </div>
+                  </td>
+                  <td>
+                    <button (click)="onClickViewDonation(donation)"
+                            class="p-button-rounded p-button-raised p-button-info mr-3" icon="fas fa-eye"
+                            pButton pRipple pTooltip="Visualizar" tooltipPosition="top">
+                    </button>
+                    <button *ngIf="!donation.donated" (click)="onClickUpdateDonationStatus(donation)"
+                            class="p-button-rounded p-button-raised p-button-success mr-2" icon="fas fa-edit"
+                            pButton pRipple pTooltip="Status" tooltipPosition="top">
+                    </button>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+        </div>
+      </div>
+      <ng-template #messageBlock>
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-12 col-md-12">
+              <p-messages [(value)]="messages" [closable]="false"></p-messages>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

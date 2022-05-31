@@ -1,4 +1,13 @@
-import {AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {
+  AfterContentChecked,
+  AfterViewInit,
+  Component,
+  ElementRef,
+  HostListener,
+  OnDestroy,
+  OnInit,
+  ViewChild
+} from '@angular/core';
 import {FormBuilderTypeSafe, FormGroupTypeSafe} from 'angular-typesafe-reactive-forms-helper';
 import {FormControl, Validators} from '@angular/forms';
 import {LogoutResult} from '../../../../../../domain/auth/models/results/logout.result';
@@ -13,13 +22,18 @@ import {PetGenderResult} from '../../../../../../domain/shared/services/models/r
 import {SelectItem} from 'primeng/api';
 import {PetResult} from '../../../../../../domain/pet/models/results/pet.result';
 import {UpdatePetResult} from '../../../../../../domain/pet/models/results/update-pet.result';
+import {finalize} from 'rxjs/operators';
+import {PetTypeResult} from '../../../../../../domain/shared/services/models/results/pet-type.result';
+import {Editor} from 'primeng/editor';
 
 @Component({
   selector: 'app-pet-registration',
   templateUrl: './pet-registration.component.html',
   styleUrls: ['./pet-registration.component.scss']
 })
-export class PetRegistrationComponent implements OnInit, OnDestroy {
+export class PetRegistrationComponent implements OnInit, OnDestroy, AfterContentChecked {
+  @ViewChild('editor', {static: false}) editor: Editor;
+
   private registerPetSubscription: Subscription | undefined;
   private updatePetSubscription: Subscription | undefined;
   private getPetSubscription: Subscription | undefined;
@@ -29,6 +43,8 @@ export class PetRegistrationComponent implements OnInit, OnDestroy {
   public pet: PetsResult | undefined;
   public petId: string | undefined;
   public optPetGenders: SelectItem[] = [];
+  public optPetTypes: SelectItem[] = [];
+  public optAgeTypes: SelectItem[] = [];
   public text: string = '';
   public img: string | ArrayBuffer | null = '';
   public submitted: boolean = false;
@@ -39,8 +55,8 @@ export class PetRegistrationComponent implements OnInit, OnDestroy {
     private readonly petService: PetService,
     private readonly authService: AuthService,
     private readonly fb: FormBuilderTypeSafe,
-    public ref: DynamicDialogRef,
-    public config: DynamicDialogConfig
+    private readonly ref: DynamicDialogRef,
+    private readonly config: DynamicDialogConfig
   ) {
     if (this.config.data) this.getConfigData(this.config);
 
@@ -49,19 +65,38 @@ export class PetRegistrationComponent implements OnInit, OnDestroy {
       img: new FormControl('', [Validators.required]),
       name: new FormControl('', [Validators.required]),
       petGenderId: new FormControl('', [Validators.required]),
+      petTypeId: new FormControl('', [Validators.required]),
       breed: new FormControl('', [Validators.required]),
       description: new FormControl('', [Validators.required]),
+      rateLikesChild: new FormControl('',),
+      rateLikesTours: new FormControl('',),
+      rateFriendly: new FormControl('',),
+      rateTraining: new FormControl('',),
+      age: new FormControl('', [Validators.required]),
+      ageType: new FormControl('', [Validators.required]),
     });
   }
 
   private getConfigData(config: DynamicDialogConfig): void {
     this.petId = this.config.data.id;
+
     this.optPetGenders = this.config.data.petGenders.map((item: PetGenderResult) => {
       return {
-        label: item.description,
-        value: item.id
+        label: item.description, value: item.id
       }
     });
+
+    this.optPetTypes = this.config.data.petTypes.map((item: PetTypeResult) => {
+      return {
+        label: item.description, value: item.id
+      }
+    });
+
+    this.optAgeTypes = [
+      {label: 'Dia(s)', value: 'dias'},
+      {label: 'Mês(es)', value: 'meses'},
+      {label: 'Ano(s)', value: 'anos'},
+    ];
   }
 
   get rf() {
@@ -70,39 +105,58 @@ export class PetRegistrationComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     if (this.petId) {
-      this.getPetSubscription = this.getPetById(this.petId);
+      this.getPetSubscription = this.getPet(this.petId);
     }
   }
 
-  private getPetById(id: string): Subscription {
+  private getPet(id: string): Subscription {
     this.isLoading = true;
     return this.petService.getPet({
       id
-    }).subscribe((pet: PetResult) => {
-      if(pet) {
-        this.rf.id.setValue(pet.id);
-        this.img = pet.img;
-        this.rf.img.setValue(pet.img);
-        this.rf.name.setValue(pet.name);
-        this.rf.petGenderId.setValue(pet.petGenderId);
-        this.rf.breed.setValue(pet.breed);
-        this.text = pet.description;
-        this.rf.description.setValue(pet.description);
-      }
-      this.isLoading = false;
-    }, (error) => {
-      if (error.status === 401) {
-        this.logout();
-      }
-      this.isLoading = false;
-    });
+    })
+      .pipe(
+        finalize(() => {
+          this.isLoading = false;
+        })
+      )
+      .subscribe((pet: PetResult) => {
+        if (pet) {
+          this.img = pet.img;
+          this.text = pet.description;
+
+          this.registerForm.patchValue({
+            id: pet.id,
+            img: pet.img,
+            name: pet.name,
+            petGenderId: pet.petGenderId,
+            petTypeId: pet.petTypeId,
+            breed: pet.breed,
+            description: pet.description,
+            rateLikesChild: pet.rateLikesChild,
+            rateLikesTours: pet.rateLikesTours,
+            rateFriendly: pet.rateFriendly,
+            rateTraining: pet.rateTraining,
+            age: Number(pet.age.split(' ')[0]),
+            ageType: pet.age.split(' ')[1],
+          });
+        }
+      }, (error) => {
+        if (error.status === 401) {
+          this.logout();
+        }
+      });
+  }
+
+  ngAfterContentChecked(): void {
+    if (this.editor) {
+    }
   }
 
   ngOnDestroy(): void {
     this.unSubscribe();
   }
 
-  public unSubscribe(): void {
+  private unSubscribe(): void {
     if (this.updatePetSubscription) this.updatePetSubscription.unsubscribe();
     if (this.registerPetSubscription) this.registerPetSubscription.unsubscribe();
     if (this.getPetSubscription) this.getPetSubscription.unsubscribe();
@@ -123,72 +177,87 @@ export class PetRegistrationComponent implements OnInit, OnDestroy {
     }
   }
 
-  public trySubmit(): void {
+  public onSubmit(): void {
     this.submitted = true;
     if (this.registerForm.invalid) {
       return;
     }
 
-    if(this.petId)
+    if (this.petId)
       this.update();
     else
       this.register();
   }
 
   private register(): void {
-    const {img, name, petGenderId, breed, description} = this.registerForm.value;
+    const {
+      img, name, petGenderId, petTypeId, breed, description, rateLikesChild, rateLikesTours, rateFriendly, rateTraining,
+      age, ageType
+    } = this.registerForm.value;
+
+    const formattedAge = `${age} ${ageType}`
+
     this.isLoading = true;
     this.registerPetSubscription = this.petService.createPet({
-      img,
-      name,
-      petGenderId,
-      breed,
-      description
-    }).subscribe((data: CreatePetResult) => {
-      if (data) {
-        if (data.success) {
-          this.pet = {id: data.id, img, name, inDonation: false}
-          this.close(this.pet);
+      img, name, petGenderId, petTypeId, breed, description, rateLikesChild, rateLikesTours, rateFriendly, rateTraining,
+      age: formattedAge
+    })
+      .pipe(
+        finalize(() => {
+          this.isLoading = false;
+        })
+      )
+      .subscribe((data: CreatePetResult) => {
+        if (data) {
+          if (data.success) {
+            this.pet = {id: data.id, img, name, inDonation: false}
+            this.onClose(this.pet);
+          }
         }
-      }
-    }, (error) => {
-      if (error.status === 401) {
-        this.logout();
-      }
-      this.isLoading = false;
-    });
+      }, (error) => {
+        if (error.status === 401) {
+          this.logout();
+        }
+      });
   }
 
   private update(): void {
-    const {id, img, name, petGenderId, breed, description} = this.registerForm.value;
+    const {
+      id, img, name, petGenderId, petTypeId, breed, description, rateLikesChild, rateLikesTours, rateFriendly,
+      rateTraining, age, ageType
+    } = this.registerForm.value;
+
+    const formattedAge = `${age} ${ageType}`
+
     this.isLoading = true;
     this.updatePetSubscription = this.petService.updatePet({
-      id,
-      img,
-      name,
-      petGenderId,
-      breed,
-      description
-    }).subscribe((data: UpdatePetResult) => {
-      if (data) {
-        if (data.success) {
-          this.pet = {id, img, name, inDonation: false}
-          this.close(this.pet);
+      id, img, name, petGenderId, petTypeId, breed, description, rateLikesChild, rateLikesTours, rateFriendly,
+      rateTraining, age: formattedAge
+    })
+      .pipe(
+        finalize(() => {
+          this.isLoading = false;
+        })
+      )
+      .subscribe((data: UpdatePetResult) => {
+        if (data) {
+          if (data.success) {
+            this.pet = {id, img, name, inDonation: false}
+            this.onClose(this.pet);
+          }
         }
-      }
-    }, (error) => {
-      if (error.status === 401) {
-        this.logout();
-      }
-      this.isLoading = false;
-    });
+      }, (error) => {
+        if (error.status === 401) {
+          this.logout();
+        }
+      });
   }
 
-  public close(pet?: PetsResult): void {
+  public onClose(pet?: PetsResult): void {
     this.ref.close(pet);
   }
 
-  public logout(): void {
+  private logout(): void {
     this.logoutSubscription = this.authService.logout()
       .subscribe((data: LogoutResult) => {
         if (data) {
@@ -207,21 +276,8 @@ export class PetRegistrationComponent implements OnInit, OnDestroy {
     return this.getScreenWidth() < 1024;
   }
 
-  private getPet(id: string): void {
-    this.getPetSubscription = this.petService.getPet({id})
-      .subscribe((pet: PetResult) => {
-        if (pet) {
-
-        }
-      }, (error) => {
-        if (error.status === 401) {
-          this.logout();
-        }
-      });
-  }
-
   public getModalHeight(): number {
-    return this.getScreenHeight() - 260;
+    return this.getScreenHeight() - 265;
   }
 
   @HostListener('window:resize', ['$event'])

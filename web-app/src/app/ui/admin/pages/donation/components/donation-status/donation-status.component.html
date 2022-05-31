@@ -1,0 +1,57 @@
+<form [formGroup]="form">
+  <div class="mt-3 mt-md-0">
+    <div *ngIf="rating; else statusBlock;" class="row">
+      <div class="col-12 col-md-12 p-fluid">
+        <b>Nota:</b>
+        <p-rating [formControl]="fc.rating" [cancel]="false"></p-rating>
+        <div *ngIf="!fc.rating.valid && (fc.rating.dirty || submitted)">
+          <p-message *ngIf="fc.rating.errors.required" severity="error" text="Informe a nota"></p-message>
+        </div>
+      </div>
+      <div class="col-12 col-md-12 p-fluid mt-2">
+        <b>Descreva sua experiência:</b>
+        <p-editor #editor [(ngModel)]="feedback" [formControl]="fc.feedback" [style]="{'height':'150px'}">
+          <ng-template pTemplate="header">
+           <span class="ql-formats">
+              <button type="button" class="ql-bold" aria-label="Bold"></button>
+              <button type="button" class="ql-underline" aria-label="Underline"></button>
+              <button type="button" class="ql-list" aria-label="Ordered List" value="ordered"></button>
+              <button type="button" class="ql-list" aria-label="Unordered List" value="bullet"></button>
+              <button type="button" class="ql-link" aria-label="Insert Link"></button>
+              <button type="button" class="ql-clean" aria-label="Remove Styles"></button>
+           </span>
+          </ng-template>
+        </p-editor>
+        <div *ngIf="!fc.feedback.valid && (fc.feedback.dirty || submitted)">
+          <p-message *ngIf="fc.feedback.errors.required" severity="error" text="Informe o feedback"></p-message>
+        </div>
+      </div>
+    </div>
+    <ng-template #statusBlock>
+      <div class="row">
+        <div class="col-12 col-md-12 p-fluid p-2">
+          <p-dropdown [formControl]="fc.data" [options]="optStatus"
+                      emptyMessage="Nenhum registro foi encontrado." optionValue="value"
+                      placeholder="Selecione a situação da doação">
+          </p-dropdown>
+          <div *ngIf="!fc.data.valid && (fc.data.dirty || submitted)">
+            <p-message *ngIf="fc.data.errors.required" severity="error" text="Informe o status"></p-message>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+  <hr/>
+  <div class="row">
+    <div class="col-12 col-md-12 mt-2">
+      <div class="float-right">
+        <button (click)="updateDonation()" class="p-button-raised p-button-success p-button-rounded mr-2"
+                label="Confirmar" pButton type="button">
+        </button>
+        <button (click)="onClose()" class="p-button-raised p-button-danger p-button-rounded" label="Cancelar"
+                pButton type="button">
+        </button>
+      </div>
+    </div>
+  </div>
+</form>

@@ -14,4 +14,5 @@ export interface AuthenticatedUserResult {
   city?: string;
   state?: string;
   complement?: string;
+  filledProfile: boolean;
 }

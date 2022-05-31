@@ -1,5 +1,8 @@
-import {HttpService, Injectable} from '@nestjs/common';
+import {HttpException, HttpService, HttpStatus, Injectable} from '@nestjs/common';
 import {IAuthRepository} from '../../../domain/auth/repositories/iauth.repository';
+import {MailService} from '../../../shared/mail/services/mail.service';
+import {UtilService} from '../../../shared/util/services/util.service';
+import {JwtService} from '@nestjs/jwt';
 import {InjectModel} from '@nestjs/mongoose';
 import {Model} from 'mongoose';
 import * as bcrypt from 'bcrypt';
@@ -22,9 +25,6 @@ import {ValidatePasswordResetCodeMessage} from '../../../domain/auth/enums/valid
 import {ChangePasswordDto} from 'src/domain/auth/dtos/change-password.dto';
 import {ChangePasswordResult} from 'src/domain/auth/models/results/change-password.result';
 import {ChangePasswordMessage} from '../../../domain/auth/enums/change-password-message.enum';
-import {MailService} from '../../../shared/mail/services/mail.service';
-import {UtilService} from '../../../shared/util/services/util.service';
-import {JwtService} from '@nestjs/jwt';
 import {ConfirmEmailDto} from '../../../domain/auth/dtos/confirm-email.dto';
 import {ConfirmEmailResult} from '../../../domain/auth/models/results/email-confirmation.result';
 import {ConfirmEmailMessage} from '../../../domain/auth/enums/confirm-email-message.enum';
@@ -37,6 +37,8 @@ import {Account} from '../../../domain/auth/models/account.model';
 import {UpdateUserMessage} from '../../../domain/auth/enums/update-user-message.enum';
 import {ValidateFacebookUserDto} from '../../../domain/auth/dtos/validate-facebook-user.dto';
 import {ValidateGoogleUserDto} from '../../../domain/auth/dtos/validate-google-user.dto';
+import {BrazilCity} from '../../../domain/config/models/brazil-city.model';
+import {PermissionRequest} from '../../../domain/manager/models/permission-request.model';
 
 
 @Injectable()
@@ -46,6 +48,8 @@ export class AuthRepository extends IAuthRepository {
         @InjectModel('User') private readonly userModel: Model<User>,
         @InjectModel('PasswordResetCode') private readonly passwordResetCodeModel: Model<PasswordResetCode>,
         @InjectModel('Account') private readonly accountModel: Model<Account>,
+        @InjectModel('BrazilCity') private readonly citiesModel: Model<BrazilCity>,
+        @InjectModel('PermissionRequest') private readonly permissionRequestModel: Model<PermissionRequest>,
         private readonly mailService: MailService,
         private readonly utilService: UtilService,
         private readonly jwtService: JwtService,
@@ -74,6 +78,8 @@ export class AuthRepository extends IAuthRepository {
             phone: doc.phone,
             cell: doc.cell,
             whatsapp: doc.whatsapp,
+            filledProfile: doc.filledProfile,
+            requestedPermission: doc.requestedPermission
         };
     }
 
@@ -201,6 +207,15 @@ export class AuthRepository extends IAuthRepository {
         let result = {accessToken: undefined, user: payload, message};
 
         if (payload) {
+
+            let latitude, longitude;
+
+            if (payload.cityId) {
+                const {lat, lng} = await this.citiesModel.findById(payload.cityId).exec();
+                latitude = lat;
+                longitude = lng;
+            }
+
             result = {
                 accessToken: this.jwtService.sign({...payload, img: ''}),
                 user: {
@@ -221,6 +236,10 @@ export class AuthRepository extends IAuthRepository {
                     phone: payload.phone,
                     cell: payload.cell,
                     whatsapp: payload.whatsapp,
+                    lat: latitude,
+                    lng: longitude,
+                    filledProfile: payload.filledProfile,
+                    requestedPermission: payload.requestedPermission
                 },
                 message
             }
@@ -233,37 +252,38 @@ export class AuthRepository extends IAuthRepository {
         let {email, provider, password, activated} = input;
         provider = !provider ? 'application' : provider;
 
-        const docExstingEmail = await this.userModel.findOne({
+        const docExistingEmail = await this.userModel.findOne({
             email, provider
         }).exec();
 
-        if (!docExstingEmail) {
-            let doc: RegisterDto = input;
-            const salt = await bcrypt.genSalt();
-            doc.password = await bcrypt.hashSync(password, salt);
+        if (docExistingEmail) {
+            throw new HttpException(result, HttpStatus.OK);
+        }
 
-            const insert = await this.userModel.insertMany(doc);
+        const salt = await bcrypt.genSalt();
+        input.password = await bcrypt.hashSync(password, salt);
 
-            if (insert) {
-                const user = insert[0];
-                const enc = await this.utilService.encrypt(user.id);
-                const token = `${enc.content}${enc.iv}`
+        const insert = await this.userModel.insertMany(input);
 
-                if (!activated) {
-                    await this.accountModel.insertMany({
-                        token, userId: user.id
-                    });
+        if (insert) {
+            const user = insert[0];
+            const enc = await this.utilService.encrypt(user.id);
+            const token = `${enc.content}${enc.iv}`
 
-                    try {
-                        await this.mailService.sendUserConfirmation(user, token);
-                    } catch (error) {
-                        await this.userModel.deleteOne({email: user.email});
-                        error.statusCode = 400;
-                        throw error;
-                    }
+            if (!activated) {
+                await this.accountModel.insertMany({
+                    token, userId: user.id
+                });
+
+                try {
+                    await this.mailService.sendUserConfirmation(user, token);
+                } catch (error) {
+                    await this.userModel.deleteOne({email: user.email});
+                    error.statusCode = 400;
+                    throw error;
                 }
-                result = {success: true, message: RegisterMessage.SuccessfulRegistration};
             }
+            result = {success: true, message: RegisterMessage.SuccessfulRegistration};
         }
         return result;
     }
@@ -397,6 +417,8 @@ export class AuthRepository extends IAuthRepository {
                     phone: user.phone,
                     cell: user.cell,
                     whatsapp: user.whatsapp,
+                    filledProfile: user.filledProfile,
+                    requestedPermission: user.requestedPermission
                 }
             }
         }
@@ -405,23 +427,45 @@ export class AuthRepository extends IAuthRepository {
 
     async updateUser(input: UpdateUserDto): Promise<UpdateUserResult> {
         let result: UpdateUserResult = {success: false, auth: null, message: UpdateUserMessage.Error};
-        const {
-            id, username, personTypeId, document, zipCode, address, district, cityId, state, complement, cell,
-            phone, whatsapp, img
-        } = input;
+        const doc = {
+            username: input.username,
+            personTypeId: input.personTypeId,
+            document: input.document,
+            zipCode: input.zipCode,
+            address: input.address,
+            district: input.district,
+            cityId: input.cityId,
+            state: input.state,
+            complement: input.complement,
+            phone: input.phone,
+            cell: input.cell,
+            whatsapp: input.whatsapp,
+            img: input.img,
+            filledProfile: true
+        };
 
-        const update = await this.userModel.findOneAndUpdate({
-            _id: id
-        }, {
-            username, personTypeId, document, zipCode, address, district, cityId, state, complement, phone, cell,
-            whatsapp, img
-        }, {returnDocument: 'after'});
+        if (input?.permissionRequest) {
+            doc['requestedPermission'] = true;
+        }
 
-        if (update) {
-            const payload = this.getPayload(update);
+        const updated = await this.userModel.findOneAndUpdate({
+            _id: input.id
+        }, doc, {returnDocument: 'after'});
+
+        if (updated) {
+            const payload = this.getPayload(updated);
             const auth = await this.login({
                 payload
             });
+
+            if (!updated.isInstitution && input?.permissionRequest) {
+                const doc = {
+                    userId: updated.id,
+                    email: updated.email,
+                    date: new Date().toLocaleDateString()
+                }
+                await this.permissionRequestModel.insertMany(doc);
+            }
 
             result = {
                 success: true,
