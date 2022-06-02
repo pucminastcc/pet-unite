@@ -37,4 +37,40 @@ export class MailService {
             throw err;
         }
     }
+
+    async sendSignalDonation(email: string, username: string, petName: string, donateToInstitution: boolean = false): Promise<void> {
+        try {
+            let subject: string;
+            let message: string;
+
+            if (donateToInstitution) {
+                subject = `Que legal! Uma doação foi postada`;
+                message = `O usuário ${username} está doando ${petName}. <br/> Não deixe seu amigo esperando entre na aplicação e veja as formas de contato disponíveis! <br/>Clique aqui: <a href="${process.env.APP_URL}">Pet Unite</a>`;
+            } else {
+                subject = `Que legal! A doação de ${petName} foi sinalizada!`;
+                message =  `O usuário ${username} sinalizou interesse em adotar ${petName}. <br/> Não deixe seu amigo esperando entre na aplicação e veja as formas de contato disponíveis! <br/>Clique aqui: <a href="${process.env.APP_URL}">Pet Unite</a>`;
+            }
+
+            await this.mailerService.sendMail({
+                to: email,
+                subject: subject,
+                html: message,
+            });
+        } catch (err) {
+        }
+    }
+
+    async sendDonationStatus(email: string, username: string, petName: string): Promise<void> {
+        try {
+            let subject: string;
+            let message: string;
+
+            await this.mailerService.sendMail({
+                to: email,
+                subject: `O status da doação de ${petName} foi alterado por ${username}`,
+                html: `Para saber mais, visite nossa aplicação! <br/>Clique aqui: <a href="${process.env.APP_URL}">Pet Unite</a>`,
+            });
+        } catch (err) {
+        }
+    }
 }

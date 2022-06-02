@@ -27,6 +27,7 @@ import {UpdateDonationStatusResult} from '../../../domain/donation/models/result
 import {UpdateDonationStatusMessage} from '../../../domain/donation/enums/update-donation-status-message.enum';
 import {DonatePetStatusSeverity} from '../../../domain/donation/enums/donate-pet-status-severity.enum';
 import {DonatePetStatusMessage} from '../../../domain/donation/enums/donate-pet-status-message.enum';
+import {MailService} from '../../../shared/mail/services/mail.service';
 
 @Injectable()
 export class DonationRepository extends IDonationRepository {
@@ -37,6 +38,7 @@ export class DonationRepository extends IDonationRepository {
         @InjectModel('Pet') private readonly petModel: Model<Pet>,
         @InjectModel('PetType') private readonly petTypesModel: Model<PetType>,
         @InjectModel('PetGender') private readonly petGendersModel: Model<PetGender>,
+        private readonly mailService: MailService,
     ) {
         super();
     }
@@ -94,6 +96,8 @@ export class DonationRepository extends IDonationRepository {
                 insertDoc['status'] = `${DonatePetStatusMessage.DonatedForInstitution}`;
                 insertDoc['statusSeverity'] = DonatePetStatusSeverity.Info;
                 insertDoc['donatedToInstitution'] = true;
+
+                this.mailService.sendSignalDonation(institution.email, user.username, pet.name, true);
 
             } else {
                 insertDoc['status'] = `${DonatePetStatusMessage.Waiting}`;
@@ -305,14 +309,15 @@ export class DonationRepository extends IDonationRepository {
         let result: SignalDonationResult;
         const {donationId, userId, username} = dto;
 
-        const user = await this.userModel.findById(userId).exec();
+        const donation = await this.donationModel.findById(donationId).exec();
+        const interestedUser = await this.userModel.findById(userId).exec();
 
-        if (user.isInstitution) {
+        if (interestedUser.isInstitution) {
             await this.donationModel.findByIdAndUpdate(donationId, {
-                interestedUserId: userId,
-                interestedUsername: username,
+                interestedUserId: interestedUser.id,
+                interestedUsername: interestedUser.username,
                 interestedUserFlagged: true,
-                status: `${DonatePetStatusMessage.FlaggedBy} ${username}`,
+                status: `${DonatePetStatusMessage.FlaggedBy} ${interestedUser.username}`,
                 statusSeverity: DonatePetStatusSeverity.Warning,
                 signalDate: new Date().toLocaleDateString()
             })
@@ -347,29 +352,44 @@ export class DonationRepository extends IDonationRepository {
                 }
             }
         }
+
+        if (result.success) {
+            const pet = await this.petModel.findById(donation.petId).exec();
+            const user = await this.userModel.findById(donation.userId).exec();
+
+            this.mailService.sendSignalDonation(user.email, interestedUser.username, pet.name);
+        }
+
         return result;
     }
 
     async updateDonationStatus(dto: UpdateDonationStatusDto): Promise<UpdateDonationStatusResult> {
         let result: UpdateDonationStatusResult = {success: false, message: UpdateDonationStatusMessage.Error};
 
-        const {donationId, data, userId} = dto;
+        const {donationId, data, userId, username} = dto;
 
         const donation = await this.donationModel.findByIdAndUpdate(
             donationId, data, {
                 returnDocument: 'after'
             }).exec();
 
-        if (donation.donated) {
-            await this.petModel.findByIdAndUpdate(donation.petId, {
+        if (donation) {
+            const pet = donation.donated ? await this.petModel.findByIdAndUpdate(donation.petId, {
                 isDonated: true,
                 inDonation: false
-            });
-        }
+            }, {
+                returnDocument: 'after'
+            }) : await this.petModel.findById(donation.petId).exec();
 
-        if (donation) {
+            const user = await this.userModel.findById(donation.userId).exec();
+            const interestedUser = await this.userModel.findById(donation.interestedUserId).exec();
+
+            this.mailService.sendDonationStatus(interestedUser.email, username, pet.name);
+            this.mailService.sendDonationStatus(user.email, username, pet.name);
+
             result = {success: true, message: UpdateDonationStatusMessage.Success};
         }
+
         return result;
     }
 

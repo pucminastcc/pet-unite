@@ -1,13 +1,4 @@
-import {
-  AfterContentChecked,
-  AfterViewInit,
-  Component,
-  ElementRef,
-  HostListener,
-  OnDestroy,
-  OnInit,
-  ViewChild
-} from '@angular/core';
+import {AfterContentChecked, Component, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {FormBuilderTypeSafe, FormGroupTypeSafe} from 'angular-typesafe-reactive-forms-helper';
 import {FormControl, Validators} from '@angular/forms';
 import {LogoutResult} from '../../../../../../domain/auth/models/results/logout.result';

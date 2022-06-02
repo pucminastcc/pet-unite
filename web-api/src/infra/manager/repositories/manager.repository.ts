@@ -19,9 +19,9 @@ import {PersonType} from '../../../domain/config/models/person-type.model';
 import {BrazilCity} from '../../../domain/config/models/brazil-city.model';
 import {PermissionRequest} from '../../../domain/manager/models/permission-request.model';
 import {GetPermissionRequestsDto} from '../../../domain/manager/dtos/get-permission-requests.dto';
-import {PermissionResquestBaseResult} from '../../../domain/manager/models/results/permission-resquest-base.result';
 import {ReplyPermissionRequestDto} from '../../../domain/manager/dtos/reply-permission-request.dto';
 import {ReplyPermissionRequestResult} from '../../../domain/manager/models/results/reply-permission-request.result';
+import {PermissionRequestBaseResult} from '../../../domain/manager/models/results/permission-request-base.result';
 
 @Injectable()
 export class ManagerRepository extends IManagerRepository {
@@ -157,8 +157,8 @@ export class ManagerRepository extends IManagerRepository {
         return result;
     }
 
-    async getPermissionRequests(input: GetPermissionRequestsDto): Promise<PermissionResquestBaseResult[]> {
-        let result: PermissionResquestBaseResult[] = [];
+    async getPermissionRequests(input: GetPermissionRequestsDto): Promise<PermissionRequestBaseResult[]> {
+        let result: PermissionRequestBaseResult[] = [];
 
         const permissionRequests = await this.permissionRequestModel.find().exec();
 

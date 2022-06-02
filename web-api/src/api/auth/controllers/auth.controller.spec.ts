@@ -15,31 +15,16 @@ import {UpdateUserDto} from '../../../domain/auth/dtos/update-user.dto';
 
 const registerResult: RegisterResult = new RegisterResult(true, '');
 
-const loginResult: LoginResult = new LoginResult('', {
-    id: '',
-    username: '',
-    email: '',
-    provider: '',
-    img: '',
-    isSuperUser: false,
-    isInstitution: false,
-    personTypeId: '',
-    document: '',
-    zipCode: '',
-    address: '',
-    district: '',
-    cityId: '',
-    state: '',
-    complement: '',
-    phone: '',
-    cell: '',
-    whatsapp: ''
-}, '');
+const loginResult: LoginResult = new LoginResult('',
+    new UserModel('', '', '', '', '', false, false, '',
+    '', '', '', '', '', '', '', '', '',
+    ''), '');
 
 const getUserResult: GetUserResult = new GetUserResult(true,
     new UserModel('', '', '', '', '', false, false, '',
         '', '', '', '', '', '', '', '', '',
-        '')
+        ''
+    )
 );
 
 const updateUserResult: UpdateUserResult = new UpdateUserResult(true, new LoginResult('',
@@ -91,7 +76,7 @@ describe('AuthController', () => {
                 terms: true,
                 activated: false,
                 provider: 'application',
-                img: ''
+                img: 'data:image/png;base64,...'
             };
 
             const req = mocks.createRequest();
@@ -114,7 +99,7 @@ describe('AuthController', () => {
         it('should return a local user', async () => {
             const body: ValidateLocalUserDto = {
                 email: 'usuario@exemplo.com',
-                password: '@Senha!23'
+                password: 'usuario@!123'
             };
 
             const req = mocks.createRequest();
@@ -136,17 +121,17 @@ describe('AuthController', () => {
     describe('facebook', () => {
         it('should return a facebook user', async () => {
             const body: ValidateFacebookUserDto = {
-                provider: 'string',
-                id: 'string',
-                email: 'string',
-                name: 'string',
-                photoUrl: 'string',
-                firstName: 'string',
-                lastName: 'string',
-                authToken: 'string',
-                idToken: 'string',
-                authorizationCode: 'string',
-                response: 'any',
+                provider: '',
+                id: '',
+                email: '',
+                name: '',
+                photoUrl: '',
+                firstName: '',
+                lastName: '',
+                authToken: '',
+                idToken: '',
+                authorizationCode: '',
+                response: '',
             };
 
             const result = await authController.facebook(body);
@@ -165,17 +150,17 @@ describe('AuthController', () => {
     describe('google', () => {
         it('should return a google user', async () => {
             const body: ValidateGoogleUserDto = {
-                provider: 'string',
-                id: 'string',
-                email: 'string',
-                name: 'string',
-                photoUrl: 'string',
-                firstName: 'string',
-                lastName: 'string',
-                authToken: 'string',
-                idToken: 'string',
-                authorizationCode: 'string',
-                response: 'any',
+                provider: '',
+                id: '',
+                email: '',
+                name: '',
+                photoUrl: '',
+                firstName: '',
+                lastName: '',
+                authToken: '',
+                idToken: '',
+                authorizationCode: '',
+                response: '',
             };
 
             const result = await authController.google(body);
@@ -191,7 +176,7 @@ describe('AuthController', () => {
         });
     });
 
-    describe('user', () => {
+    describe('getUser', () => {
         it('should return a user data', async () => {
             let req = mocks.createRequest();
             req.user = {
@@ -204,6 +189,14 @@ describe('AuthController', () => {
             expect(result).toEqual(getUserResult);
         });
 
+        it('should throw an exception', () => {
+            jest.spyOn(authService, 'getUser').mockRejectedValueOnce(new Error());
+
+            expect(authController.getUser).rejects.toThrowError();
+        });
+    });
+
+    describe('updateUser', () => {
         it('should update a user data', async () => {
             let req = mocks.createRequest();
             req.user = {
@@ -212,7 +205,7 @@ describe('AuthController', () => {
 
             const body: UpdateUserDto = {
                 id: '624a47cce5ac8d49955684e8',
-                img: '',
+                img: 'data:image/png;base64,...',
                 username: 'Usuário',
                 personTypeId: '61edc763ba146329a791e7a3',
                 document: '390.319.950-88',
@@ -224,7 +217,8 @@ describe('AuthController', () => {
                 complement: 'de 2801 a 3099 - lado ímpar',
                 phone: '(17)3632-3632',
                 cell: '(17)99799-9999',
-                whatsapp: '(17)99799-9999'
+                whatsapp: '(17)99799-9999',
+                permissionRequest: false
             };
 
             const result = await authController.updateUser(body, req);
@@ -233,13 +227,7 @@ describe('AuthController', () => {
             expect(result).toEqual(updateUserResult);
         });
 
-        it('should throw an exception on get user data', () => {
-            jest.spyOn(authService, 'getUser').mockRejectedValueOnce(new Error());
-
-            expect(authController.getUser).rejects.toThrowError();
-        });
-
-        it('should throw an exception on update user data', () => {
+        it('should throw an exception', () => {
             jest.spyOn(authService, 'updateUser').mockRejectedValueOnce(new Error());
 
             expect(authController.updateUser).rejects.toThrowError();

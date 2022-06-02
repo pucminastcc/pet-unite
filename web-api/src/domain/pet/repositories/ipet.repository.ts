@@ -7,12 +7,12 @@ import {DeletePetResult} from '../models/results/delete-pet.result';
 import {GetPetDto} from '../dtos/get-pet.dto';
 import {GetPetResult} from '../models/results/get-pet.result';
 import {GetPetsDto} from '../dtos/get-pets.dto';
-import {GetPetsResult} from '../models/results/get-pets.result';
+import {PetBaseResult} from '../models/results/pet-base.result';
 
 export abstract class IPetRepository {
     abstract getPet(dto: GetPetDto): Promise<GetPetResult>;
 
-    abstract getPets(dto: GetPetsDto): Promise<GetPetsResult[]>;
+    abstract getPets(dto: GetPetsDto): Promise<PetBaseResult[]>;
 
     abstract createPet(dto: CreatePetDto): Promise<CreatePetResult>;
 

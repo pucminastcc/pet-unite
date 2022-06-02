@@ -46,7 +46,6 @@ export class AppAdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy
     const navbar: HTMLElement = this.element.nativeElement;
     this.toggleButton = navbar.getElementsByClassName('navbar-toggler')[0] as HTMLElement;
     this.body = document.getElementsByTagName('body')[0] as HTMLElement;
-    this.body.style.overflow = 'hidden';
     this.layer = document.getElementsByClassName('close-layer')[0] as HTMLElement;
 
     this.sidebarClose();
@@ -58,7 +57,6 @@ export class AppAdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy
 
     setTimeout(() => {
       this.isLoading = false;
-      this.body.style.overflow = 'visible'
     }, 2500);
   }
 

@@ -1,4 +1,4 @@
-export interface PermissionResquestBaseResult {
+export interface PermissionRequestBaseResult {
     id: string;
     userId: string;
     username: string;

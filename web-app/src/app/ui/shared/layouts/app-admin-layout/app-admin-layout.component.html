@@ -1,5 +1,5 @@
-<app-loading [isLoading]="isLoading"></app-loading>
 <div class="wrapper">
+  <app-loading [isLoading]="isLoading"></app-loading>
   <app-sidebar (onLogout)="logout()" (onMenuItemClick)="sidebarToggle()" [isMobile]="isMobileMenu()"
                [menuItems]="sidebarMenuItem" [user]="user">
   </app-sidebar>

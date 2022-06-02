@@ -24,7 +24,12 @@ export interface Donation extends Document {
     donatedToInstitution: boolean;
 }
 
-export interface Contacts {
+export class Contacts {
     description: string;
     value: string;
+
+    constructor(description?: string, value?: string) {
+        this.description = description;
+        this.value = value;
+    }
 }

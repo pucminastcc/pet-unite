@@ -11,7 +11,7 @@ import {DeletePetResult} from '../../../domain/pet/models/results/delete-pet.res
 import {GetPetDto} from '../../../domain/pet/dtos/get-pet.dto';
 import {GetPetResult} from '../../../domain/pet/models/results/get-pet.result';
 import {GetPetsDto} from '../../../domain/pet/dtos/get-pets.dto';
-import {GetPetsResult} from '../../../domain/pet/models/results/get-pets.result';
+import {PetBaseResult} from '../../../domain/pet/models/results/pet-base.result';
 
 @Controller('pet')
 export class PetController {
@@ -31,7 +31,7 @@ export class PetController {
         status: 401,
         description: 'A solicitação não foi aplicada porque não possui credenciais de autenticação válidas para o recurso de destino'
     })
-    async getPets(@Query() query: GetPetsDto, @Request() req): Promise<GetPetsResult[]> {
+    async getPets(@Query() query: GetPetsDto, @Request() req): Promise<PetBaseResult[]> {
         return await this.petService.getPets({
             userId: req.user.id
         });
