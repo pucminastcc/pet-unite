@@ -1,6 +1,6 @@
 import {Types} from 'mongoose';
 
-export interface GetPetsResult {
+export interface PetBaseResult {
     id: Types.ObjectId;
     img: string;
     name: string;

@@ -12,8 +12,8 @@ import {UpdatePetResult} from '../../../domain/pet/models/results/update-pet.res
 import {GetPetDto} from '../../../domain/pet/dtos/get-pet.dto';
 import {GetPetResult} from '../../../domain/pet/models/results/get-pet.result';
 import {GetPetsDto} from '../../../domain/pet/dtos/get-pets.dto';
-import {GetPetsResult} from '../../../domain/pet/models/results/get-pets.result';
 import {Donation} from '../../../domain/donation/models/donation.model';
+import {PetBaseResult} from '../../../domain/pet/models/results/pet-base.result';
 
 @Injectable()
 export class PetRepository extends IPetRepository {
@@ -24,8 +24,8 @@ export class PetRepository extends IPetRepository {
         super();
     }
 
-    async getPets(dto: GetPetsDto): Promise<GetPetsResult[]> {
-        let result: GetPetsResult[] = [];
+    async getPets(dto: GetPetsDto): Promise<PetBaseResult[]> {
+        let result: PetBaseResult[] = [];
         const {userId} = dto;
         const pets = await this.petModel.find({userId}).exec();
 

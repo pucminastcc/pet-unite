@@ -110,6 +110,7 @@ export class DonationController {
     async updateDonationStatus(@Body() body: UpdateDonationStatusDto, @Request() req): Promise<UpdateDonationStatusResult> {
         return await this.donationService.updateDonationStatus({
             userId: req.user.id,
+            username: req.user.username,
             ...body
         });
     }
@@ -137,7 +138,7 @@ export class DonationController {
     @ApiResponse({status: 200, description: 'Resposta padrão para solicitação HTTP bem-sucedida.'})
     @ApiResponse({status: 400, description: 'A solicitação não pode ser atendida devido a sintaxe incorreta.'})
     @ApiResponse({status: 401, description: 'A solicitação não foi aplicada porque não possui credenciais de autenticação válidas para o recurso de destino'})
-    async getDonation(@Query() query: GetDonationDto, @Request() req): Promise<DonationResult> {
+    async getDonation(@Query() query: GetDonationDto): Promise<DonationResult> {
         return await this.donationService.getDonation({
             donationId: query.donationId
         });

@@ -10,7 +10,7 @@ import {DeletePetResult} from '../../../domain/pet/models/results/delete-pet.res
 import {GetPetDto} from '../../../domain/pet/dtos/get-pet.dto';
 import {GetPetResult} from '../../../domain/pet/models/results/get-pet.result';
 import {GetPetsDto} from '../../../domain/pet/dtos/get-pets.dto';
-import {GetPetsResult} from '../../../domain/pet/models/results/get-pets.result';
+import {PetBaseResult} from '../../../domain/pet/models/results/pet-base.result';
 
 
 @Injectable()
@@ -20,7 +20,7 @@ export class PetService implements IPetRepository{
     ) {
     }
 
-    async getPets(dto: GetPetsDto): Promise<GetPetsResult[]> {
+    async getPets(dto: GetPetsDto): Promise<PetBaseResult[]> {
         return await this.petRepository.getPets(dto);
     }
 

@@ -10,6 +10,7 @@ import {FormBuilderTypeSafe, FormGroupTypeSafe} from 'angular-typesafe-reactive-
 import {FormControl, Validators} from '@angular/forms';
 import {DonationResult} from '../../../../../../domain/donation/models/results/donation.result';
 import {UpdateDonationStatusResult} from '../../../../../../domain/donation/models/results/update-donation-status.result';
+import {finalize} from 'rxjs/operators';
 
 interface StatusForm {
   data: any;
@@ -37,6 +38,7 @@ export class DonationStatusComponent implements OnInit, OnDestroy {
   public optStatus: SelectItem[] = [];
   public form: FormGroupTypeSafe<StatusForm> | FormGroupTypeSafe<RatingForm> | undefined;
   public submitted: boolean = false;
+  public isLoading: boolean = false;
   public rating: boolean = false;
   public feedback: string = null;
 
@@ -97,10 +99,17 @@ export class DonationStatusComponent implements OnInit, OnDestroy {
       data = this.form.get('data').value;
     }
 
+    this.isLoading = true;
     this.updateDonationStatusSubscription = this.donationService.updateDonationStatus({
       donationId: this.donation.id,
       data
-    }).subscribe((result: UpdateDonationStatusResult) => {
+    })
+      .pipe(
+        finalize(() => {
+          this.isLoading = false;
+        })
+      )
+      .subscribe((result: UpdateDonationStatusResult) => {
       if (result) {
         if (result.success) {
           this.donation = {

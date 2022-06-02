@@ -1,4 +1,4 @@
-<div *ngIf="petId" class="text-center">
+<div class="text-center">
   <p-progressSpinner *ngIf="isLoading"></p-progressSpinner>
 </div>
 
@@ -82,7 +82,7 @@
               </p-dropdown>
             </div>
             <div *ngIf="(!rf.age.valid || !rf.ageType.valid) && ((rf.age.dirty || rf.ageType.dirty) || submitted)">
-              <p-message *ngIf="rf.age.errors.required || rf.ageType.errors.required" severity="error" text="Informe a idade"></p-message>
+              <p-message *ngIf="rf.age?.errors?.required || rf.ageType?.errors?.required" severity="error" text="Informe a idade"></p-message>
             </div>
           </div>
         </div>
