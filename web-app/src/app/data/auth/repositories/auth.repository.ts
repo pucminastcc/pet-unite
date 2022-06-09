@@ -29,6 +29,10 @@ import {GetUserInput} from '../../../domain/auth/commands/inputs/get-user.input'
 import {GetUserResult} from '../../../domain/auth/models/results/get-user.result';
 import {LoginFacebookInput} from '../../../domain/auth/commands/inputs/login-facebook.input';
 import {LoginGoogleInput} from '../../../domain/auth/commands/inputs/login-google.input';
+import {GetDonationChartInput} from '../../../domain/auth/commands/inputs/get-donation-chart.input';
+import {DonationChartResult} from '../../../domain/auth/models/results/donation-chart.result';
+import {GetContributionChartInput} from '../../../domain/auth/commands/inputs/get-contribution-chart.input';
+import {ContributionChartResult} from '../../../domain/auth/models/results/contribution-chart.result';
 
 @Injectable({
   providedIn: 'root'
@@ -156,6 +160,22 @@ export class AuthRepository extends IAuthRepository {
     const {accessToken} = input;
     return this.api.put<UpdateUserResult>(`${environment.apiUrl}/auth/user`, input, accessToken)
       .pipe(map((result: UpdateUserResult) => {
+        return result;
+      }));
+  }
+
+  getDonationChart(input: GetDonationChartInput): Observable<DonationChartResult> {
+    const {accessToken} = input;
+    return this.api.get<DonationChartResult>(`${environment.apiUrl}/auth/donationChart`, accessToken)
+      .pipe(map((result: DonationChartResult) => {
+        return result;
+      }));
+  }
+
+  getContributionChart(input: GetContributionChartInput): Observable<ContributionChartResult> {
+    const {accessToken} = input;
+    return this.api.get<ContributionChartResult>(`${environment.apiUrl}/auth/contributionChart`, accessToken)
+      .pipe(map((result: ContributionChartResult) => {
         return result;
       }));
   }

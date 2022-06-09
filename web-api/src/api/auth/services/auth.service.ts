@@ -21,6 +21,10 @@ import {UpdateUserDto} from '../../../domain/auth/dtos/update-user.dto';
 import {UpdateUserResult} from '../../../domain/auth/models/results/update-user.result';
 import {ValidateFacebookUserDto} from '../../../domain/auth/dtos/validate-facebook-user.dto';
 import {ValidateGoogleUserDto} from '../../../domain/auth/dtos/validate-google-user.dto';
+import {GetDonationChartDto} from '../../../domain/auth/dtos/get-donation-chart.dto';
+import {DonationChartResult} from '../../../domain/auth/models/results/donation-chart.result';
+import {GetContributionChartDto} from '../../../domain/auth/dtos/get-contribution-chart.dto';
+import {ContributionChartResult} from '../../../domain/auth/models/results/contribution-chart.result';
 
 @Injectable()
 export class AuthService implements IAuthRepository {
@@ -71,5 +75,13 @@ export class AuthService implements IAuthRepository {
 
     async updateUser(input: UpdateUserDto): Promise<UpdateUserResult> {
         return await this.repository.updateUser(input);
+    }
+
+    async getDonationChart(input: GetDonationChartDto): Promise<DonationChartResult> {
+        return await this.repository.getDonationChart(input);
+    }
+
+    async getContributionChart(input: GetContributionChartDto): Promise<ContributionChartResult> {
+        return await this.repository.getContributionChart(input);
     }
 }

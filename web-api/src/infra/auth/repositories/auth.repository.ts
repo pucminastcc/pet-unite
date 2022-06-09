@@ -4,7 +4,7 @@ import {MailService} from '../../../shared/mail/services/mail.service';
 import {UtilService} from '../../../shared/util/services/util.service';
 import {JwtService} from '@nestjs/jwt';
 import {InjectModel} from '@nestjs/mongoose';
-import {Model} from 'mongoose';
+import {Model, Types} from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import {User, UserModel} from '../../../domain/auth/models/user.model';
@@ -39,6 +39,12 @@ import {ValidateFacebookUserDto} from '../../../domain/auth/dtos/validate-facebo
 import {ValidateGoogleUserDto} from '../../../domain/auth/dtos/validate-google-user.dto';
 import {BrazilCity} from '../../../domain/config/models/brazil-city.model';
 import {PermissionRequest} from '../../../domain/manager/models/permission-request.model';
+import {DonationChartResult} from '../../../domain/auth/models/results/donation-chart.result';
+import {GetDonationChartDto} from '../../../domain/auth/dtos/get-donation-chart.dto';
+import {Donation} from '../../../domain/donation/models/donation.model';
+import {GetContributionChartDto} from '../../../domain/auth/dtos/get-contribution-chart.dto';
+import {ContributionChartResult} from '../../../domain/auth/models/results/contribution-chart.result';
+import {Report} from '../../../domain/manager/models/report.model';
 
 
 @Injectable()
@@ -46,6 +52,8 @@ export class AuthRepository extends IAuthRepository {
 
     constructor(
         @InjectModel('User') private readonly userModel: Model<User>,
+        @InjectModel('Donation') private readonly donationModel: Model<Donation>,
+        @InjectModel('Report') private readonly reportsModel: Model<Report>,
         @InjectModel('PasswordResetCode') private readonly passwordResetCodeModel: Model<PasswordResetCode>,
         @InjectModel('Account') private readonly accountModel: Model<Account>,
         @InjectModel('BrazilCity') private readonly citiesModel: Model<BrazilCity>,
@@ -473,6 +481,231 @@ export class AuthRepository extends IAuthRepository {
                 message: UpdateUserMessage.Success
             }
         }
+
+        return result;
+    }
+
+    async getDonationChart(input: GetDonationChartDto): Promise<DonationChartResult> {
+        let result: DonationChartResult = {donations: [], adoptions: []};
+
+        const donations = await this.donationModel.aggregate([
+            {
+                $group: {
+                    _id: {
+                        userId: '$userId',
+                        month: {
+                            $month: '$createdAt'
+                        },
+                        year: {
+                            $year: '$createdAt'
+                        }
+                    },
+                    count: {
+                        $sum: 1
+                    }
+                },
+            },
+            {
+                $project: {
+                    _id: 0,
+                    userId: '$_id.userId',
+                    year: '$_id.year',
+                    count: '$count',
+                    month: {
+                        $arrayElemAt: [
+                            ['', 'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                            '$_id.month'
+                        ]
+                    }
+                }
+            },
+            {
+                $match: {
+                    year: input.currentYear,
+                    userId: new Types.ObjectId(input.userId)
+                }
+            }
+        ]).exec();
+
+        const adoptions = await this.donationModel.aggregate([
+            {
+                $group: {
+                    _id: {
+                        interestedUserId: '$interestedUserId',
+                        month: {
+                            $month: '$createdAt'
+                        },
+                        year: {
+                            $year: '$createdAt'
+                        }
+                    },
+                    count: {
+                        $sum: 1
+                    }
+                },
+            },
+            {
+                $project: {
+                    _id: 0,
+                    interestedUserId: '$_id.interestedUserId',
+                    year: '$_id.year',
+                    count: '$count',
+                    month: {
+                        $arrayElemAt: [
+                            ['', 'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                            '$_id.month'
+                        ]
+                    }
+                }
+            },
+            {
+                $match: {
+                    year: input.currentYear,
+                    interestedUserId: new Types.ObjectId(input.userId)
+                }
+            }
+        ]).exec();
+
+        result = {
+            donations,
+            adoptions
+        };
+
+        return result;
+    }
+
+    async getContributionChart(input: GetContributionChartDto): Promise<ContributionChartResult> {
+        let result: ContributionChartResult = {contributions: []};
+
+        const labels: string[] = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+
+        const donations = await this.donationModel.aggregate([
+            {
+                $group: {
+                    _id: {
+                        userId: '$userId',
+                        month: {
+                            $month: '$createdAt'
+                        },
+                        year: {
+                            $year: '$createdAt'
+                        }
+                    },
+                    count: {
+                        $sum: 1
+                    }
+                },
+            },
+            {
+                $project: {
+                    _id: 0,
+                    userId: '$_id.userId',
+                    year: '$_id.year',
+                    count: '$count',
+                    month: {
+                        $arrayElemAt: [
+                            ['', 'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                            '$_id.month'
+                        ]
+                    }
+                }
+            },
+            {
+                $match: {
+                    year: input.currentYear,
+                    userId: new Types.ObjectId(input.userId)
+                }
+            }
+        ]).exec();
+
+        const adoptions = await this.donationModel.aggregate([
+            {
+                $group: {
+                    _id: {
+                        interestedUserId: '$interestedUserId',
+                        month: {
+                            $month: '$createdAt'
+                        },
+                        year: {
+                            $year: '$createdAt'
+                        }
+                    },
+                    count: {
+                        $sum: 1
+                    }
+                },
+            },
+            {
+                $project: {
+                    _id: 0,
+                    interestedUserId: '$_id.interestedUserId',
+                    year: '$_id.year',
+                    count: '$count',
+                    month: {
+                        $arrayElemAt: [
+                            ['', 'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                            '$_id.month'
+                        ]
+                    }
+                }
+            },
+            {
+                $match: {
+                    year: input.currentYear,
+                    interestedUserId: new Types.ObjectId(input.userId)
+                }
+            }
+        ]).exec();
+
+        const reports = await this.reportsModel.aggregate([
+            {
+                $group: {
+                    _id: {
+                        userId: '$userId',
+                        month: {
+                            $month: '$createdAt'
+                        },
+                        year: {
+                            $year: '$createdAt'
+                        }
+                    },
+                    count: {
+                        $sum: 1
+                    }
+                },
+            },
+            {
+                $project: {
+                    _id: 0,
+                    userId: '$_id.userId',
+                    year: '$_id.year',
+                    count: '$count',
+                    month: {
+                        $arrayElemAt: [
+                            ['', 'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                            '$_id.month'
+                        ]
+                    }
+                }
+            },
+            {
+                $match: {
+                    year: input.currentYear,
+                    userId: new Types.ObjectId(input.userId)
+                }
+            }
+        ]).exec();
+
+        labels.forEach((label: string) => {
+            const donationsCount = donations.find(f => f.month === label) ? donations.find(f => f.month === label).count : 0;
+            const adoptionsCount = adoptions.find(f => f.month === label) ? adoptions.find(f => f.month === label).count : 0;
+            const reportsCount = reports.find(f => f.month === label) ? reports.find(f => f.month === label).count : 0;
+
+            result.contributions.push({
+                month: label,
+                count: donationsCount + adoptionsCount + reportsCount
+            });
+        });
 
         return result;
     }

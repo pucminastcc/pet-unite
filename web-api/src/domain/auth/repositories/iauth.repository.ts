@@ -18,6 +18,10 @@ import {UpdateUserDto} from '../dtos/update-user.dto';
 import {UpdateUserResult} from '../models/results/update-user.result';
 import {ValidateFacebookUserDto} from '../dtos/validate-facebook-user.dto';
 import {ValidateGoogleUserDto} from '../dtos/validate-google-user.dto';
+import {GetDonationChartDto} from '../dtos/get-donation-chart.dto';
+import {DonationChartResult} from '../models/results/donation-chart.result';
+import {GetContributionChartDto} from '../dtos/get-contribution-chart.dto';
+import {ContributionChartResult} from '../models/results/contribution-chart.result';
 
 
 export abstract class IAuthRepository {
@@ -42,4 +46,8 @@ export abstract class IAuthRepository {
     abstract getUser(input: GetUserDto): Promise<GetUserResult>;
 
     abstract updateUser(input: UpdateUserDto): Promise<UpdateUserResult>;
+
+    abstract getDonationChart(input: GetDonationChartDto): Promise<DonationChartResult>;
+
+    abstract getContributionChart(input: GetContributionChartDto): Promise<ContributionChartResult>;
 }
