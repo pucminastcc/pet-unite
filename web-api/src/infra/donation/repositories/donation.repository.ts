@@ -123,7 +123,7 @@ export class DonationRepository extends IDonationRepository {
 
     async getThirdDonations(dto: GetThirdDonationsDto): Promise<DonationResult[]> {
         let result: DonationResult[] = [];
-        const {petTypeId, petGenderId, state, currentDate, userId} = dto;
+        const {petTypeId, petGenderId, state, currentDate, userId, isInstitution} = dto;
 
         let filter = {
             userId: {$ne: userId},
@@ -137,7 +137,7 @@ export class DonationRepository extends IDonationRepository {
             const currentDate = new Date();
 
             let offsetDate = new Date();
-            offsetDate.setDate(offsetDate.getDate() - 7);
+            offsetDate.setDate(offsetDate.getDate() - 31);
 
             filter['createdAt'] = {
                 $gte: offsetDate.toISOString(),
@@ -152,34 +152,43 @@ export class DonationRepository extends IDonationRepository {
 
         if (donations) {
             for (let donation of donations) {
-                const pet = await this.petModel.findById(donation.petId).exec();
+                const pet = await this.petModel.findById(
+                    donation.petId
+                ).exec();
 
-                result.push({
-                    id: donation.id,
-                    userId: donation.userId,
-                    username: donation.username,
-                    petId: pet.id,
-                    petName: pet.name,
-                    petImg: pet.img,
-                    petGenderId: pet.petGenderId,
-                    petGender: petGenders.find(f => f.id == pet.petGenderId).description,
-                    petTypeId: pet.petTypeId,
-                    petType: petTypes.find(f => f.id == pet.petTypeId).description,
-                    petBreed: pet.breed,
-                    petAge: pet.age,
-                    rateTraining: pet.rateTraining,
-                    rateFriendly: pet.rateFriendly,
-                    rateLikesTours: pet.rateLikesTours,
-                    rateLikesChild: pet.rateLikesChild,
-                    state: donation.state,
-                    city: donation.city,
-                    lng: donation.lng,
-                    lat: donation.lat,
-                    date: donation.date,
-                    donated: donation.donated,
-                    signalDate: donation.signalDate,
-                    donatedToInstitution: donation.donatedToInstitution
-                });
+                const user = await this.userModel.find({
+                    _id: donation.userId}, {isInstitution: 1
+                }).exec();
+
+                if (isInstitution && user.find(f => true).isInstitution) {
+                } else {
+                    result.push({
+                        id: donation.id,
+                        userId: donation.userId,
+                        username: donation.username,
+                        petId: pet.id,
+                        petName: pet.name,
+                        petImg: pet.img,
+                        petGenderId: pet.petGenderId,
+                        petGender: petGenders.find(f => f.id == pet.petGenderId).description,
+                        petTypeId: pet.petTypeId,
+                        petType: petTypes.find(f => f.id == pet.petTypeId).description,
+                        petBreed: pet.breed,
+                        petAge: pet.age,
+                        rateTraining: pet.rateTraining,
+                        rateFriendly: pet.rateFriendly,
+                        rateLikesTours: pet.rateLikesTours,
+                        rateLikesChild: pet.rateLikesChild,
+                        state: donation.state,
+                        city: donation.city,
+                        lng: donation.lng,
+                        lat: donation.lat,
+                        date: donation.date,
+                        donated: donation.donated,
+                        signalDate: donation.signalDate,
+                        donatedToInstitution: donation.donatedToInstitution
+                    });
+                }
             }
         }
         return result;

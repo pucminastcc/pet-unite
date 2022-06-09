@@ -9,4 +9,4 @@ export const ReportSchema = new mongoose.Schema({
     subject: {type: String, required: true},
     description: {type: String, required: true},
     date: {type: String, required: true}
-}, {timestamps: false, collection: 'reports'});
+}, {timestamps: true, collection: 'reports'});

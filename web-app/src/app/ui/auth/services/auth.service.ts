@@ -37,6 +37,12 @@ import {LoginFacebookInput} from '../../../domain/auth/commands/inputs/login-fac
 import {LoginFacebookCommand} from '../../../domain/auth/commands/login-facebook.command';
 import {LoginGoogleInput} from '../../../domain/auth/commands/inputs/login-google.input';
 import {LoginGoogleCommand} from '../../../domain/auth/commands/login-google.command';
+import {GetDonationChartInput} from '../../../domain/auth/commands/inputs/get-donation-chart.input';
+import {DonationChartResult} from '../../../domain/auth/models/results/donation-chart.result';
+import {GetDonationChartCommand} from '../../../domain/auth/commands/get-donation-chart.command';
+import {GetContributionChartCommand} from '../../../domain/auth/commands/get-contribution-chart.command';
+import { GetContributionChartInput } from 'src/app/domain/auth/commands/inputs/get-contribution-chart.input';
+import { ContributionChartResult } from 'src/app/domain/auth/models/results/contribution-chart.result';
 
 @Injectable({
   providedIn: 'root'
@@ -59,6 +65,8 @@ export class AuthService implements IAuthRepository {
     private readonly getTokenCommand: GetTokenCommand,
     private readonly getUserCommand: GetUserCommand,
     private readonly updateUserCommand: UpdateUserCommand,
+    private readonly getDonationChartCommand: GetDonationChartCommand,
+    private readonly getContributionChartCommand: GetContributionChartCommand,
   ) {
     this.accessToken = this.getToken();
   }
@@ -116,6 +124,20 @@ export class AuthService implements IAuthRepository {
 
   updateUser(input: UpdateUserInput): Observable<UpdateUserResult> {
     return this.updateUserCommand.execute({
+      ...input,
+      accessToken: this.accessToken
+    });
+  }
+
+  getDonationChart(input?: GetDonationChartInput): Observable<DonationChartResult> {
+    return this.getDonationChartCommand.execute({
+      ...input,
+      accessToken: this.accessToken
+    });
+  }
+
+  getContributionChart(input?: GetContributionChartInput): Observable<ContributionChartResult> {
+    return this.getContributionChartCommand.execute({
       ...input,
       accessToken: this.accessToken
     });

@@ -2,6 +2,6 @@ export interface GetThirdDonationsInput {
   petTypeId?: string;
   petGenderId?: string;
   state?: string;
-  currentDate?: Date;
+  currentDate?: string;
   accessToken?: string;
 }

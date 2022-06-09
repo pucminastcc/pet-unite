@@ -1,15 +1,25 @@
 <div class="container-fluid">
   <div class="card">
     <div class="card-header card-header-danger">
-      <h5 class="card-title">Estatísticas</h5>
+      <h5 class="card-title">Estatísticas em {{currentYear}}</h5>
     </div>
     <div class="card-body animate__animated animate__fadeIn">
       <div class="row">
         <div class="col-12 col-md-6">
-          <p-chart type="line" [data]="basicData" [options]="basicOptions"></p-chart>
+          <div class="text-center">
+            <p-progressSpinner *ngIf="isLoadingDonationsData; else donationsChart;"></p-progressSpinner>
+          </div>
+          <ng-template #donationsChart>
+            <p-chart type="line" [data]="donationsChartData" [options]="basicOptions"></p-chart>
+          </ng-template>
         </div>
         <div class="col-12 col-md-6">
-          <p-chart type="line" [data]="basicData2" [options]="basicOptions"></p-chart>
+          <div class="text-center">
+            <p-progressSpinner *ngIf="isLoadingContributionsData; else contributionsChart;"></p-progressSpinner>
+          </div>
+          <ng-template #contributionsChart>
+            <p-chart type="line" [data]="contributionsChartData" [options]="basicOptions"></p-chart>
+          </ng-template>
         </div>
       </div>
     </div>

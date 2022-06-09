@@ -22,6 +22,10 @@ import {UpdateUserInput} from '../commands/inputs/update-user.input';
 import {UpdateUserResult} from '../models/results/update-user.result';
 import {GetUserInput} from '../commands/inputs/get-user.input';
 import {GetUserResult} from '../models/results/get-user.result';
+import {GetDonationChartInput} from '../commands/inputs/get-donation-chart.input';
+import {DonationChartResult} from '../models/results/donation-chart.result';
+import {GetContributionChartInput} from '../commands/inputs/get-contribution-chart.input';
+import {ContributionChartResult} from '../models/results/contribution-chart.result';
 
 export abstract class IAuthRepository {
   abstract login(input: LoginInput): Observable<LoginResult>;
@@ -49,4 +53,8 @@ export abstract class IAuthRepository {
   abstract getUser(input: GetUserInput): Observable<GetUserResult>;
 
   abstract updateUser(input: UpdateUserInput): Observable<UpdateUserResult>;
+
+  abstract getDonationChart(input: GetDonationChartInput): Observable<DonationChartResult>;
+
+  abstract getContributionChart(input: GetContributionChartInput): Observable<ContributionChartResult>;
 }

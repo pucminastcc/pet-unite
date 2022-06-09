@@ -176,7 +176,7 @@ export class DonationComponent implements OnInit, OnDestroy {
       state: currentDate ? this.user.state : state,
       petTypeId,
       petGenderId,
-      currentDate
+      currentDate: currentDate ? currentDate.toLocaleDateString() : ''
     })
       .pipe(
         finalize(() => {

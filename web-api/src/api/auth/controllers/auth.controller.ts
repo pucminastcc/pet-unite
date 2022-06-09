@@ -1,4 +1,18 @@
-import {Body, Controller, Get, HttpCode, HttpStatus, Patch, Post, Put, Query, Request, Res, UseGuards} from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Get,
+    HttpCode,
+    HttpStatus,
+    Patch,
+    Post,
+    Put,
+    Query,
+    Request,
+    Res,
+    UnauthorizedException,
+    UseGuards
+} from '@nestjs/common';
 import {AuthService} from '../services/auth.service';
 import {LoginResult} from '../../../domain/auth/models/results/login.result';
 import {RegisterDto} from '../../../domain/auth/dtos/register.dto';
@@ -20,6 +34,8 @@ import {ConfirmEmailResult} from '../../../domain/auth/models/results/email-conf
 import {GetUserResult} from '../../../domain/auth/models/results/get-user.result';
 import {ValidateFacebookUserDto} from '../../../domain/auth/dtos/validate-facebook-user.dto';
 import {ValidateGoogleUserDto} from '../../../domain/auth/dtos/validate-google-user.dto';
+import {DonationChartResult} from '../../../domain/auth/models/results/donation-chart.result';
+import {ContributionChartResult} from '../../../domain/auth/models/results/contribution-chart.result';
 
 @Controller('auth')
 export class AuthController {
@@ -125,6 +141,46 @@ export class AuthController {
         return await this.authService.updateUser({
             ...body,
             id: req.user.id
+        });
+    }
+
+    @Get('donationChart')
+    @HttpCode(HttpStatus.OK)
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @ApiTags('autenticação')
+    @ApiOperation({summary: 'Obter gráfico de doações e adoções'})
+    @ApiResponse({status: 200, description: 'Resposta padrão para solicitação HTTP bem-sucedida.'})
+    @ApiResponse({status: 400, description: 'A solicitação não pode ser atendida devido a sintaxe incorreta.'})
+    @ApiResponse({status: 401, description: 'A solicitação não foi aplicada porque não possui credenciais de autenticação válidas para o recurso de destino.'})
+    @ApiResponse({status: 500, description: 'Erro do Servidor Interno.'})
+    async getDonationChart(@Request() req): Promise<DonationChartResult> {
+        if (!req.user.isInstitution) {
+            throw new UnauthorizedException();
+        }
+        return await this.authService.getDonationChart({
+            userId: req.user.id,
+            currentYear: new Date().getFullYear()
+        });
+    }
+
+    @Get('contributionChart')
+    @HttpCode(HttpStatus.OK)
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @ApiTags('autenticação')
+    @ApiOperation({summary: 'Obter gráfico de contribuições'})
+    @ApiResponse({status: 200, description: 'Resposta padrão para solicitação HTTP bem-sucedida.'})
+    @ApiResponse({status: 400, description: 'A solicitação não pode ser atendida devido a sintaxe incorreta.'})
+    @ApiResponse({status: 401, description: 'A solicitação não foi aplicada porque não possui credenciais de autenticação válidas para o recurso de destino.'})
+    @ApiResponse({status: 500, description: 'Erro do Servidor Interno.'})
+    async getContributionChart(@Request() req): Promise<ContributionChartResult> {
+        if (!req.user.isInstitution) {
+            throw new UnauthorizedException();
+        }
+        return await this.authService.getContributionChart({
+            userId: req.user.id,
+            currentYear: new Date().getFullYear()
         });
     }
 }

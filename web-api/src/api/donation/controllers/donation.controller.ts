@@ -49,6 +49,7 @@ export class DonationController {
     async getThirdDonations(@Query() query: GetThirdDonationsDto, @Request() req): Promise<DonationResult[]> {
         return await this.donationService.getThirdDonations({
             userId: req.user.id,
+            isInstitution: req.user.isInstitution,
             ...query
         });
     }
