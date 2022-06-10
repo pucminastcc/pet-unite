@@ -7,18 +7,18 @@
       <div class="row">
         <div class="col-12 col-md-6">
           <div class="text-center">
-            <p-progressSpinner *ngIf="isLoadingDonationsData; else donationsChart;"></p-progressSpinner>
+            <p-progressSpinner *ngIf="isLoadingDonationData; else donationChart;"></p-progressSpinner>
           </div>
-          <ng-template #donationsChart>
-            <p-chart type="line" [data]="donationsChartData" [options]="basicOptions"></p-chart>
+          <ng-template #donationChart>
+            <p-chart type="line" [data]="donationChartData" [options]="basicOptions"></p-chart>
           </ng-template>
         </div>
         <div class="col-12 col-md-6">
           <div class="text-center">
-            <p-progressSpinner *ngIf="isLoadingContributionsData; else contributionsChart;"></p-progressSpinner>
+            <p-progressSpinner *ngIf="isLoadingContributionData; else contributionChart;"></p-progressSpinner>
           </div>
-          <ng-template #contributionsChart>
-            <p-chart type="line" [data]="contributionsChartData" [options]="basicOptions"></p-chart>
+          <ng-template #contributionChart>
+            <p-chart type="line" [data]="contributionChartData" [options]="basicOptions"></p-chart>
           </ng-template>
         </div>
       </div>

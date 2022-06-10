@@ -12,6 +12,10 @@ import {GetPermissionRequestsDto} from '../dtos/get-permission-requests.dto';
 import {ReplyPermissionRequestDto} from '../dtos/reply-permission-request.dto';
 import {ReplyPermissionRequestResult} from '../models/results/reply-permission-request.result';
 import {PermissionRequestBaseResult} from '../models/results/permission-request-base.result';
+import {GetDonationChartDto} from '../dtos/get-donation-chart.dto';
+import {DonationChartResult} from '../models/results/donation-chart.result';
+import {ContributionChartResult} from '../models/results/contribution-chart.result';
+import {GetContributionChartDto} from '../dtos/get-contribution-chart.dto';
 
 export abstract class IManagerRepository {
     abstract getUsers(input: GetUsersDto): Promise<UserBaseResult[]>
@@ -27,4 +31,8 @@ export abstract class IManagerRepository {
     abstract getPermissionRequests(input: GetPermissionRequestsDto): Promise<PermissionRequestBaseResult[]>
 
     abstract replyPermissionRequest(input: ReplyPermissionRequestDto): Promise<ReplyPermissionRequestResult>
+
+    abstract getDonationChart(input: GetDonationChartDto): Promise<DonationChartResult>
+
+    abstract getContributionChart(input: GetContributionChartDto): Promise<ContributionChartResult>
 }

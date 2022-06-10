@@ -23,6 +23,12 @@ import {GetPermissionRequestsCommand} from '../../../domain/manager/commands/get
 import {ReplyPermissionRequestInput} from '../../../domain/manager/commands/inputs/reply-permission-request.input';
 import {ReplyPermissionRequestResult} from '../../../domain/manager/models/results/reply-permission-request.result';
 import {ReplyPermissionRequestCommand} from '../../../domain/manager/commands/reply-permission-request.command';
+import {GetDonationChartInput} from '../../../domain/manager/commands/inputs/get-donation-chart.input';
+import {DonationChartResult} from '../../../domain/manager/models/results/donation-chart.result';
+import {ContributionChartResult} from '../../../domain/manager/models/results/contribution-chart.result';
+import {GetContributionChartInput} from '../../../domain/manager/commands/inputs/get-contribution-chart.input';
+import {GetDonationChartCommand} from '../../../domain/manager/commands/get-donation-chart.command';
+import {GetContributionChartCommand} from '../../../domain/manager/commands/get-contribution-chart.command';
 
 @Injectable({
   providedIn: 'root'
@@ -39,6 +45,8 @@ export class ManagerService implements IManagerRepository {
     private readonly getReportCommand: GetReportCommand,
     private readonly getPermissionRequestsCommand: GetPermissionRequestsCommand,
     private readonly replyPermissionRequestCommand: ReplyPermissionRequestCommand,
+    private readonly getDonationChartCommand: GetDonationChartCommand,
+    private readonly getContributionChartCommand: GetContributionChartCommand,
   ) {
     this.accessToken = this.authService.getToken();
   }
@@ -87,6 +95,20 @@ export class ManagerService implements IManagerRepository {
 
   replyPermissionRequest(input: ReplyPermissionRequestInput): Observable<ReplyPermissionRequestResult> {
     return this.replyPermissionRequestCommand.execute({
+      ...input,
+      accessToken: this.accessToken
+    });
+  }
+
+  getDonationChart(input?: GetDonationChartInput): Observable<DonationChartResult> {
+    return this.getDonationChartCommand.execute({
+      ...input,
+      accessToken: this.accessToken
+    });
+  }
+
+  getContributionChart(input?: GetContributionChartInput): Observable<ContributionChartResult> {
+    return this.getContributionChartCommand.execute({
       ...input,
       accessToken: this.accessToken
     });

@@ -4,7 +4,6 @@ import {GetUsersInput} from '../../../domain/manager/commands/inputs/get-users.i
 import {UserBaseResult} from '../../../domain/manager/models/results/user-base.result';
 import {ApiDatasource} from '../../datasources/api.datasource';
 import {Injectable} from '@angular/core';
-import {GetUserResult} from '../../../domain/auth/models/results/get-user.result';
 import {environment} from '../../../../environments/environment';
 import {map} from 'rxjs/operators';
 import {DeleteUserInput} from '../../../domain/manager/commands/inputs/delete-user.input';
@@ -17,8 +16,12 @@ import {GetReportInput} from '../../../domain/manager/commands/inputs/get-report
 import {ReportResult} from '../../../domain/manager/models/results/report.result';
 import {GetPermissionRequestsInput} from '../../../domain/manager/commands/inputs/get-permission-requests.input';
 import {PermissionRequestBaseResult} from '../../../domain/manager/models/results/permission-request-base.result';
-import { ReplyPermissionRequestInput } from 'src/app/domain/manager/commands/inputs/reply-permission-request.input';
-import { ReplyPermissionRequestResult } from 'src/app/domain/manager/models/results/reply-permission-request.result';
+import {ReplyPermissionRequestInput} from 'src/app/domain/manager/commands/inputs/reply-permission-request.input';
+import {ReplyPermissionRequestResult} from 'src/app/domain/manager/models/results/reply-permission-request.result';
+import {GetContributionChartInput} from '../../../domain/manager/commands/inputs/get-contribution-chart.input';
+import {GetDonationChartInput} from '../../../domain/manager/commands/inputs/get-donation-chart.input';
+import {DonationChartResult} from 'src/app/domain/auth/models/results/donation-chart.result';
+import {ContributionChartResult} from '../../../domain/manager/models/results/contribution-chart.result';
 
 @Injectable({
   providedIn: 'root'
@@ -83,6 +86,22 @@ export class ManagerRepository extends IManagerRepository {
     const {accessToken} = input;
     return this.api.put<ReplyPermissionRequestResult>(`${environment.apiUrl}/manager/requests`, input, accessToken)
       .pipe(map((result: ReplyPermissionRequestResult) => {
+        return result;
+      }));
+  }
+
+  getDonationChart(input: GetDonationChartInput): Observable<DonationChartResult> {
+    const {accessToken} = input;
+    return this.api.get<DonationChartResult>(`${environment.apiUrl}/manager/donationChart`, accessToken)
+      .pipe(map((result: DonationChartResult) => {
+        return result;
+      }));
+  }
+
+  getContributionChart(input: GetContributionChartInput): Observable<ContributionChartResult> {
+    const {accessToken} = input;
+    return this.api.get<ContributionChartResult>(`${environment.apiUrl}/manager/contributionChart`, accessToken)
+      .pipe(map((result: ContributionChartResult) => {
         return result;
       }));
   }

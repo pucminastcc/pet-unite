@@ -16,6 +16,10 @@ import {GetPermissionRequestsDto} from '../../../domain/manager/dtos/get-permiss
 import {ReplyPermissionRequestDto} from '../../../domain/manager/dtos/reply-permission-request.dto';
 import {ReplyPermissionRequestResult} from '../../../domain/manager/models/results/reply-permission-request.result';
 import {PermissionRequestBaseResult} from '../../../domain/manager/models/results/permission-request-base.result';
+import {GetDonationChartDto} from '../../../domain/manager/dtos/get-donation-chart.dto';
+import {GetContributionChartDto} from '../../../domain/manager/dtos/get-contribution-chart.dto';
+import {ContributionChartResult} from '../../../domain/manager/models/results/contribution-chart.result';
+import {DonationChartResult} from '../../../domain/manager/models/results/donation-chart.result';
 
 @Controller('manager')
 export class ManagerController {
@@ -156,5 +160,49 @@ export class ManagerController {
             throw new UnauthorizedException();
         }
         return await this.managerService.replyPermissionRequest(body);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('donationChart')
+    @ApiTags('gerenciador')
+    @ApiBearerAuth()
+    @ApiOperation({summary: 'Obter gráficos de doações e adoções do sistema'})
+    @ApiResponse({status: 200, description: 'Resposta padrão para solicitação HTTP bem-sucedida.'})
+    @ApiResponse({status: 400, description: 'A solicitação não pode ser atendida devido a sintaxe incorreta.'})
+    @ApiResponse({
+        status: 401,
+        description: 'A solicitação não foi aplicada porque não possui credenciais de autenticação válidas para o recurso de destino'
+    })
+    @ApiResponse({status: 500, description: 'Erro do Servidor Interno.'})
+    async getDonationChart(@Query() query: GetDonationChartDto, @Request() req): Promise<DonationChartResult> {
+        if (!req.user.isSuperUser) {
+            throw new UnauthorizedException();
+        }
+        return await this.managerService.getDonationChart({
+            userId: req.user.id,
+            currentYear: new Date().getFullYear()
+        });
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('contributionChart')
+    @ApiTags('gerenciador')
+    @ApiBearerAuth()
+    @ApiOperation({summary: 'Obter gráficos de contribuições do sistema'})
+    @ApiResponse({status: 200, description: 'Resposta padrão para solicitação HTTP bem-sucedida.'})
+    @ApiResponse({status: 400, description: 'A solicitação não pode ser atendida devido a sintaxe incorreta.'})
+    @ApiResponse({
+        status: 401,
+        description: 'A solicitação não foi aplicada porque não possui credenciais de autenticação válidas para o recurso de destino'
+    })
+    @ApiResponse({status: 500, description: 'Erro do Servidor Interno.'})
+    async getContributionChart(@Query() query: GetContributionChartDto, @Request() req): Promise<ContributionChartResult> {
+        if (!req.user.isSuperUser) {
+            throw new UnauthorizedException();
+        }
+        return await this.managerService.getContributionChart({
+            userId: req.user.id,
+            currentYear: new Date().getFullYear()
+        });
     }
 }

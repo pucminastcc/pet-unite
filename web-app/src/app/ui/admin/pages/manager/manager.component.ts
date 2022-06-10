@@ -19,6 +19,8 @@ import {ReplyPermissionRequestResult} from '../../../../domain/manager/models/re
 import {FormControl} from '@angular/forms';
 import {ConfigService} from '../../../shared/services/config.service';
 import {StateResult} from '../../../../domain/shared/services/models/results/state.result';
+import {DonationChartResult} from '../../../../domain/auth/models/results/donation-chart.result';
+import {ContributionChartResult} from '../../../../domain/auth/models/results/contribution-chart.result';
 
 enum TabViewIndex {
   Users = 0,
@@ -44,9 +46,6 @@ interface FormFilter {
   styleUrls: ['./manager.component.scss']
 })
 export class ManagerComponent implements OnInit, OnDestroy {
-  public basicOptions: any;
-  public basicData: any;
-  public basicData2: any;
 
   private authSubscription: Subscription | undefined;
   private getUsersSubscription: Subscription | undefined;
@@ -55,6 +54,8 @@ export class ManagerComponent implements OnInit, OnDestroy {
   private getChartsSubscription: Subscription | undefined;
   private deleteUserSubscription: Subscription | undefined;
   private replyPermissionRequestSubscription: Subscription | undefined;
+  private getDonationChartSubscription: Subscription;
+  private getContributionChartSubscription: Subscription;
   private logoutSubscription: Subscription | undefined;
 
   public tabViewIndex = TabViewIndex;
@@ -71,6 +72,29 @@ export class ManagerComponent implements OnInit, OnDestroy {
 
   public isLoading: boolean = false;
   public activeIndex: number = 0;
+
+  public isLoadingDonationData: boolean = false;
+  public isLoadingContributionData: boolean = false;
+
+  public currentYear: number = new Date().getFullYear();
+  private labels: string[] = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+
+  private donationData: number[] = [];
+  private adoptionData: number[] = [];
+  private contributionData: number[] = [];
+
+  public donationChartData: any;
+  public contributionChartData: any;
+  public basicOptions: any = {
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          precision: 0,
+        }
+      }
+    }
+  };
 
   private exportColumns: { dataKey: string; title: string }[] = [];
 
@@ -198,33 +222,86 @@ export class ManagerComponent implements OnInit, OnDestroy {
       });
   }
 
-  private getCharts(): void {
-    this.basicData = {
-      labels: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho'],
+  private getDonationChart(): void {
+    this.isLoadingDonationData = true;
+    this.getDonationChartSubscription = this.managerService.getDonationChart()
+      .pipe(
+        finalize(() => {
+          this.isLoadingDonationData = false;
+        })
+      )
+      .subscribe((result: DonationChartResult) => {
+        if (result) {
+          this.labels.forEach((label: string) => {
+            const donation = result.donations.find((donation: { count: number, month: string }) => donation.month === label);
+            this.donationData.push(donation ? donation.count : 0);
+
+            const adoption = result.adoptions.find((adoption: { count: number, month: string }) => adoption.month === label);
+            this.adoptionData.push(adoption ? adoption.count : 0);
+          });
+
+          this.updateDonationChartData();
+        }
+      }, (error) => {
+        if (error.status === 401) {
+          this.logout();
+        }
+      });
+  }
+
+  private updateDonationChartData(): void {
+    this.donationChartData = {
+      labels: this.labels,
       datasets: [
         {
           label: 'Doações',
-          data: [3, 0, 2, 1, 0, 0, 2],
+          data: this.donationData,
           fill: false,
           borderColor: '#42A5F5',
           tension: .4
         },
         {
           label: 'Adoções',
-          data: [4, 2, 0, 3, 1, 1, 0],
+          data: this.adoptionData,
           fill: false,
           borderColor: '#FFA726',
           tension: .4
         }
       ]
     };
+  }
 
-    this.basicData2 = {
-      labels: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho'],
+  private getContributionChart(): void {
+    this.isLoadingContributionData = true;
+    this.getContributionChartSubscription = this.managerService.getContributionChart()
+      .pipe(
+        finalize(() => {
+          this.isLoadingContributionData = false;
+        })
+      )
+      .subscribe((result: ContributionChartResult) => {
+        if (result) {
+          this.labels.forEach((label: string) => {
+            const contribution = result.contributions.find((contribution: { count: number, month: string }) => contribution.month === label);
+            this.contributionData.push(contribution ? contribution.count : 0);
+          });
+
+          this.updateContributionChartData();
+        }
+      }, (error) => {
+        if (error.status === 401) {
+          this.logout();
+        }
+      });
+  }
+
+  private updateContributionChartData(): void {
+    this.contributionChartData = {
+      labels: this.labels,
       datasets: [
         {
           label: 'Contribuições',
-          data: [7, 2, 2, 4, 1, 1, 2],
+          data: this.contributionData,
           fill: true,
           borderColor: '#42A5F5',
           tension: .4
@@ -260,10 +337,13 @@ export class ManagerComponent implements OnInit, OnDestroy {
     })
       .subscribe((result: ReplyPermissionRequestResult) => {
         if (result) {
-          if (result.success) {
-            const toDelete = new Set([id]);
-            this.permissionRequests = this.permissionRequests.filter(obj => !toDelete.has(obj.id));
-          }
+          const toDelete = new Set([id]);
+          this.permissionRequests = this.permissionRequests.filter(obj => !toDelete.has(obj.id));
+
+          this.messageService.add({
+            severity: confirm ? 'success' : 'warn',
+            detail: result.message,
+          });
         }
       }, (error) => {
         error.status === 401 ?
@@ -288,6 +368,8 @@ export class ManagerComponent implements OnInit, OnDestroy {
     if (this.deleteUserSubscription) this.deleteUserSubscription.unsubscribe();
     if (this.replyPermissionRequestSubscription) this.replyPermissionRequestSubscription.unsubscribe();
     if (this.logoutSubscription) this.logoutSubscription.unsubscribe();
+    if (this.getDonationChartSubscription) this.getDonationChartSubscription.unsubscribe();
+    if (this.getContributionChartSubscription) this.getContributionChartSubscription.unsubscribe();
   }
 
   public handleChange(e): void {
@@ -307,7 +389,8 @@ export class ManagerComponent implements OnInit, OnDestroy {
         return;
 
       case TabViewIndex.Charts:
-        this.getCharts();
+        this.getDonationChart();
+        this.getContributionChart();
         return;
     }
   }

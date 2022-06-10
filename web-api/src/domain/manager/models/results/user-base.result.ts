@@ -4,6 +4,7 @@ export interface UserBaseResult {
     username: string;
     email: string;
     isSuperUser: boolean;
+    isInstitution: boolean;
     provider: string;
     blocked: boolean;
 }

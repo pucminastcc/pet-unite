@@ -19,12 +19,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
   public currentYear: number = new Date().getFullYear();
   private labels: string[] = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
-  private donationsData: number[] = [];
-  private adoptionsData: number[] = [];
-  private contributionsData: number[] = [];
+  private donationData: number[] = [];
+  private adoptionData: number[] = [];
+  private contributionData: number[] = [];
 
-  public donationsChartData: any;
-  public contributionsChartData: any;
+  public donationChartData: any;
+  public contributionChartData: any;
   public basicOptions: any = {
     scales: {
       y: {
@@ -36,8 +36,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   };
 
-  public isLoadingDonationsData: boolean = false;
-  public isLoadingContributionsData: boolean = false;
+  public isLoadingDonationData: boolean = false;
+  public isLoadingContributionData: boolean = false;
 
   constructor(
       private readonly authService: AuthService
@@ -45,29 +45,29 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.getDonationsChartData();
-    this.getContributionsChartData();
+    this.getDonationChart();
+    this.getContributionChart();
   }
 
-  private getDonationsChartData(): void {
-    this.isLoadingDonationsData  = true;
+  private getDonationChart(): void {
+    this.isLoadingDonationData  = true;
     this.getDonationChartSubscription = this.authService.getDonationChart()
         .pipe(
             finalize(() => {
-              this.isLoadingDonationsData = false;
+              this.isLoadingDonationData = false;
             })
         )
         .subscribe((result: DonationChartResult) => {
           if (result) {
             this.labels.forEach((label: string) => {
               const donation = result.donations.find((donation: {count: number, month: string}) => donation.month === label);
-              this.donationsData.push(donation ? donation.count : 0);
+              this.donationData.push(donation ? donation.count : 0);
 
               const adoption = result.adoptions.find((adoption: {count: number, month: string}) => adoption.month === label);
-              this.adoptionsData.push(adoption ? adoption.count : 0);
+              this.adoptionData.push(adoption ? adoption.count : 0);
             });
 
-            this.updateDonationsChartData();
+            this.updateDonationChartData();
           }
         }, (error) => {
           if (error.status === 401) {
@@ -76,23 +76,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
         });
   }
 
-  private getContributionsChartData(): void {
-    this.isLoadingContributionsData = true;
+  private getContributionChart(): void {
+    this.isLoadingContributionData = true;
     this.getContributionChartSubscription = this.authService.getContributionChart()
         .pipe(
             finalize(() => {
-              this.isLoadingContributionsData = false;
+              this.isLoadingContributionData = false;
             })
         )
         .subscribe((result: ContributionChartResult) => {
           if (result) {
-            console.log(result);
             this.labels.forEach((label: string) => {
               const contribution = result.contributions.find((contribution: {count: number, month: string}) => contribution.month === label);
-              this.contributionsData.push(contribution ? contribution.count : 0);
+              this.contributionData.push(contribution ? contribution.count : 0);
             });
 
-            this.updateContributionsChartData();
+            this.updateContributionChartData();
           }
         }, (error) => {
           if (error.status === 401) {
@@ -124,20 +123,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
         });
   }
 
-  private updateDonationsChartData(): void {
-    this.donationsChartData = {
+  private updateDonationChartData(): void {
+    this.donationChartData = {
       labels: this.labels,
       datasets: [
         {
           label: 'Doações',
-          data: this.donationsData,
+          data: this.donationData,
           fill: false,
           borderColor: '#42A5F5',
           tension: .4
         },
         {
           label: 'Adoções',
-          data: this.adoptionsData,
+          data: this.adoptionData,
           fill: false,
           borderColor: '#FFA726',
           tension: .4
@@ -146,13 +145,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
     };
   }
 
-  private updateContributionsChartData(): void {
-    this.contributionsChartData = {
+  private updateContributionChartData(): void {
+    this.contributionChartData = {
       labels: this.labels,
       datasets: [
         {
           label: 'Contribuições',
-          data: this.contributionsData,
+          data: this.contributionData,
           fill: true,
           borderColor: '#42A5F5',
           tension: .4
