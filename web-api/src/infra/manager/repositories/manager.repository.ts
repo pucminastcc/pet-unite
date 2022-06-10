@@ -206,13 +206,13 @@ export class ManagerRepository extends IManagerRepository {
                 result = {success: true, message: ReplyPermissionRequestMessage.Decline};
             }
 
-            // await this.userModel.findOneAndUpdate({
-            //     _id: permissionRequest.userId
-            // }, update).exec();
-            //
-            // await this.permissionRequestModel.deleteOne({
-            //     _id: permissionRequest.id
-            // }).exec();
+            await this.userModel.findOneAndUpdate({
+                _id: permissionRequest.userId
+            }, update).exec();
+
+            await this.permissionRequestModel.deleteOne({
+                _id: permissionRequest.id
+            }).exec();
         }
         return result;
     }
