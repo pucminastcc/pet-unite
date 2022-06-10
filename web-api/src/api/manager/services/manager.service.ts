@@ -15,6 +15,10 @@ import {GetPermissionRequestsDto} from '../../../domain/manager/dtos/get-permiss
 import {ReplyPermissionRequestDto} from '../../../domain/manager/dtos/reply-permission-request.dto';
 import {ReplyPermissionRequestResult} from '../../../domain/manager/models/results/reply-permission-request.result';
 import {PermissionRequestBaseResult} from '../../../domain/manager/models/results/permission-request-base.result';
+import { GetDonationChartDto } from 'src/domain/manager/dtos/get-donation-chart.dto';
+import {DonationChartResult} from '../../../domain/manager/models/results/donation-chart.result';
+import {ContributionChartResult} from '../../../domain/manager/models/results/contribution-chart.result';
+import {GetContributionChartDto} from '../../../domain/manager/dtos/get-contribution-chart.dto';
 
 @Injectable()
 export class ManagerService implements IManagerRepository {
@@ -49,5 +53,13 @@ export class ManagerService implements IManagerRepository {
 
     async replyPermissionRequest(input: ReplyPermissionRequestDto): Promise<ReplyPermissionRequestResult> {
         return await this.repository.replyPermissionRequest(input);
+    }
+
+    async getDonationChart(input: GetDonationChartDto): Promise<DonationChartResult> {
+        return await this.repository.getDonationChart(input);
+    }
+
+    async getContributionChart(input: GetContributionChartDto): Promise<ContributionChartResult> {
+        return await this.repository.getContributionChart(input);
     }
 }

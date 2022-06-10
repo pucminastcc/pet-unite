@@ -62,7 +62,7 @@
                 </div>
               </form>
               <div class="text-center">
-                <p-progressSpinner *ngIf="isLoading"></p-progressSpinner>
+                <p-progressSpinner *ngIf="isLoading && activeIndex !== tabViewIndex.Charts"></p-progressSpinner>
               </div>
               <p-tabPanel header="Usuários">
                 <p-table #dt *ngIf="!isLoading"
@@ -230,15 +230,25 @@
                   </ng-template>
                 </p-table>
               </p-tabPanel>
-              <p-tabPanel header="Estatísticas">
+              <p-tabPanel header="Estatísticas {{currentYear}}">
                 <div class="card">
                   <div class="card-body animate__animated animate__fadeIn">
                     <div class="row">
                       <div class="col-12 col-md-6">
-                        <p-chart type="line" [data]="basicData" [options]="basicOptions"></p-chart>
+                        <div class="text-center">
+                          <p-progressSpinner *ngIf="isLoadingDonationData; else donationChart;"></p-progressSpinner>
+                        </div>
+                        <ng-template #donationChart>
+                          <p-chart type="line" [data]="donationChartData" [options]="basicOptions"></p-chart>
+                        </ng-template>
                       </div>
                       <div class="col-12 col-md-6">
-                        <p-chart type="line" [data]="basicData2" [options]="basicOptions"></p-chart>
+                        <div class="text-center">
+                          <p-progressSpinner *ngIf="isLoadingContributionData; else contributionChart;"></p-progressSpinner>
+                        </div>
+                        <ng-template #contributionChart>
+                          <p-chart type="line" [data]="contributionChartData" [options]="basicOptions"></p-chart>
+                        </ng-template>
                       </div>
                     </div>
                   </div>

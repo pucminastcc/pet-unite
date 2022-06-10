@@ -13,6 +13,10 @@ import {PermissionRequestBaseResult} from '../models/results/permission-request-
 import {GetPermissionRequestsInput} from '../commands/inputs/get-permission-requests.input';
 import {ReplyPermissionRequestInput} from '../commands/inputs/reply-permission-request.input';
 import {ReplyPermissionRequestResult} from '../models/results/reply-permission-request.result';
+import {GetDonationChartInput} from '../commands/inputs/get-donation-chart.input';
+import {GetContributionChartInput} from '../commands/inputs/get-contribution-chart.input';
+import {ContributionChartResult} from '../models/results/contribution-chart.result';
+import {DonationChartResult} from '../models/results/donation-chart.result';
 
 export abstract class IManagerRepository {
   abstract getUsers(input?: GetUsersInput): Observable<UserBaseResult[]>;
@@ -22,4 +26,6 @@ export abstract class IManagerRepository {
   abstract getReport(input: GetReportInput): Observable<ReportResult>;
   abstract getPermissionRequests(input: GetPermissionRequestsInput): Observable<PermissionRequestBaseResult[]>;
   abstract replyPermissionRequest(input: ReplyPermissionRequestInput): Observable<ReplyPermissionRequestResult>;
+  abstract getDonationChart(input: GetDonationChartInput): Observable<DonationChartResult>;
+  abstract getContributionChart(input: GetContributionChartInput): Observable<ContributionChartResult>;
 }
